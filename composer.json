@@ -1,9 +1,10 @@
 {
-    "name": "keboola/my-component",
-    "description": "MyComponent description",
+    "name": "keboola/app-transformation-pattern-scd",
+    "description": "Generate code for SCD type 2 or 4 on any input dataset.",
     "license": "MIT",
     "require": {
         "php": "^7.4",
+        "jdorn/sql-formatter": "^1.2",
         "keboola/php-component": "^8.1"
     },
     "require-dev": {
@@ -17,13 +18,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MyComponent\\": "src/"
+            "Keboola\\TransformationPatternScd\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MyComponent\\Tests\\": "tests/phpunit/",
-            "MyComponent\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\TransformationPatternScd\\Tests\\": "tests/phpunit/",
+            "Keboola\\TransformationPatternScd\\FunctionalTests\\": "tests/functional/"
         }
     },
     "scripts": {
