@@ -15,7 +15,12 @@ class Config extends BaseConfig
 
     public function getMonitoredParameters(): array
     {
-        return $this->getValue(['parameters', 'monitored_parameters']);
+        $monitoredParameters = $this->getValue(['parameters', 'monitored_parameters']);
+        $monitoredParameters = array_map(function ($v) {
+            return trim($v);
+        }, explode(',', $monitoredParameters));
+
+        return $monitoredParameters;
     }
 
     public function getPrimaryKey(): array

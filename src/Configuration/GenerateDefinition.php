@@ -35,15 +35,11 @@ class GenerateDefinition extends BaseConfigDefinition
                         ->cannotBeEmpty()
                     ->end()
                 ->end()
-                ->arrayNode('monitored_parameters')
-                    ->prototype('scalar')
-                        ->cannotBeEmpty()
-                    ->end()
-                ->end()
+                ->scalarNode('monitored_parameters')->end()
                 ->booleanNode('deleted_flag')->defaultFalse()->end()
                 ->booleanNode('use_datetime')->defaultFalse()->end()
                 ->booleanNode('keep_del_active')->defaultFalse()->end()
-                ->scalarNode('timezone')->end()
+                ->scalarNode('timezone')->isRequired()->cannotBeEmpty()->end()
             ->end()
         ;
         // @formatter:on

@@ -3,7 +3,7 @@
   "parameters": {
     "scd_type": "scd4",
     "primaryKey": ["zipcode"],
-    "monitored_parameters": ["usergender", "usercity"],
+    "monitored_parameters": "usergender, usercity",
     "timezone": "Europe/Prague",
     "deleted_flag": false,
     "use_datetime": false,
