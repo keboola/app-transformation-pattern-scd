@@ -25,7 +25,12 @@ class Config extends BaseConfig
 
     public function getPrimaryKey(): array
     {
-        return $this->getValue(['parameters', 'primaryKey']);
+        $primaryKeys = $this->getValue(['parameters', 'primary_key']);
+        $primaryKeys = array_map(function ($v) {
+            return trim($v);
+        }, explode(',', $primaryKeys));
+
+        return $primaryKeys;
     }
 
     public function hasDeletedFlag(): bool

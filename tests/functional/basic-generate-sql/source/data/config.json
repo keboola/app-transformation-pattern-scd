@@ -2,7 +2,7 @@
   "action": "generate",
   "parameters": {
     "scd_type": "scd4",
-    "primaryKey": ["zipcode"],
+    "primary_key": "zipcode",
     "monitored_parameters": "usergender, usercity",
     "timezone": "Europe/Prague",
     "deleted_flag": false,
