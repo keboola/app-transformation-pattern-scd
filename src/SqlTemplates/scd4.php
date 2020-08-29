@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 return <<< SQL
 
-SET CURR_DATE =  (SELECT CONVERT_TIMEZONE('Europe/Prague', current_timestamp()))::DATE;
-SET CURR_TIMESTAMP =  (SELECT CONVERT_TIMEZONE('Europe/Prague', current_timestamp())::TIMESTAMP_NTZ);
+SET CURR_DATE =  (SELECT CONVERT_TIMEZONE('\${timezone}', current_timestamp()))::DATE;
+SET CURR_TIMESTAMP =  (SELECT CONVERT_TIMEZONE('\${timezone}', current_timestamp())::TIMESTAMP_NTZ);
 SET CURR_DATE_TXT =  (SELECT TO_CHAR(\$CURR_DATE, 'YYYY-MM-DD'));
 SET CURR_TIMESTAMP_TXT =  (SELECT TO_CHAR(\$CURR_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
 
