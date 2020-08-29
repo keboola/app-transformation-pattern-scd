@@ -1,0 +1,12 @@
+{
+  "action": "generate",
+  "parameters": {
+    "scd_type": "scd4",
+    "primary_key": "zipcode",
+    "monitored_parameters": "usergender, usercity",
+    "timezone": "Europe/Prague",
+    "deleted_flag": true,
+    "use_datetime": false,
+    "keep_del_active": false
+  }
+}
