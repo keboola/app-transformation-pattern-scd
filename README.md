@@ -15,7 +15,7 @@
 - timezone: string (required)
 
 ## SCD type
-Type of the snapshot generated snapshot / slowly changing dimension.
+Type of the slowly changing dimension.
 
 ### SCD type 2
 This is a most common type of slowly changing dimension. It produces a row whenever some of the monitored attributes is changed. For more information about type 2 [see here](https://en.wikipedia.org/wiki/Slowly_changing_dimension#Type_2:_add_new_row).
