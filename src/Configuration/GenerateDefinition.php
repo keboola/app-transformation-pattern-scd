@@ -30,8 +30,8 @@ class GenerateDefinition extends BaseConfigDefinition
                         ]
                     )
                 ->end()
-                ->scalarNode('primary_key')->isRequired()->end()
-                ->scalarNode('monitored_parameters')->end()
+                ->scalarNode('primary_key')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('monitored_parameters')->isRequired()->cannotBeEmpty()->end()
                 ->booleanNode('deleted_flag')->defaultFalse()->end()
                 ->booleanNode('use_datetime')->defaultFalse()->end()
                 ->booleanNode('keep_del_active')->defaultFalse()->end()
