@@ -54,9 +54,7 @@ class InputMapping
      * In input mapping are expected two tables with destination:
      * "in_table", and "curr_snapshot", all others are ignored.
      *
-     * If only one table is present, it is taken as the "in_table" and the "curr_snapshot" table is added.
-     *
-     * If there is no table in the input mapping, then an exception is thrown.
+     * If only one table is present, it is taken as the "in_table", and destination is modified.
      */
     private function parseInputMapping(): void
     {

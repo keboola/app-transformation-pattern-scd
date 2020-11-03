@@ -11,7 +11,7 @@ return <<< SQL
 
     CREATE OR REPLACE TABLE "changed_records_snapshot" AS
     WITH
-        "diff_records" AS (
+        diff_records AS (
             SELECT
                 \${input_table_cols_w_alias}
             FROM "in_table" input
@@ -29,7 +29,7 @@ return <<< SQL
       , '9999-12-31 00:00:00' AS "end_date"
       , 1                     AS "actual"
       , 0 AS "is_deleted"
-    FROM "diff_records";
+    FROM diff_records;
 
     CREATE OR REPLACE TABLE "deleted_records_snapshot" AS
     SELECT
