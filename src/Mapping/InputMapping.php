@@ -142,9 +142,8 @@ class InputMapping
 
     private function setSnapshotTableFilter(array &$data): void
     {
-        $data['whereColumn'] = 'actual';
-        $data['whereValues'] = ['1'];
-        $data['whereOperator'] = 'eq';
+        $data['where_column'] = 'actual';
+        $data['where_values'] = ['1'];
     }
 
     private function createTable(array $data): Table
