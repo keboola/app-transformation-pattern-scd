@@ -6,14 +6,17 @@ namespace Keboola\TransformationPatternScd\Mapping;
 
 use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\Config;
+use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class InputMapping
 {
     public const SOURCE_TABLE_DESTINATION = 'in_table';
     public const SNAPSHOT_TABLE_DESTINATION = 'curr_snapshot';
-    public const SNAPSHOT_TABLE_SOURCE_PREFIX = 'curr_snapshot_';
+    public const SNAPSHOT_TABLE_SOURCE = 'curr_snapshot';
 
     private Config $config;
+
+    private TableIdGenerator $tableIdGenerator;
 
     private Table $sourceTable;
 
@@ -64,43 +67,37 @@ class InputMapping
             throw new UserException('Please specify one input table in the input mapping.');
         }
 
-        // One table in input mapping -> it is source table, we rewrite the destination
         if (count($imTables) === 1) {
+            // One table in input mapping -> it is source table, we rewrite the destination
             $data = $imTables[0];
             $data['destination'] = self::SOURCE_TABLE_DESTINATION;
             $this->sourceTable = $this->createTable($data);
-            $this->generateSnapshotTable();
-            return;
+        } else {
+            // Multiple tables in input mapping, we need to find source table by "destination" = "in_table"
+            $this->sourceTable = $this->findSnapshotTable($imTables);
         }
 
-        // Multiple tables in input mapping, we need to find source table by "destination" = "in_table"
-        $sourceTableFound = false;
-        $snapshotTableFound = false;
+        // Create table id generator from source table
+        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($this->config, $this->sourceTable);
+
+        // Generate snapshot table
+        $this->generateSnapshotTable();
+    }
+
+    private function findSnapshotTable(array $imTables): Table
+    {
+        $sourceTable = null;
         foreach ($imTables as $data) {
             switch ($data['destination'] ?? null) {
                 // Found destination table
                 case self::SOURCE_TABLE_DESTINATION:
-                    if ($sourceTableFound === true) {
+                    if ($sourceTable) {
                         throw new UserException(sprintf(
                             'Found multiple tables with "destination" = "%s" in input mapping, but only one allowed.',
                             self::SOURCE_TABLE_DESTINATION
                         ));
                     }
-                    $sourceTableFound = true;
-                    $this->sourceTable = $this->createTable($data);
-                    break;
-
-                // Found snapshot table
-                case self::SNAPSHOT_TABLE_DESTINATION:
-                    if ($snapshotTableFound === true) {
-                        throw new UserException(sprintf(
-                            'Found multiple tables with "destination" = "%s" in input mapping, but only one allowed.',
-                            self::SNAPSHOT_TABLE_DESTINATION
-                        ));
-                    }
-                    $snapshotTableFound = true;
-                    $this->setSnapshotTableFilter($data);
-                    $this->snapshotTable = $this->createTable($data);
+                    $sourceTable = $this->createTable($data);
                     break;
 
                 default:
@@ -110,7 +107,7 @@ class InputMapping
         }
 
         // No source table found -> error
-        if ($sourceTableFound === false) {
+        if (!$sourceTable) {
             throw new UserException(sprintf(
                 'Found "%d" tables in input mapping, but no source table with "destination" = "%s". ' .
                 'Please set the source table in the input mapping.',
@@ -119,31 +116,18 @@ class InputMapping
             ));
         }
 
-        // No snapshot table found -> generate default
-        if ($snapshotTableFound === false) {
-            $this->generateSnapshotTable();
-        }
+        return $sourceTable;
     }
 
     private function generateSnapshotTable(): void
     {
         $data = [
-            'source' => sprintf(
-                '%s.%s%s',
-                $this->getSourceTable()->getBuckedId(),
-                self::SNAPSHOT_TABLE_SOURCE_PREFIX,
-                $this->getSourceTable()->getTableName()
-            ),
+            'source' => $this->tableIdGenerator->generate(self::SNAPSHOT_TABLE_SOURCE),
             'destination' => self::SNAPSHOT_TABLE_DESTINATION,
+            'where_column' => 'actual',
+            'where_values' => ['1'],
         ];
-        $this->setSnapshotTableFilter($data);
         $this->snapshotTable = $this->createTable($data);
-    }
-
-    private function setSnapshotTableFilter(array &$data): void
-    {
-        $data['where_column'] = 'actual';
-        $data['where_values'] = ['1'];
     }
 
     private function createTable(array $data): Table

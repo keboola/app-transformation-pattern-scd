@@ -8,6 +8,7 @@ use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\Application;
 use Keboola\TransformationPatternScd\Config;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
+use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class OutputMapping
 {
@@ -17,8 +18,7 @@ class OutputMapping
 
     private InputMapping $inputMapping;
 
-    /** @var Table[] */
-    private array $currentMapping;
+    private TableIdGenerator $tableIdGenerator;
 
     /** @var Table[] */
     private array $newMapping = [];
@@ -27,7 +27,7 @@ class OutputMapping
     {
         $this->config = $config;
         $this->inputMapping = $inputMapping;
-        $this->parseOutputMapping();
+        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($config, $inputMapping->getSourceTable());
         $this->generateOutputMapping();
     }
 
@@ -39,15 +39,6 @@ class OutputMapping
     public function getNewMapping(): array
     {
         return $this->newMapping;
-    }
-
-    private function parseOutputMapping(): void
-    {
-        // Parse current output mapping, so we can preserve destination in new mapping
-        foreach ($this->config->getExpectedOutputTables() as $data) {
-            $table = new Table($data, Table::MAPPING_TYPE_OUTPUT);
-            $this->currentMapping[$table->getSource()] = $table;
-        }
     }
 
     private function generateOutputMapping(): void
@@ -66,15 +57,7 @@ class OutputMapping
         foreach ($this->getOutputTablesList() as $tableName) {
             $this->newMapping[] = $this->createTable([
                 'source' => $tableName,
-                'destination' => $this->getDestinationOrDefault(
-                    $tableName,
-                    sprintf(
-                        '%s.%s_%s',
-                        $snapshotInputMapping->getBuckedId(),
-                        $tableName,
-                        $sourceInputMapping->getTableName()
-                    )
-                ),
+                'destination' => $this->tableIdGenerator->generate($tableName),
             ]);
         }
     }
@@ -103,11 +86,5 @@ class OutputMapping
     private function createTable(array $data): Table
     {
         return new Table($data, Table::MAPPING_TYPE_OUTPUT);
-    }
-
-    private function getDestinationOrDefault(string $source, string $default): string
-    {
-        $table = $this->currentMapping[$source] ?? null;
-        return $table ? $table->getDestination() : $default;
     }
 }
