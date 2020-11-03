@@ -122,7 +122,7 @@ class InputMapping
         $data = [
             'source' => $this->tableIdGenerator->generate(
                 self::SNAPSHOT_TABLE_SOURCE,
-                TableIdGenerator::STAGE_INPUT
+                TableIdGenerator::STAGE_OUTPUT // snapshot is in OUT stage
             ),
             'destination' => self::SNAPSHOT_TABLE_DESTINATION,
             'where_column' => 'actual',
