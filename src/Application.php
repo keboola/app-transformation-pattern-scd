@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Keboola\TransformationPatternScd;
 
 use Keboola\Component\UserException;
+use Keboola\Csv\CsvFile;
+use Keboola\StorageApi\Client;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
 use Psr\Log\LoggerInterface;
 use SqlFormatter;
@@ -48,6 +50,63 @@ class Application
         return array_map(function ($sql) {
             return SqlFormatter::format($sql, false);
         }, $sqls);
+    }
+
+    public function createDestinationTable(Client $client, string $datadir, string $tableId): string
+    {
+        $header = $this->buildDestinationTableHeader(
+            $this->config->getPrimaryKey(),
+            $this->config->getMonitoredParameters()
+        );
+
+        $csvFile = new CsvFile(sprintf('%s.dst.csv', $datadir));
+        $csvFile->writeRow($header);
+
+        $tableInfo = explode('.', $tableId);
+
+        $destinationTableName = sprintf('curr_snapshot_%s', $tableInfo[2]);
+
+        $client->createTable(
+            sprintf('%s.%s', $tableInfo[0], $tableInfo[1]),
+            $destinationTableName,
+            $csvFile,
+            ['primaryKey'=> implode(',', $this->config->getPrimaryKey())]
+        );
+
+        return $destinationTableName;
+    }
+
+    private function buildDestinationTableHeader(array $primaryKey, array $monitoredColumns): array
+    {
+        $header = [];
+        $header[] = self::COL_SNAP_PK;
+        $header = array_merge($header, $primaryKey, $monitoredColumns);
+
+        switch ($this->config->getScdType()) {
+            case GenerateDefinition::SCD_TYPE_2:
+                $header[] = self::COL_START_DATE;
+                $header[] = self::COL_END_DATE;
+                break;
+            case GenerateDefinition::SCD_TYPE_4:
+                $header[] = self::COL_SNAP_DATE;
+                break;
+            default:
+                throw new UserException(
+                    sprintf('Unknown scd type "%s"', $this->config->getScdType())
+                );
+        }
+
+        $header[] = self::COL_ACTUAL;
+
+        if ($this->config->hasDeletedFlag()) {
+            $header[] = self::COL_IS_DELETED;
+        }
+
+        array_walk($header, function ($v) {
+            return mb_strtolower($v);
+        });
+
+        return $header;
     }
 
     private function generateScd2Type(): string
