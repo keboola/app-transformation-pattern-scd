@@ -56,10 +56,7 @@ class OutputMapping
         $snapshotInputMapping = $this->inputMapping->getSnapshotTable();
         $this->newMapping[] = $this->createTable([
             'source' => self::SNAPSHOT_TABLE_SOURCE,
-            'destination' => $this->getDestinationOrDefault(
-                self::SNAPSHOT_TABLE_SOURCE,
-                $snapshotInputMapping->getSource()
-            ),
+            'destination' => $snapshotInputMapping->getSource(),
             'primary_key' => [Application::COL_SNAP_PK],
             'incremental' => true,
         ]);
