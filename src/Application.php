@@ -101,7 +101,7 @@ class Application
             $placeholders['actual_deleted_timestamp'] = $placeholders['curr_date_value'];
         } else {
             $placeholders['actual_deleted_value'] = 1;
-            $placeholders['actual_deleted_timestamp'] = '9999-12-31 00:00:00';
+            $placeholders['actual_deleted_timestamp'] = $this->quoteValue('9999-12-31 00:00:00');
         }
 
         return str_ireplace($this->getPlaceholdersName($placeholders), $placeholders, $template);
@@ -205,6 +205,11 @@ SQL;
     private function quote(string $v): string
     {
         return sprintf('"%s"', $v);
+    }
+
+    private function quoteValue(string $v): string
+    {
+        return sprintf("'%s'", $v);
     }
 
     private function getPlaceholdersName(array $placeholders): array
