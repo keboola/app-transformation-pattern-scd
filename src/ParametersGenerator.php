@@ -23,7 +23,7 @@ class ParametersGenerator
                     'codes' => [
                         'name' => 'SCD code',
                         'script' => $statements,
-                    ]
+                    ],
                 ],
             ],
         ];
