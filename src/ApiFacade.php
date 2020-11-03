@@ -40,8 +40,17 @@ class ApiFacade
         $snapshotTable = $this->mappingManager->getInputMapping()->getSnapshotTable();
 
         try {
+            $bucketId = $snapshotTable->getBuckedId();
+            if (!$this->client->bucketExists($bucketId)) {
+                // Split bucket id to stage and name
+                [$stage, $name] = explode('.', $bucketId, 2);
+                // Remove c- from the name start
+                $name = (string) preg_replace('~^c-~', '', $name);
+                $this->client->createBucket($name, $stage);
+            }
+
             $this->client->createTable(
-                $snapshotTable->getBuckedId(),
+                $bucketId,
                 $snapshotTable->getTableName(),
                 $csvFile,
                 ['primaryKey'=> Application::COL_SNAP_PK]
