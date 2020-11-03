@@ -5,108 +5,82 @@ declare(strict_types=1);
 namespace Keboola\TransformationPatternScd;
 
 use Keboola\Component\UserException;
-use Keboola\Csv\CsvFile;
-use Keboola\StorageApi\Client;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
+use Keboola\TransformationPatternScd\Mapping\MappingManager;
 use Psr\Log\LoggerInterface;
-use SqlFormatter;
 
 class Application
 {
-    private const COL_SNAP_PK = 'snap_pk';
-    private const COL_START_DATE = 'start_date';
-    private const COL_END_DATE = 'end_date';
-    private const COL_ACTUAL = 'actual';
-    private const COL_IS_DELETED = 'is_deleted';
-    private const COL_SNAP_DATE = 'snapshot_date';
+    public const COL_SNAP_PK = 'snap_pk';
+    public const COL_START_DATE = 'start_date';
+    public const COL_END_DATE = 'end_date';
+    public const COL_ACTUAL = 'actual';
+    public const COL_IS_DELETED = 'is_deleted';
+    public const COL_SNAP_DATE = 'snapshot_date';
 
     private Config $config;
 
     private LoggerInterface $logger;
 
-    public function __construct(Config $config, LoggerInterface $logger)
+    private string $dataDir;
+
+    private MappingManager $mappingManager;
+
+    private StorageGenerator $storageGenerator;
+
+    private ParametersGenerator $parametersGenerator;
+
+    private ApiFacade $apiFacade;
+
+    public function __construct(Config $config, LoggerInterface $logger, string $dataDir)
     {
         $this->config = $config;
         $this->logger = $logger;
+        $this->dataDir = $dataDir;
+        $this->mappingManager = new MappingManager($this->config);
+        $this->storageGenerator = new StorageGenerator($this->mappingManager);
+        $this->parametersGenerator = new ParametersGenerator();
+        $this->apiFacade = new ApiFacade($this->config, $this->mappingManager, $dataDir);
     }
 
-    public function generate(): array
+    public function generateConfig(): array
+    {
+        $this->validateComponentId();
+        $this->apiFacade->createSnapshotTable();
+        return [
+            'storage' => $this->storageGenerator->generate(),
+            'parameters' => $this->parametersGenerator->generate($this->generateSqlCode()),
+        ];
+    }
+
+    private function validateComponentId(): void
+    {
+        switch ($this->config->getComponentId()) {
+            case 'keboola.snowflake-transformation':
+            case 'keboola.synapse-transformation':
+                // OK
+                return;
+
+            default:
+                throw new UserException(sprintf(
+                    'The SCD code pattern is not compatible with component "%s".',
+                    $this->config->getComponentId()
+                ));
+        }
+    }
+
+    private function generateSqlCode(): string
     {
         switch ($this->config->getScdType()) {
             case GenerateDefinition::SCD_TYPE_2:
-                $sqlTemplate = $this->generateScd2Type();
-                break;
+                return $this->generateScd2Type();
             case GenerateDefinition::SCD_TYPE_4:
-                $sqlTemplate = $this->generateScd4Type();
-                break;
+                return $this->generateScd4Type();
             default:
                 throw new UserException(
                     sprintf('Unknown scd type "%s"', $this->config->getScdType())
                 );
         }
-
-        $sqls = SqlFormatter::splitQuery($sqlTemplate);
-
-        return array_map(function ($sql) {
-            return SqlFormatter::format($sql, false);
-        }, $sqls);
-    }
-
-    public function createDestinationTable(Client $client, string $datadir, string $tableId): string
-    {
-        $header = $this->buildDestinationTableHeader(
-            $this->config->getPrimaryKey(),
-            $this->config->getMonitoredParameters()
-        );
-
-        $csvFile = new CsvFile(sprintf('%s/dst.csv', $datadir));
-        $csvFile->writeRow($header);
-
-        $tableInfo = explode('.', $tableId);
-
-        $destinationTableName = sprintf('curr_snapshot_%s', $tableInfo[2]);
-
-        $client->createTable(
-            sprintf('%s.%s', $tableInfo[0], $tableInfo[1]),
-            $destinationTableName,
-            $csvFile,
-            ['primaryKey'=> self::COL_SNAP_PK]
-        );
-
-        return $destinationTableName;
-    }
-
-    private function buildDestinationTableHeader(array $primaryKey, array $monitoredColumns): array
-    {
-        $header = [];
-        $header[] = self::COL_SNAP_PK;
-        $header = array_merge($header, $primaryKey, $monitoredColumns);
-
-        switch ($this->config->getScdType()) {
-            case GenerateDefinition::SCD_TYPE_2:
-                $header[] = self::COL_START_DATE;
-                $header[] = self::COL_END_DATE;
-                break;
-            case GenerateDefinition::SCD_TYPE_4:
-                $header[] = self::COL_SNAP_DATE;
-                break;
-            default:
-                throw new UserException(
-                    sprintf('Unknown scd type "%s"', $this->config->getScdType())
-                );
-        }
-
-        $header[] = self::COL_ACTUAL;
-
-        if ($this->config->hasDeletedFlag()) {
-            $header[] = self::COL_IS_DELETED;
-        }
-
-        array_walk($header, function (&$v): void {
-            $v = mb_strtolower($v);
-        });
-
-        return $header;
     }
 
     private function generateScd2Type(): string

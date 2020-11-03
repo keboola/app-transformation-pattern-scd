@@ -27,6 +27,7 @@ class ConfigTest extends TestCase
     {
         $config = [
             'parameters' => [
+                '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'primary_key' => 'testKey, testKey2',
                 'timezone' => 'Europe/Prague',
@@ -50,6 +51,7 @@ class ConfigTest extends TestCase
     {
         $config = [
             'parameters' => [
+                '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => 'invalidScdType',
                 'primary_key' => 'testKey, testKey2',
                 'timezone' => 'Europe/Prague',
@@ -68,6 +70,7 @@ class ConfigTest extends TestCase
     {
         $config = [
             'parameters' => [
+                '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'timezone' => 'Europe/Prague',
             ],
@@ -82,6 +85,7 @@ class ConfigTest extends TestCase
     {
         $config = [
             'parameters' => [
+                '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'primary_key' => 'testKey, testKey2',
             ],
@@ -98,6 +102,7 @@ class ConfigTest extends TestCase
             [
                 [
                     'parameters' => [
+                        '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_2,
                         'primary_key' => 'testKey, testKey2',
                         'timezone' => 'Europe/Prague',
@@ -110,6 +115,7 @@ class ConfigTest extends TestCase
             [
                 [
                     'parameters' => [
+                        '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_2,
                         'primary_key' => 'testKey, testKey2',
                         'timezone' => 'Europe/Prague',
@@ -122,6 +128,7 @@ class ConfigTest extends TestCase
             [
                 [
                     'parameters' => [
+                        '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_4,
                         'primary_key' => 'testKey, testKey2',
                         'timezone' => 'Europe/Prague',

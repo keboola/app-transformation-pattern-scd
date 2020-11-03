@@ -20,6 +20,7 @@ class GenerateDefinition extends BaseConfigDefinition
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
+                ->scalarNode('_componentId')->isRequired()->cannotBeEmpty()->end()
                 ->enumNode('scd_type')
                     ->isRequired()
                     ->values(

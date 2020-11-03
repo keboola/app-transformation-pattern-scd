@@ -27,6 +27,13 @@ class Config extends BaseConfig
         return $url;
     }
 
+    public function getComponentId(): string
+    {
+        // Returns the ID of the component for which the code is generated.
+        // Eg. "keboola.snowflake-transformation"
+        return $this->getValue(['parameters', '_componentId']);
+    }
+
     public function getScdType(): string
     {
         return $this->getValue(['parameters', 'scd_type']);
