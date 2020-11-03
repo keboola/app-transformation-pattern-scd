@@ -70,7 +70,7 @@ class Application
             sprintf('%s.%s', $tableInfo[0], $tableInfo[1]),
             $destinationTableName,
             $csvFile,
-            ['primaryKey'=> implode(',', $this->config->getPrimaryKey())]
+            ['primaryKey'=> self::COL_SNAP_PK]
         );
 
         return $destinationTableName;
