@@ -108,7 +108,7 @@ class OutputMapping
         return new Table($data, Table::MAPPING_TYPE_OUTPUT);
     }
 
-    private function getDestinationOrDefault(string $source, string $default): ?string
+    private function getDestinationOrDefault(string $source, string $default): string
     {
         $table = $this->currentMapping[$source] ?? null;
         return $table ? $table->getDestination() : $default;
