@@ -18,32 +18,48 @@ class OutputMapping
     private InputMapping $inputMapping;
 
     /** @var Table[] */
-    private array $tables = [];
+    private array $currentMapping;
+
+    /** @var Table[] */
+    private array $newMapping = [];
 
     public function __construct(Config $config, InputMapping $inputMapping)
     {
         $this->config = $config;
         $this->inputMapping = $inputMapping;
+        $this->parseOutputMapping();
         $this->generateOutputMapping();
     }
 
     public function toArray(): array
     {
-        return array_map(fn(Table $table) => $table->toArray(), $this->getTables());
+        return array_map(fn(Table $table) => $table->toArray(), $this->getNewMapping());
     }
 
-    public function getTables(): array
+    public function getNewMapping(): array
     {
-        return $this->tables;
+        return $this->newMapping;
+    }
+
+    private function parseOutputMapping(): void
+    {
+        // Parse current output mapping, so we can preserve destination in new mapping
+        foreach ($this->config->getExpectedOutputTables() as $data) {
+            $table = new Table($data, Table::MAPPING_TYPE_OUTPUT);
+            $this->currentMapping[$table->getSource()] = $table;
+        }
     }
 
     private function generateOutputMapping(): void
     {
         // Output mapping for snapshot table
         $snapshotInputMapping = $this->inputMapping->getSnapshotTable();
-        $this->tables[] = $this->createTable([
+        $this->newMapping[] = $this->createTable([
             'source' => self::SNAPSHOT_TABLE_SOURCE,
-            'destination' => $snapshotInputMapping->getSource(),
+            'destination' => $this->getDestinationOrDefault(
+                self::SNAPSHOT_TABLE_SOURCE,
+                $snapshotInputMapping->getSource()
+            ),
             'primary_key' => [Application::COL_SNAP_PK],
             'incremental' => true,
         ]);
@@ -51,13 +67,16 @@ class OutputMapping
         // Output mapping of aux tables -> for debug
         $sourceInputMapping = $this->inputMapping->getSourceTable();
         foreach ($this->getOutputTablesList() as $tableName) {
-            $this->tables[] = $this->createTable([
+            $this->newMapping[] = $this->createTable([
                 'source' => $tableName,
-                'destination' => sprintf(
-                    '%s.%s_%s',
-                    $snapshotInputMapping->getBuckedId(),
+                'destination' => $this->getDestinationOrDefault(
                     $tableName,
-                    $sourceInputMapping->getTableName()
+                    sprintf(
+                        '%s.%s_%s',
+                        $snapshotInputMapping->getBuckedId(),
+                        $tableName,
+                        $sourceInputMapping->getTableName()
+                    )
                 ),
             ]);
         }
@@ -87,5 +106,11 @@ class OutputMapping
     private function createTable(array $data): Table
     {
         return new Table($data, Table::MAPPING_TYPE_OUTPUT);
+    }
+
+    private function getDestinationOrDefault(string $source, string $default): ?string
+    {
+        $table = $this->currentMapping[$source] ?? null;
+        return $table ? $table->getDestination() : $default;
     }
 }
