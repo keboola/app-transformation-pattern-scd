@@ -29,10 +29,10 @@ class InputMapping
 
     public function toArray(): array
     {
-        return array_map(fn(Table $table) => $table->toArray(), $this->getTables());
+        return array_map(fn(Table $table) => $table->toArray(), $this->getNewMapping());
     }
 
-    public function getTables(): array
+    public function getNewMapping(): array
     {
         return [$this->getSourceTable(), $this->getSnapshotTable()];
     }

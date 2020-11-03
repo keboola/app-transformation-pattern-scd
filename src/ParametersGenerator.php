@@ -21,8 +21,10 @@ class ParametersGenerator
                 [
                     'name' => 'Generated SCD block',
                     'codes' => [
-                        'name' => 'SCD code',
-                        'script' => $statements,
+                        [
+                            'name' => 'SCD code',
+                            'script' => $statements,
+                        ],
                     ],
                 ],
             ],
