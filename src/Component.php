@@ -6,6 +6,7 @@ namespace Keboola\TransformationPatternScd;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
+use Keboola\StorageApi\Client;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
 
 class Component extends BaseComponent
@@ -25,6 +26,23 @@ class Component extends BaseComponent
         $config = $this->getConfig();
 
         $application = new Application($config, $this->getLogger());
+
+        $originalInputMapping = array_values(array_filter($config->getInputTables(), function ($v) {
+            return !in_array($v['destination'], ['curr_snapshot', 'in_table']);
+        }));
+
+        if ($originalInputMapping) {
+            $destinationTableName = $application->createDestinationTable(
+                new Client(
+                    [
+                        'url' => $config->getStorageApiUrl(),
+                        'token' => $config->getStorageApiToken(),
+                    ]
+                ),
+                $this->getDataDir(),
+                $originalInputMapping[0]['source']
+            );
+        }
 
         return [
             'result' => $application->generate(),
