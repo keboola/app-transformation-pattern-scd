@@ -102,8 +102,8 @@ class Application
             $header[] = self::COL_IS_DELETED;
         }
 
-        array_walk($header, function ($v) {
-            return mb_strtolower($v);
+        array_walk($header, function (&$v) {
+            $v = mb_strtolower($v);
         });
 
         return $header;
