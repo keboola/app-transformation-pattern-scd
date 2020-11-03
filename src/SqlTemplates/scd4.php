@@ -32,9 +32,8 @@ SELECT \${snap_table_cols_w_alias}
        , 1 AS "actual"
        , 1 AS "is_deleted"
 FROM "current_snapshot" snap
-LEFT JOIN "input_table" INPUT ON snap."id"=input."ID"
-WHERE snap."actual" = 1
-  AND input."ID" IS NULL;
+LEFT JOIN "input_table" input ON \${snap_input_join_condition}
+WHERE snap."actual" = 1 AND input.\${input_random_col} IS NULL;
 
 -- final snapshot table
 
