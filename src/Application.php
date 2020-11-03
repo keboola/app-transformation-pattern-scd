@@ -133,7 +133,7 @@ UNION
     SELECT \${snap_primary_key_lower}
               ,\${snap_table_cols}
               ,\${snap_default_cols}
-    FROM deleted_records
+    FROM "deleted_records"
 SQL;
             $placeholders['deleted_snap_query'] = str_ireplace(
                 $this->getPlaceholdersName($placeholders),
