@@ -44,7 +44,7 @@ class OutputMapping
         $this->tables[] = $this->createTable([
             'source' => self::SNAPSHOT_TABLE_SOURCE,
             'destination' => $snapshotInputMapping->getSource(),
-            'primaryKey' => [Application::COL_SNAP_PK],
+            'primary_key' => [Application::COL_SNAP_PK],
             'incremental' => true,
         ]);
 
