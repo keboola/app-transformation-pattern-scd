@@ -15,21 +15,15 @@ class ParametersGenerator
             return SqlFormatter::format($sql, false);
         }, SqlFormatter::splitQuery($sql));
 
-        // Map statements to codes, add name
-        $sqlCodes = [];
-        foreach ($statements as $index => $statement) {
-            $sqlCodes[] = [
-                'name' => 'Code ' . ($index + 1),
-                'script' => $statement,
-            ];
-        }
-
         // Return generated blocks
         return [
             'blocks' => [
                 [
                     'name' => 'Generated SCD block',
-                    'codes' => $sqlCodes,
+                    'codes' => [
+                        'name' => 'SCD code',
+                        'script' => $statements,
+                    ],
                 ],
             ],
         ];

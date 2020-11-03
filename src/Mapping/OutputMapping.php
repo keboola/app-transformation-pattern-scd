@@ -41,7 +41,7 @@ class OutputMapping
     {
         // Output mapping for snapshot table
         $snapshotInputMapping = $this->inputMapping->getSnapshotTable();
-        $this->createTable([
+        $this->tables[] = $this->createTable([
             'source' => self::SNAPSHOT_TABLE_SOURCE,
             'destination' => $snapshotInputMapping->getSource(),
             'primaryKey' => [Application::COL_SNAP_PK],
@@ -51,7 +51,7 @@ class OutputMapping
         // Output mapping of aux tables -> for debug
         $sourceInputMapping = $this->inputMapping->getSourceTable();
         foreach ($this->getOutputTablesList() as $tableName) {
-            $this->createTable([
+            $this->tables[] = $this->createTable([
                 'source' => $tableName,
                 'destination' => sprintf(
                     '%s.%s_%s',
