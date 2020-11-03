@@ -29,7 +29,7 @@ WHERE "actual" = 1 ;
 CREATE OR REPLACE TABLE "deleted_records" AS
 SELECT \${snap_table_cols_w_alias}
        , \$CURRENT_TIMESTAMP_TXT AS "snapshot_date"
-       , 1 AS "actual"
+       , \${is_actual_value_for_deleted} AS "actual"
        , 1 AS "is_deleted"
 FROM "current_snapshot" snap
 LEFT JOIN "input_table" input ON \${snap_input_join_condition}

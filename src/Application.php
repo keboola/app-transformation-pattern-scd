@@ -127,7 +127,9 @@ class Application
 
         // if deleted add union
         $placeholders['deleted_snap_query'] = '';
-        if ($this->config->keepDeleteActive()) {
+        if (($this->config->getScdType() === GenerateDefinition::SCD_TYPE_2 && $this->config->keepDeleteActive()) ||
+            ($this->config->getScdType() === GenerateDefinition::SCD_TYPE_4 && $this->config->hasDeletedFlag())
+        ) {
             $deletedRecordsQuery = <<< SQL
 UNION
     SELECT \${snap_primary_key_lower}
@@ -140,6 +142,10 @@ SQL;
                 $placeholders,
                 $deletedRecordsQuery
             );
+        }
+
+        if ($this->config->getScdType() === GenerateDefinition::SCD_TYPE_4) {
+            $placeholders['is_actual_value_for_deleted'] = $this->config->keepDeleteActive() ? 1 : 0;
         }
 
         return str_ireplace($this->getPlaceholdersName($placeholders), $placeholders, $template);
