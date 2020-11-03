@@ -59,7 +59,7 @@ class Application
             $this->config->getMonitoredParameters()
         );
 
-        $csvFile = new CsvFile(sprintf('%s.dst.csv', $datadir));
+        $csvFile = new CsvFile(sprintf('%s/dst.csv', $datadir));
         $csvFile->writeRow($header);
 
         $tableInfo = explode('.', $tableId);
