@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd;
 
+use InvalidArgumentException;
 use Keboola\TransformationPatternScd\Mapping\Table;
 
 class TableIdGenerator
 {
-    public const HASH_LENGTH = 10;
+    public const STAGE_INPUT = 'in';
+    public const STAGE_OUTPUT = 'out';
+
+    public const HASH_LENGTH = 6;
 
     private string $configHash;
 
@@ -25,8 +29,13 @@ class TableIdGenerator
         );
     }
 
-    public function __construct(Config $config, string $bucketId, string $sourceTableName)
+    public function __construct(Config $config, string $fullBucketId, string $sourceTableName)
     {
+        [$stage, $bucketId] = explode('.', $fullBucketId, 2);
+        if ($stage !== 'in' && $stage !== 'out') {
+            throw new InvalidArgumentException(sprintf('Expected bucket from IN/OUT stage, given "%s".', $fullBucketId));
+        }
+
         // We add hash to table name,
         // ... so if the user changes the configuration, there will be no problem with incompatible tables.
         $this->configHash = substr(md5(serialize($config->getData()['parameters'])), 0, self::HASH_LENGTH);
@@ -34,8 +43,21 @@ class TableIdGenerator
         $this->sourceTableName = $sourceTableName;
     }
 
-    public function generate(string $name): string
+    public function generate(string $name, string $stage): string
     {
-        return sprintf('%s.%s_%s_%s', $this->bucketId, $this->sourceTableName, $this->configHash, $name);
+        return sprintf('%s.%s_%s_%s', $this->getBucketId($stage), $this->sourceTableName, $this->configHash, $name);
+    }
+
+    private function getBucketId(string $stage) {
+        switch ($stage) {
+            case self::STAGE_INPUT:
+                return 'in.' . $this->bucketId;
+
+            case self::STAGE_OUTPUT:
+                return 'out.' . $this->bucketId;
+
+            default:
+                throw new \InvalidArgumentException(sprintf('Unexpected stage "%s".', $stage));
+        }
     }
 }

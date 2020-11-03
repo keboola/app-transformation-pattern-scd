@@ -10,9 +10,9 @@ use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class InputMapping
 {
-    public const SOURCE_TABLE_DESTINATION = 'in_table';
-    public const SNAPSHOT_TABLE_DESTINATION = 'curr_snapshot';
-    public const SNAPSHOT_TABLE_SOURCE = 'curr_snapshot';
+    public const SOURCE_TABLE_DESTINATION = 'input_table';
+    public const SNAPSHOT_TABLE_DESTINATION = 'current_snapshot';
+    public const SNAPSHOT_TABLE_SOURCE = 'current_snapshot';
 
     private Config $config;
 
@@ -52,9 +52,9 @@ class InputMapping
 
     /**
      * In input mapping are expected two tables with destination:
-     * "in_table", and "curr_snapshot", all others are ignored.
+     * "input_table", and "current_snapshot", all others are ignored.
      *
-     * If only one table is present, it is taken as the "in_table", and destination is modified.
+     * If only one table is present, it is taken as the "input_table", and destination is modified.
      */
     private function parseInputMapping(): void
     {
@@ -71,7 +71,7 @@ class InputMapping
             $data['destination'] = self::SOURCE_TABLE_DESTINATION;
             $this->sourceTable = $this->createTable($data);
         } else {
-            // Multiple tables in input mapping, we need to find source table by "destination" = "in_table"
+            // Multiple tables in input mapping, we need to find source table by "destination" = "input_table"
             $this->sourceTable = $this->findSnapshotTable($imTables);
         }
 
@@ -120,7 +120,10 @@ class InputMapping
     private function generateSnapshotTable(): void
     {
         $data = [
-            'source' => $this->tableIdGenerator->generate(self::SNAPSHOT_TABLE_SOURCE),
+            'source' => $this->tableIdGenerator->generate(
+                self::SNAPSHOT_TABLE_SOURCE,
+                TableIdGenerator::STAGE_INPUT
+            ),
             'destination' => self::SNAPSHOT_TABLE_DESTINATION,
             'where_column' => 'actual',
             'where_values' => ['1'],

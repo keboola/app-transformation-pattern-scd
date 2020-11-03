@@ -12,7 +12,7 @@ use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class OutputMapping
 {
-    public const SNAPSHOT_TABLE_SOURCE = 'final_snapshot';
+    public const SNAPSHOT_TABLE_SOURCE = 'new_snapshot';
 
     private Config $config;
 
@@ -53,11 +53,13 @@ class OutputMapping
         ]);
 
         // Output mapping of aux tables -> for debug
-        $sourceInputMapping = $this->inputMapping->getSourceTable();
         foreach ($this->getOutputTablesList() as $tableName) {
             $this->newMapping[] = $this->createTable([
                 'source' => $tableName,
-                'destination' => $this->tableIdGenerator->generate($tableName),
+                'destination' => $this->tableIdGenerator->generate(
+                    $tableName,
+                    TableIdGenerator::STAGE_OUTPUT
+                ),
             ]);
         }
     }
@@ -67,14 +69,14 @@ class OutputMapping
         switch ($this->config->getScdType()) {
             case GenerateDefinition::SCD_TYPE_2:
                 return [
-                    'changed_records_snapshot',
-                    'deleted_records_snapshot',
+                    'changed_records',
+                    'deleted_records',
                     'updated_snapshots',
                 ];
             case GenerateDefinition::SCD_TYPE_4:
                 return [
-                    'last_curr_records',
-                    'deleted_records_snapshot',
+                    'last_current_records',
+                    'deleted_records',
                 ];
             default:
                 throw new UserException(

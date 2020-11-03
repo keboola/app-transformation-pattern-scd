@@ -98,7 +98,7 @@ class Application
 
         if (!$this->config->keepDeleteActive()) {
             $placeholders['actual_deleted_value'] = 0;
-            $placeholders['actual_deleted_timestamp'] = $placeholders['curr_date_value'];
+            $placeholders['actual_deleted_timestamp'] = $placeholders['current_date_value'];
         } else {
             $placeholders['actual_deleted_value'] = 1;
             $placeholders['actual_deleted_timestamp'] = $this->quoteValue('9999-12-31 00:00:00');
@@ -133,7 +133,7 @@ UNION
     SELECT \${snap_primary_key_lower}
               ,\${snap_table_cols}
               ,\${snap_default_cols}
-    FROM deleted_records_snapshot
+    FROM deleted_records
 SQL;
             $placeholders['deleted_snap_query'] = str_ireplace(
                 $this->getPlaceholdersName($placeholders),
@@ -174,11 +174,11 @@ SQL;
             return $this->quote($v);
         }, $snapDefaultColumns));
 
-        $currentDateValue = '$CURR_DATE_TXT';
+        $currentDateValue = '$CURRENT_DATE_TXT';
         if ($this->config->useDatetime()) {
-            $currentDateValue = '$CURR_TIMESTAMP_TXT';
+            $currentDateValue = '$CURRENT_TIMESTAMP_TXT';
         }
-        $placeholders['curr_date_value'] = $currentDateValue;
+        $placeholders['current_date_value'] = $currentDateValue;
 
         $placeholders['input_random_col'] = $this->quote($this->config->getPrimaryKey()[0]);
 
