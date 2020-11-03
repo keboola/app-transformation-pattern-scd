@@ -18,7 +18,7 @@ class OutputMapping
     private InputMapping $inputMapping;
 
     /** @var Table[] */
-    private array $tables;
+    private array $tables = [];
 
     public function __construct(Config $config, InputMapping $inputMapping)
     {
