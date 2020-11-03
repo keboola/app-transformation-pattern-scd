@@ -13,6 +13,7 @@ use Keboola\TransformationPatternScd\TableIdGenerator;
 class OutputMapping
 {
     public const SNAPSHOT_TABLE_SOURCE = 'new_snapshot';
+    public const INCLUDE_AUX_TABLES_IN_OUTPUT_MAPPING = false;
 
     private Config $config;
 
@@ -53,18 +54,20 @@ class OutputMapping
         ]);
 
         // Output mapping of aux tables -> for debug
-        foreach ($this->getOutputTablesList() as $tableName) {
-            $this->newMapping[] = $this->createTable([
-                'source' => $tableName,
-                'destination' => $this->tableIdGenerator->generate(
-                    $tableName,
-                    TableIdGenerator::STAGE_OUTPUT
-                ),
-            ]);
+        if (self::INCLUDE_AUX_TABLES_IN_OUTPUT_MAPPING) {
+            foreach ($this->getAuxiliaryTables() as $tableName) {
+                $this->newMapping[] = $this->createTable([
+                    'source' => $tableName,
+                    'destination' => $this->tableIdGenerator->generate(
+                        $tableName,
+                        TableIdGenerator::STAGE_OUTPUT
+                    ),
+                ]);
+            }
         }
     }
 
-    private function getOutputTablesList(): array
+    private function getAuxiliaryTables(): array
     {
         switch ($this->config->getScdType()) {
             case GenerateDefinition::SCD_TYPE_2:
