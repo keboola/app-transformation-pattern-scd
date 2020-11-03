@@ -7,6 +7,7 @@ namespace Keboola\TransformationPatternScd;
 use Keboola\Component\UserException;
 use Keboola\Csv\CsvFile;
 use Keboola\StorageApi\Client;
+use Keboola\StorageApi\ClientException;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
 use Keboola\TransformationPatternScd\Mapping\MappingManager;
 
@@ -37,12 +38,17 @@ class ApiFacade
         $csvFile->writeRow($this->getSnapshotTableHeader());
 
         $snapshotTable = $this->mappingManager->getInputMapping()->getSnapshotTable();
-        $this->client->createTable(
-            $snapshotTable->getBuckedId(),
-            $snapshotTable->getTableName(),
-            $csvFile,
-            ['primaryKey'=> Application::COL_SNAP_PK]
-        );
+
+        try {
+            $this->client->createTable(
+                $snapshotTable->getBuckedId(),
+                $snapshotTable->getTableName(),
+                $csvFile,
+                ['primaryKey'=> Application::COL_SNAP_PK]
+            );
+        } catch (ClientException $e) {
+            throw new UserException($e->getMessage(), 0, $e);
+        }
     }
 
     private function getSnapshotTableHeader(): array

@@ -33,7 +33,10 @@ class TableIdGenerator
     {
         [$stage, $bucketId] = explode('.', $fullBucketId, 2);
         if ($stage !== 'in' && $stage !== 'out') {
-            throw new InvalidArgumentException(sprintf('Expected bucket from IN/OUT stage, given "%s".', $fullBucketId));
+            throw new InvalidArgumentException(sprintf(
+                'Expected bucket from IN/OUT stage, given "%s".',
+                $fullBucketId
+            ));
         }
 
         // We add hash to table name,
@@ -48,7 +51,8 @@ class TableIdGenerator
         return sprintf('%s.%s_%s_%s', $this->getBucketId($stage), $this->sourceTableName, $this->configHash, $name);
     }
 
-    private function getBucketId(string $stage) {
+    private function getBucketId(string $stage): string
+    {
         switch ($stage) {
             case self::STAGE_INPUT:
                 return 'in.' . $this->bucketId;
