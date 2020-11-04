@@ -1,0 +1,23 @@
+{%- macro selectFromColumns(columns, prefix = "", asLower = false) -%}
+    {%- for column in columns -%}
+        {{ prefix }}{{ column | quoteIdentifier }}
+        {%- if asLower == true %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
+        {%- if not loop.last %}, {% endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro generateJoin(columns, firstAlias, secondAlias) -%}
+    {%- for column in columns -%}
+        {{  firstAlias }}.{{ column | lower | quoteIdentifier }} = {{ secondAlias }}.{{ column | quoteIdentifier }}
+        {%- if not loop.last %} AND {% endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) -%}
+    {%- for column in snapshotPrimaryKeyParts -%}
+        {{ column | lower | quoteIdentifier }}
+        {%- if not loop.last %} || '|' || {% endif -%}
+        {%- if loop.last %} {% endif -%}
+    {%- endfor -%}
+    AS {{ snapshotPrimaryKeyName | quoteIdentifier }}
+{%- endmacro -%}

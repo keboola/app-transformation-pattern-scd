@@ -6,25 +6,30 @@ namespace Keboola\TransformationPatternScd\Mapping;
 
 use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\Config;
+use Keboola\TransformationPatternScd\Patterns\Pattern;
 use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class InputMapping
 {
-    public const SOURCE_TABLE_DESTINATION = 'input_table';
-    public const SNAPSHOT_TABLE_DESTINATION = 'current_snapshot';
-    public const SNAPSHOT_TABLE_SOURCE = 'current_snapshot';
+    public const SNAPSHOT_TABLE_SUFFIX = 'snapshot';
 
     private Config $config;
 
+    private Pattern $pattern;
+
     private TableIdGenerator $tableIdGenerator;
 
-    private Table $sourceTable;
+    private string $inputTableName;
+
+    private Table $inputTable;
 
     private Table $snapshotTable;
 
-    public function __construct(Config $config)
+    public function __construct(Config $config, Pattern $pattern)
     {
         $this->config = $config;
+        $this->pattern = $pattern;
+        $this->inputTableName = $pattern->getInputTableName();
 
         // Parse input mapping and find source table
         $this->parseInputMapping();
@@ -37,12 +42,12 @@ class InputMapping
 
     public function getNewMapping(): array
     {
-        return [$this->getSourceTable(), $this->getSnapshotTable()];
+        return [$this->getInputTable(), $this->getSnapshotTable()];
     }
 
-    public function getSourceTable(): Table
+    public function getInputTable(): Table
     {
-        return $this->sourceTable;
+        return $this->inputTable;
     }
 
     public function getSnapshotTable(): Table
@@ -68,15 +73,15 @@ class InputMapping
         if (count($imTables) === 1) {
             // One table in input mapping -> it is source table, we rewrite the destination
             $data = $imTables[0];
-            $data['destination'] = self::SOURCE_TABLE_DESTINATION;
-            $this->sourceTable = $this->createTable($data);
+            $data['destination'] = $this->inputTableName;
+            $this->inputTable = $this->createTable($data);
         } else {
             // Multiple tables in input mapping, we need to find source table by "destination" = "input_table"
-            $this->sourceTable = $this->findSnapshotTable($imTables);
+            $this->inputTable = $this->findSnapshotTable($imTables);
         }
 
         // Create table id generator from source table
-        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($this->config, $this->sourceTable);
+        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($this->config, $this->inputTable);
 
         // Generate snapshot table
         $this->generateSnapshotTable();
@@ -87,12 +92,12 @@ class InputMapping
         $sourceTable = null;
         foreach ($imTables as $data) {
             switch ($data['destination'] ?? null) {
-                // Found destination table
-                case self::SOURCE_TABLE_DESTINATION:
+                // Found input table
+                case $this->inputTableName:
                     if ($sourceTable) {
                         throw new UserException(sprintf(
                             'Found multiple tables with "destination" = "%s" in input mapping, but only one allowed.',
-                            self::SOURCE_TABLE_DESTINATION
+                            $this->inputTableName
                         ));
                     }
                     $sourceTable = $this->createTable($data);
@@ -110,7 +115,7 @@ class InputMapping
                 'Found "%d" tables in input mapping, but no source table with "destination" = "%s". ' .
                 'Please set the source table in the input mapping.',
                 count($imTables),
-                self::SOURCE_TABLE_DESTINATION
+                $this->inputTableName
             ));
         }
 
@@ -121,10 +126,10 @@ class InputMapping
     {
         $data = [
             'source' => $this->tableIdGenerator->generate(
-                self::SNAPSHOT_TABLE_SOURCE,
+                self::SNAPSHOT_TABLE_SUFFIX,
                 TableIdGenerator::STAGE_OUTPUT // snapshot is in OUT stage
             ),
-            'destination' => self::SNAPSHOT_TABLE_DESTINATION,
+            'destination' => $this->pattern->getSnapshotInputTable(),
             'where_column' => 'actual',
             'where_values' => ['1'],
         ];

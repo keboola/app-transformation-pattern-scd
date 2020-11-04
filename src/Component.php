@@ -23,7 +23,7 @@ class Component extends BaseComponent
     {
         /** @var Config $config */
         $config = $this->getConfig();
-        $application = new Application($config, $this->getLogger(), $this->getDataDir());
+        $application = new Application($this->getDataDir(), $config, $this->getLogger());
 
         return [
             'result' => $application->generateConfig(),

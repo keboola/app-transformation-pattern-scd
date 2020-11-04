@@ -8,14 +8,16 @@ use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\Application;
 use Keboola\TransformationPatternScd\Config;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
+use Keboola\TransformationPatternScd\Patterns\Pattern;
 use Keboola\TransformationPatternScd\TableIdGenerator;
 
 class OutputMapping
 {
-    public const SNAPSHOT_TABLE_SOURCE = 'new_snapshot';
     public const INCLUDE_AUX_TABLES_IN_OUTPUT_MAPPING = false;
 
     private Config $config;
+
+    private Pattern $pattern;
 
     private InputMapping $inputMapping;
 
@@ -24,11 +26,12 @@ class OutputMapping
     /** @var Table[] */
     private array $newMapping = [];
 
-    public function __construct(Config $config, InputMapping $inputMapping)
+    public function __construct(Config $config, Pattern $pattern, InputMapping $inputMapping)
     {
         $this->config = $config;
+        $this->pattern = $pattern;
         $this->inputMapping = $inputMapping;
-        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($config, $inputMapping->getSourceTable());
+        $this->tableIdGenerator = TableIdGenerator::createFromSourceTable($config, $inputMapping->getInputTable());
         $this->generateOutputMapping();
     }
 
@@ -47,9 +50,9 @@ class OutputMapping
         // Output mapping for snapshot table
         $snapshotInputMapping = $this->inputMapping->getSnapshotTable();
         $this->newMapping[] = $this->createTable([
-            'source' => self::SNAPSHOT_TABLE_SOURCE,
+            'source' => $this->pattern->getSnapshotOutputTable(),
             'destination' => $snapshotInputMapping->getSource(),
-            'primary_key' => [Application::COL_SNAP_PK],
+            'primary_key' => [$this->pattern->getSnapshotPrimaryKey()],
             'incremental' => true,
         ]);
 

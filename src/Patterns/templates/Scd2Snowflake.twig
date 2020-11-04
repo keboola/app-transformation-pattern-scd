@@ -1,0 +1,93 @@
+{% import "macros.twig" as macro %}
+{% set timezone = config.getTimezone() %}
+{% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
+{% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input") %}
+{% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) %}
+
+--- SCD2: This method tracks historical data by creating new records for new/modified data in the snapshot table --
+
+{%- if config.useDatetime() ~%}
+    {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
+    {% set infiniteDate = '9999-12-31 00:00:00' | quoteValue %}
+    SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
+    SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
+{%- else ~%}
+    {% set currentDate = '$CURRENT_DATE_TXT' %}
+    {% set infiniteDate = '9999-12-31' | quoteValue %}
+    SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
+    SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
+{%- endif -%}
+
+{%- if config.keepDeleteActive() -%}
+    {% set deletedEndDate = '9999-12-31 00:00:00' | quoteValue %}
+{%- else -%}
+    {% set deletedEndDate = currentDate %}
+{% endif %}
+
+-- Changed records: are not same in the snapshot and the input table --
+CREATE OR REPLACE TABLE "changed_records" AS
+    WITH "diff_records" AS (
+        SELECT {{ macro.selectFromColumns(inputColumns, "input.", true) }}
+        FROM {{ tableName.input | quoteIdentifier }} input
+            MINUS
+        SELECT {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }}
+        FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+        WHERE {{ columnName.actual | quoteIdentifier }} = 1
+    )
+    SELECT
+        {{ macro.selectFromColumns(snapshotInputColumns) }},
+        {{ currentDate }} AS {{ columnName.startDate | quoteIdentifier }},
+        {{ infiniteDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        1 AS {{ columnName.actual | quoteIdentifier }},
+        0 AS {{ columnName.isDeleted | quoteIdentifier }}
+    FROM "diff_records";
+
+-- Deleted records: actual = 1 in snapshot, but missing in input table --
+CREATE OR REPLACE TABLE "deleted_records" AS
+    SELECT
+        {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
+        snapshot.{{ columnName.startDate | quoteIdentifier }},
+        {{ deletedEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        {{ deletedActualValue }} AS {{ columnName.actual | quoteIdentifier }},
+        1 AS {{ columnName.isDeleted | quoteIdentifier }}
+    FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+    LEFT JOIN {{ tableName.input | quoteIdentifier }} input ON {{ snapshotInputJoinConditionSql }}
+    WHERE
+        snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+        input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
+
+-- Updated records: update previous version of the changed records, set actual = 0 --
+CREATE OR REPLACE TABLE "updated_records" AS
+    SELECT
+        {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
+        snapshot.{{ columnName.startDate | quoteIdentifier }},
+        {{ deletedEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        0 AS {{ columnName.actual | quoteIdentifier }},
+        0 AS {{ columnName.isDeleted | quoteIdentifier }}
+    FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+    JOIN "changed_records" changed ON {{ macro.generateJoin(inputPrimaryKeyLower, "snapshot", "changed") }}
+    WHERE snapshot.{{ columnName.actual | quoteIdentifier }} = 1;
+
+{# Note: "changed_records" must be before "updated_records"  #}
+{# ... so if there is the same PK, eg. "1|2020-11-04" (id|start_date) #}
+{# ... (it is possible when a start date WITHOUT time is used and the job run several times a day) #}
+{# ... then "changes_records" takes precedence over "updated_records" in the incremental loading #}
+{# ... otherwise, the new value will not be not saved #}
+-- Merge partial results to final snapshot --
+CREATE OR REPLACE TABLE "new_snapshot" AS
+    SELECT
+        {{ snapshotPrimaryKeySelect }},
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+    FROM "changed_records"
+        UNION
+    SELECT
+        {{ snapshotPrimaryKeySelect }},
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+    FROM "deleted_records"
+        UNION
+    SELECT
+        {{ snapshotPrimaryKeySelect }},
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+    FROM "updated_records";
+
+
