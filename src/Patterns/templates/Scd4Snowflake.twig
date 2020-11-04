@@ -1,7 +1,7 @@
 {% import "macros.twig" as macro %}
 {% set timezone = config.getTimezone() %}
 {% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
-{% set snapshotInputJoinConditionSql = macro.snapshotInputJoinCondition(inputPrimaryKey) %}
+{% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input") %}
 {% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) %}
 
 --- SCD4: This method snapshot full current state of the data to the snapshot table
