@@ -9,11 +9,13 @@
 {%- if config.useDatetime() ~%}
     {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
     {% set infiniteDate = '9999-12-31 00:00:00' | quoteValue %}
+    -- The start and end dates contain the time, because "use_datetime" = true in the configuration. --
     SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
     SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
 {%- else ~%}
     {% set currentDate = '$CURRENT_DATE_TXT' %}
     {% set infiniteDate = '9999-12-31' | quoteValue %}
+    -- The start and end dates DO NOT contain the time, because "use_datetime" = false in the configuration. --
     SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
     SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
 {%- endif -%}
@@ -24,7 +26,7 @@
     {% set deletedEndDate = currentDate %}
 {% endif %}
 
--- Changed records: are not same in the snapshot and the input table --
+-- Changed records: are all rows from the input table except same rows already present in the snapshot. --
 CREATE TABLE "changed_records" AS
     WITH "diff_records" AS (
         SELECT {{ macro.selectFromColumns(inputColumns, "input.", true) }}
@@ -42,46 +44,65 @@ CREATE TABLE "changed_records" AS
         0 AS {{ columnName.isDeleted | quoteIdentifier }}
     FROM "diff_records";
 
--- Deleted records: actual = 1 in snapshot, but missing in input table --
+-- Deleted records: they have set actual flag in snapshot table, but are missing in input table. --
 CREATE TABLE "deleted_records" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
+        -- The start date is unchanged, it is part of the snapshot primary key, so old values are overwritten by incremental loading. --
         snapshot.{{ columnName.startDate | quoteIdentifier }},
+        -- The end date of the deleted records is set to "{{  deletedEndDate  }}" according to "keep_del_active" configuration. --
         {{ deletedEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        -- The actual flag is set to "{{  deletedActualValue  }}" according to "keep_del_active" configuration. --
         {{ deletedActualValue }} AS {{ columnName.actual | quoteIdentifier }},
+        -- IsDeleted flag is set to "1". --
         1 AS {{ columnName.isDeleted | quoteIdentifier }}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+    -- Join input and snapshot table on the defined primary key. --
     LEFT JOIN {{ tableName.input | quoteIdentifier }} input ON {{ snapshotInputJoinConditionSql }}
     WHERE
+        -- Deleted records are calculated only from the actual records. --
         snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+        -- Record is no more present in the input table. --
         input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
 
--- Updated records: update previous version of the changed records, set actual = 0 --
+-- Updated records: we set actual = 0 to the previous version of the records that have been changed. --
 CREATE TABLE "updated_records" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         snapshot.{{ columnName.startDate | quoteIdentifier }},
-        {{ deletedEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        {{ currentDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        -- Actual flag is set to "0", because the new version exists. --
         0 AS {{ columnName.actual | quoteIdentifier }},
+        -- IsDeleted flag is set to "0", because the new version exists. --
         0 AS {{ columnName.isDeleted | quoteIdentifier }}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+    -- Join change records and snapshot table on the defined primary key
     JOIN "changed_records" changed ON {{ macro.generateJoin(inputPrimaryKeyLower, "snapshot", "changed") }}
     WHERE
+        -- Modify only previous actual results. --
         snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+        -- Exclude records with the same start date (and therefore with the same snapshot primary key), eg. "2020-11-04". --
+        -- This can happen if time is not part of the date. --
+        -- Record with the same start date (and primary key) is already part of the "changed_records", --
+        -- so we don't want to rewrite it in the "new_snapshot" by incremental loading. --
         snapshot.{{ columnName.startDate | quoteIdentifier }} != {{ currentDate }};
 
 -- Merge partial results to final snapshot --
+-- Incremental loading is used to load table in the storage, so old rows with the same primary key are overwritten. --
 CREATE TABLE "new_snapshot" AS
+    -- Changed records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
     FROM "changed_records"
         UNION
+    -- Deleted records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
     FROM "deleted_records"
         UNION
+    -- Updated previous versions of the changed records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
