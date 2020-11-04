@@ -19,7 +19,7 @@
 {%- endif -%}
 
 -- Actual snapshot of the all data  --
-CREATE OR REPLACE TABLE "last_state" AS
+CREATE TABLE "last_state" AS
     SELECT
         {{ macro.selectFromColumns(inputColumns, "input.", true) }},
         {{ currentDate }} AS {{ columnName.snapshotDate | quoteIdentifier }},
@@ -28,7 +28,7 @@ CREATE OR REPLACE TABLE "last_state" AS
     FROM {{ tableName.input | quoteIdentifier }} input;
 
 -- Update actual = 0 flag in previous snapshot records --
-CREATE OR REPLACE TABLE "previous_state" AS
+CREATE TABLE "previous_state" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         {{ columnName.snapshotDate | quoteIdentifier }},
@@ -40,7 +40,7 @@ CREATE OR REPLACE TABLE "previous_state" AS
     WHERE snapshot.{{ columnName.actual | quoteIdentifier }} = 1;
 
 -- Deleted records: actual = 1 in snapshot, but missing in input table --
-CREATE OR REPLACE TABLE "deleted_records" AS
+CREATE TABLE "deleted_records" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         {{ currentDate }} AS {{ columnName.snapshotDate | quoteIdentifier }},
@@ -53,7 +53,7 @@ CREATE OR REPLACE TABLE "deleted_records" AS
         input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
 
 -- Merge partial results to final snapshot --
-CREATE OR REPLACE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
+CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
     {% if config.keepDeleteActive() -%}
     SELECT
         {{ snapshotPrimaryKeySelect }},

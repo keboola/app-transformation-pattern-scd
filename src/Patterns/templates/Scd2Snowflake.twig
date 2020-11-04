@@ -25,7 +25,7 @@
 {% endif %}
 
 -- Changed records: are not same in the snapshot and the input table --
-CREATE OR REPLACE TABLE "changed_records" AS
+CREATE TABLE "changed_records" AS
     WITH "diff_records" AS (
         SELECT {{ macro.selectFromColumns(inputColumns, "input.", true) }}
         FROM {{ tableName.input | quoteIdentifier }} input
@@ -43,7 +43,7 @@ CREATE OR REPLACE TABLE "changed_records" AS
     FROM "diff_records";
 
 -- Deleted records: actual = 1 in snapshot, but missing in input table --
-CREATE OR REPLACE TABLE "deleted_records" AS
+CREATE TABLE "deleted_records" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         snapshot.{{ columnName.startDate | quoteIdentifier }},
@@ -57,7 +57,7 @@ CREATE OR REPLACE TABLE "deleted_records" AS
         input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
 
 -- Updated records: update previous version of the changed records, set actual = 0 --
-CREATE OR REPLACE TABLE "updated_records" AS
+CREATE TABLE "updated_records" AS
     SELECT
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         snapshot.{{ columnName.startDate | quoteIdentifier }},
@@ -74,7 +74,7 @@ CREATE OR REPLACE TABLE "updated_records" AS
 {# ... then "changes_records" takes precedence over "updated_records" in the incremental loading #}
 {# ... otherwise, the new value will not be not saved #}
 -- Merge partial results to final snapshot --
-CREATE OR REPLACE TABLE "new_snapshot" AS
+CREATE TABLE "new_snapshot" AS
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
