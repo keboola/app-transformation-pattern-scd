@@ -7,12 +7,15 @@ namespace Keboola\TransformationPatternScd;
 use Keboola\Component\UserException;
 use Keboola\Csv\CsvFile;
 use Keboola\StorageApi\Client;
-use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
+use Keboola\StorageApi\ClientException;
 use Keboola\TransformationPatternScd\Mapping\MappingManager;
+use Keboola\TransformationPatternScd\Patterns\Pattern;
 
 class ApiFacade
 {
     private Config $config;
+
+    private Pattern $pattern;
 
     private MappingManager $mappingManager;
 
@@ -20,9 +23,10 @@ class ApiFacade
 
     private Client $client;
 
-    public function __construct(Config $config, MappingManager $mappingManager, string $dataDir)
+    public function __construct(Config $config, Pattern $pattern, MappingManager $mappingManager, string $dataDir)
     {
         $this->config = $config;
+        $this->pattern = $pattern;
         $this->mappingManager = $mappingManager;
         $this->dataDir = $dataDir;
         $this->client = new Client([
@@ -34,47 +38,28 @@ class ApiFacade
     public function createSnapshotTable(): void
     {
         $csvFile = new CsvFile(sprintf('%s/snapshot.csv', $this->dataDir));
-        $csvFile->writeRow($this->getSnapshotTableHeader());
+        $csvFile->writeRow($this->pattern->getSnapshotTableHeader());
 
         $snapshotTable = $this->mappingManager->getInputMapping()->getSnapshotTable();
-        $this->client->createTable(
-            $snapshotTable->getBuckedId(),
-            $snapshotTable->getTableName(),
-            $csvFile,
-            ['primaryKey'=> Application::COL_SNAP_PK]
-        );
-    }
 
-    private function getSnapshotTableHeader(): array
-    {
-        $header = [];
-        $header[] = Application::COL_SNAP_PK;
-        $header = array_merge($header, $this->config->getPrimaryKey(), $this->config->getMonitoredParameters());
+        try {
+            $bucketId = $snapshotTable->getBuckedId();
+            if (!$this->client->bucketExists($bucketId)) {
+                // Split bucket id to stage and name
+                [$stage, $name] = explode('.', $bucketId, 2);
+                // Remove c- from the name start
+                $name = (string) preg_replace('~^c-~', '', $name);
+                $this->client->createBucket($name, $stage);
+            }
 
-        switch ($this->config->getScdType()) {
-            case GenerateDefinition::SCD_TYPE_2:
-                $header[] = Application::COL_START_DATE;
-                $header[] = Application::COL_END_DATE;
-                break;
-            case GenerateDefinition::SCD_TYPE_4:
-                $header[] = Application::COL_SNAP_DATE;
-                break;
-            default:
-                throw new UserException(
-                    sprintf('Unknown scd type "%s"', $this->config->getScdType())
-                );
+            $this->client->createTable(
+                $bucketId,
+                $snapshotTable->getTableName(),
+                $csvFile,
+                ['primaryKey'=> $this->pattern->getSnapshotPrimaryKey()]
+            );
+        } catch (ClientException $e) {
+            throw new UserException($e->getMessage(), 0, $e);
         }
-
-        $header[] = Application::COL_ACTUAL;
-
-        if ($this->config->hasDeletedFlag()) {
-            $header[] = Application::COL_IS_DELETED;
-        }
-
-        array_walk($header, function (&$v): void {
-            $v = mb_strtolower($v);
-        });
-
-        return $header;
     }
 }

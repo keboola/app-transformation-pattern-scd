@@ -6,7 +6,6 @@ namespace Keboola\TransformationPatternScd;
 
 use Keboola\Component\BaseComponent;
 use Keboola\Component\UserException;
-use Keboola\StorageApi\Client;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
 
 class Component extends BaseComponent
@@ -24,7 +23,7 @@ class Component extends BaseComponent
     {
         /** @var Config $config */
         $config = $this->getConfig();
-        $application = new Application($config, $this->getLogger(), $this->getDataDir());
+        $application = new Application($this->getDataDir(), $config, $this->getLogger());
 
         return [
             'result' => $application->generateConfig(),
@@ -41,6 +40,24 @@ class Component extends BaseComponent
         return [
             self::ACTION_GENERATE => 'generate',
         ];
+    }
+
+    protected function loadConfig(): void
+    {
+        try {
+            parent::loadConfig();
+        } catch (UserException $e) {
+            // Empty configuration -> convert to user friendly message
+            if (strpos($e->getMessage(), ' at path "root.parameters" must be configured') !== false) {
+                throw new UserException(
+                    'Did you forget to save the configuration? ' . $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                );
+            }
+
+            throw $e;
+        }
     }
 
     protected function getConfigDefinitionClass(): string
