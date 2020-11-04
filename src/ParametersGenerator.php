@@ -12,7 +12,7 @@ class ParametersGenerator
     {
         // Split SQL to statements
         $statements = array_map(function ($sql) {
-            return SqlFormatter::format($sql, false);
+            return trim($sql);
         }, SqlFormatter::splitQuery($sql));
 
         // Return generated blocks
