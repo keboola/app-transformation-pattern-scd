@@ -66,13 +66,10 @@ CREATE TABLE "updated_records" AS
         0 AS {{ columnName.isDeleted | quoteIdentifier }}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
     JOIN "changed_records" changed ON {{ macro.generateJoin(inputPrimaryKeyLower, "snapshot", "changed") }}
-    WHERE snapshot.{{ columnName.actual | quoteIdentifier }} = 1;
+    WHERE
+        snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+        snapshot.{{ columnName.startDate | quoteIdentifier }} != {{ currentDate }};
 
-{# Note: "changed_records" must be before "updated_records"  #}
-{# ... so if there is the same PK, eg. "1|2020-11-04" (id|start_date) #}
-{# ... (it is possible when a start date WITHOUT time is used and the job run several times a day) #}
-{# ... then "changes_records" takes precedence over "updated_records" in the incremental loading #}
-{# ... otherwise, the new value will not be not saved #}
 -- Merge partial results to final snapshot --
 CREATE TABLE "new_snapshot" AS
     SELECT

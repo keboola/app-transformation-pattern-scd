@@ -37,7 +37,9 @@ CREATE TABLE "previous_state" AS
         snapshot.{{ columnName.isDeleted | quoteIdentifier }}
 {% endif %}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
-    WHERE snapshot.{{ columnName.actual | quoteIdentifier }} = 1;
+    WHERE
+        snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+        snapshot.{{ columnName.snapshotDate | quoteIdentifier }} != {{ currentDate }};
 
 -- Deleted records: actual = 1 in snapshot, but missing in input table --
 CREATE TABLE "deleted_records" AS
@@ -54,6 +56,11 @@ CREATE TABLE "deleted_records" AS
 
 -- Merge partial results to final snapshot --
 CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
+    SELECT
+        {{ snapshotPrimaryKeySelect }},
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+    FROM "last_state"
+        UNION
     {% if config.keepDeleteActive() -%}
     SELECT
         {{ snapshotPrimaryKeySelect }},
@@ -61,11 +68,6 @@ CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
     FROM "deleted_records"
         UNION
     {% endif -%}
-    SELECT
-        {{ snapshotPrimaryKeySelect }},
-        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
-    FROM "last_state"
-        UNION
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
