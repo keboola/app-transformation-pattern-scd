@@ -14,10 +14,10 @@
 {%- endmacro -%}
 
 {%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) -%}
-    {%- for column in snapshotPrimaryKeyParts -%}
-        {{ column | lower | quoteIdentifier }}
-        {%- if not loop.last %} || '|' || {% endif -%}
-        {%- if loop.last %} {% endif -%}
-    {%- endfor -%}
-    AS {{ snapshotPrimaryKeyName | quoteIdentifier }}
+    CONCAT(
+        {%- for column in snapshotPrimaryKeyParts -%}
+            {{ column | lower | quoteIdentifier }}
+            {%- if not loop.last %}, {{ '|' | quoteValue }}, {% endif -%}
+        {%- endfor -%}
+    ) AS {{ snapshotPrimaryKeyName | quoteIdentifier }}
 {%- endmacro -%}

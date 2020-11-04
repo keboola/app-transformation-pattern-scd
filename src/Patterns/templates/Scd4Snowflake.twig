@@ -54,13 +54,13 @@ CREATE OR REPLACE TABLE "deleted_records" AS
 
 -- Merge partial results to final snapshot --
 CREATE OR REPLACE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
-    {%- if config.keepDeleteActive() -%}
+    {% if config.keepDeleteActive() -%}
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
     FROM "deleted_records"
         UNION
-    {%- endif -%}
+    {% endif -%}
     SELECT
         {{ snapshotPrimaryKeySelect }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
