@@ -19,7 +19,7 @@
 {%- endif -%}
 
 {%- if config.keepDeleteActive() -%}
-    {% set deletedEndDate = '9999-12-31 00:00:00' | quoteValue %}
+    {% set deletedEndDate = infiniteDate %}
 {%- else -%}
     {% set deletedEndDate = currentDate %}
 {% endif %}
