@@ -32,7 +32,9 @@ CREATE TABLE "changed_records" AS
         -- Values of the monitored parameters. --
         SELECT {{ macro.selectFromColumns(inputColumns, "input.", true) }}
         FROM {{ tableName.input | quoteIdentifier }} input
-            MINUS
+
+            EXCEPT
+
         -- Values of the monitored parameters. --
         SELECT {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }}
         FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
