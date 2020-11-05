@@ -40,7 +40,7 @@ class Config extends BaseConfig
         return $this->getValue(['parameters', 'scd_type']);
     }
 
-    public function getMonitoredParameters(): array
+    public function getIncludedParametersInput(): array
     {
         $monitoredParameters = $this->getValue(['parameters', 'monitored_parameters']);
         $monitoredParameters = array_map(function ($v) {
@@ -50,7 +50,7 @@ class Config extends BaseConfig
         return $monitoredParameters;
     }
 
-    public function getPrimaryKey(): array
+    public function getPrimaryKeyInput(): array
     {
         $primaryKeys = $this->getValue(['parameters', 'primary_key']);
         $primaryKeys = array_map(function ($v) {

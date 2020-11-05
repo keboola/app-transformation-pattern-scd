@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd;
 
-use Twig;
-use Keboola\TransformationPatternScd\Exception\ApplicationException;
+use Keboola\TransformationPatternScd\Parameters\ParametersFactory;
 use Keboola\TransformationPatternScd\Patterns\Pattern;
 use Keboola\TransformationPatternScd\Mapping\MappingManager;
 use Keboola\TransformationPatternScd\Patterns\PatternFactory;
@@ -22,6 +21,8 @@ class Application
 
     private LoggerInterface $logger;
 
+    private ApiFacade $apiFacade;
+
     private PatternFactory $patternFactory;
 
     private Pattern $pattern;
@@ -30,54 +31,39 @@ class Application
 
     private StorageGenerator $storageGenerator;
 
-    private ParametersGenerator $parametersGenerator;
+    private BlocksGenerator $blocksGenerator;
 
-    private ApiFacade $apiFacade;
+    private ParametersFactory $parametersFactory;
 
     public function __construct(string $dataDir, Config $config, LoggerInterface $logger)
     {
         $this->config = $config;
         $this->logger = $logger;
         $this->dataDir = $dataDir;
-        $this->patternFactory = new PatternFactory($this->config);
+        $this->apiFacade = new ApiFacade($this->config, $dataDir);
+        $this->patternFactory = new PatternFactory($this->config->getScdType());
         $this->pattern = $this->patternFactory->create();
         $this->mappingManager = new MappingManager($this->config, $this->pattern);
         $this->storageGenerator = new StorageGenerator($this->mappingManager);
-        $this->parametersGenerator = new ParametersGenerator();
-        $this->apiFacade = new ApiFacade($this->config, $this->pattern, $this->mappingManager, $dataDir);
+        $this->blocksGenerator = new BlocksGenerator();
+        $this->parametersFactory = new ParametersFactory($this->config, $this->apiFacade, $this->mappingManager);
     }
 
     public function generateConfig(): array
     {
-        $this->apiFacade->createSnapshotTable();
+        // Create parameters
+        $parameters = $this->parametersFactory->create();
+
+        // Create snapshot table by API
+        $this->apiFacade->createSnapshotTable(
+            $this->mappingManager->getInputMapping()->getSnapshotTable(),
+            $this->pattern->getSnapshotTableHeader(),
+            $this->pattern->getSnapshotPrimaryKey(),
+        );
 
         return [
             'storage' => $this->storageGenerator->generate(),
-            'parameters' => $this->parametersGenerator->generate($this->renderSqlCode()),
+            'parameters' => $this->blocksGenerator->generate($this->pattern->render($parameters)),
         ];
-    }
-
-    private function renderSqlCode(): string
-    {
-        $loader = new Twig\Loader\FilesystemLoader(__DIR__ . '/Patterns/templates');
-        $twig = new Twig\Environment($loader, ['strict_variables' => true, 'autoescape' => false]);
-
-        $extension = $this->pattern->getTwigExtension();
-        if ($extension) {
-            $twig->addExtension($extension);
-        }
-
-        try {
-            $template = $twig->load($this->pattern->getTemplatePath());
-            $sql = $template->render($this->pattern->getTemplateVariables());
-        } catch (Twig\Error\Error $e) {
-            throw new ApplicationException(
-                $e->getMessage() . " File: {$e->getFile()}, line: {$e->getLine()}.",
-                $e->getCode(),
-                $e
-            );
-        }
-
-        return $sql;
     }
 }

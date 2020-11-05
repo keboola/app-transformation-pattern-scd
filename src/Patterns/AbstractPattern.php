@@ -4,28 +4,44 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Patterns;
 
-use Keboola\TransformationPatternScd\Config;
-use Keboola\TransformationPatternScd\QuoteHelper;
+use Twig;
 use Twig\Extension\AbstractExtension;
-use Twig\Extension\ExtensionInterface;
 use Twig\TwigFilter;
+use Keboola\TransformationPatternScd\Parameters\Parameters;
+use Keboola\TransformationPatternScd\Exception\ApplicationException;
+use Keboola\TransformationPatternScd\QuoteHelper;
 
 abstract class AbstractPattern extends AbstractExtension implements Pattern
 {
-    protected Config $config;
-
+    // Available after render method calling
     protected QuoteHelper $quoteHelper;
 
-    public function __construct(Config $config, QuoteHelper $quoteHelper)
-    {
-        $this->config = $config;
-        $this->quoteHelper = $quoteHelper;
-    }
+    // Available after render method calling
+    protected Parameters $parameters;
 
-    public function getTwigExtension(): ?ExtensionInterface
+    abstract protected function getTemplatePath(): string;
+
+    abstract protected function getTemplateVariables(): array;
+
+    public function render(Parameters $parameters): string
     {
-        // Custom filters, ... can be specified, see AbstractExtension
-        return $this;
+        $this->parameters = $parameters;
+        $this->quoteHelper = new QuoteHelper($parameters->getBackend());
+
+        $loader = new Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
+        $twig = new Twig\Environment($loader, ['strict_variables' => true, 'autoescape' => false]);
+        $twig->addExtension($this);
+
+        try {
+            $template = $twig->load($this->getTemplatePath());
+            return $template->render($this->getTemplateVariables());
+        } catch (Twig\Error\Error $e) {
+            throw new ApplicationException(
+                $e->getMessage() . " File: {$e->getFile()}, line: {$e->getLine()}.",
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     public function getFilters(): array
@@ -37,7 +53,13 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         ];
     }
 
-    private function noIndent(string $str): string
+
+    protected function columnsToLower(array $columns): array
+    {
+        return array_map(fn(string $column) => mb_strtolower($column), $columns);
+    }
+
+    protected function noIndent(string $str): string
     {
         return implode(
             "\n",

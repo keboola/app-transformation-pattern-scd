@@ -6,7 +6,7 @@ namespace Keboola\TransformationPatternScd;
 
 use SqlFormatter;
 
-class ParametersGenerator
+class BlocksGenerator
 {
     public function generate(string $sql): array
     {
