@@ -10,7 +10,7 @@
     {% if config.useDatetime() %}
         select
             'datetime' as "key",
-            CONVERT(VARCHAR(255), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATETIME)) AT TIME ZONE '{{ timezone }}', 20) as "value"
+            CONVERT(VARCHAR(19), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATETIME)) AT TIME ZONE '{{ timezone }}', 20) as "value"
         into "properties";
         -- The start and end dates contain the time ("use_datetime" = true). --
         {% set currentDate = '(SELECT value FROM properties WHERE "key" = \'datetime\')' %}
@@ -18,7 +18,7 @@
     {%- else ~%}
         select
             'date' as "key",
-            CONVERT(VARCHAR(255), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATE)) AT TIME ZONE '{{ timezone }}', 20) as "value"
+            CONVERT(VARCHAR(10), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATE)) AT TIME ZONE '{{ timezone }}', 20) as "value"
         into "properties";
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
         {% set currentDate = '(SELECT value FROM properties WHERE "key" = \'date\')' %}
