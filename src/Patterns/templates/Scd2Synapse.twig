@@ -8,19 +8,19 @@
 
 {% apply noIndent %}
     {% if config.useDatetime() %}
-        select
-            'datetime' as "key",
-            CONVERT(VARCHAR(19), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATETIME)) AT TIME ZONE '{{ timezone }}', 20) as "value"
-        into "properties";
         -- The start and end dates contain the time ("use_datetime" = true). --
+        SELECT
+            'datetime' AS "key",
+            CONVERT(VARCHAR(19), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATETIME)) AT TIME ZONE '{{ timezone }}', 20) AS "value"
+        INTO "properties";
         {% set currentDate = '(SELECT value FROM properties WHERE "key" = \'datetime\')' %}
         {% set infiniteDate = '9999-12-31 00:00:00' | quoteValue %}
     {%- else ~%}
-        select
-            'date' as "key",
-            CONVERT(VARCHAR(10), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATE)) AT TIME ZONE '{{ timezone }}', 20) as "value"
-        into "properties";
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
+        SELECT
+            'date' AS "key",
+            CONVERT(VARCHAR(10), CONVERT(DATETIMEOFFSET, CAST(CURRENT_TIMESTAMP AS DATE)) AT TIME ZONE '{{ timezone }}', 20) AS "value"
+        INTO "properties";
         {% set currentDate = '(SELECT value FROM properties WHERE "key" = \'date\')' %}
         {% set infiniteDate = '9999-12-31' | quoteValue %}
     {% endif %}
