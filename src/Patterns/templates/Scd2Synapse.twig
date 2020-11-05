@@ -1,1 +1,94 @@
--- TODO --
+{% import "macros.twig" as macro %}
+{% set timezone = config.getTimezone() %}
+{% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
+{% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input") %}
+{% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) %}
+-- SCD4: This method snapshot full current state of the data to the snapshot table. --
+
+{% apply noIndent %}
+    {%- if config.useDatetime() -%}
+        {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
+        {% set infiniteDate = '9999-12-31 00:00:00' | quoteValue %}
+        -- The start and end dates contain the time ("use_datetime" = true). --
+        SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
+        SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
+    {% else -%}
+        {% set currentDate = '$CURRENT_DATE_TXT' %}
+        {% set infiniteDate = '9999-12-31' | quoteValue %}
+        -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
+        SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
+        SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
+    {% endif %}
+{% endapply %}
+
+-- Last state: Actual snapshot of the all rows  --
+CREATE TABLE "last_state" AS
+SELECT
+-- Monitored parameters. --
+{{ macro.selectFromColumns(inputColumns, "input.", true) }},
+-- The snapshot date is set to now. --
+{{ currentDate }} AS {{ columnName.snapshotDate | quoteIdentifier }},
+-- Actual flag is set to "1". --
+1 AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+    -- IsDeleted flag is set to "0". --
+    0 AS {{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
+FROM {{ tableName.input | quoteIdentifier }} input;
+
+-- Previous state: Set actual flag to "0" in the previous version of the records. --
+CREATE TABLE "previous_state" AS
+SELECT
+-- Monitored parameters. --
+{{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
+-- The snapshot date is preserved. --
+{{ columnName.snapshotDate | quoteIdentifier }},
+-- Actual flag is set to "0". --
+0  AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+    -- IsDeleted flag is preserved. --
+    snapshot.{{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
+FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+WHERE
+-- Only the last results are modified. --
+snapshot.{{ columnName.actual | quoteIdentifier }} = 1
+-- Exclude records with the current date (and therefore with the same PK). --
+-- This can happen if time is not part of the date, eg. "2020-11-04". --
+-- Row for this PK is then already included in the "last_state". --
+-- TLDR: for each PK, we can have max one row in the new snapshot. --
+AND snapshot.{{ columnName.snapshotDate | quoteIdentifier }} != {{ currentDate }};
+
+-- Deleted records are missing in input table, but have actual "1" in last snapshot. --
+CREATE TABLE "deleted_records" AS
+SELECT
+{{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
+-- The snapshot date is set to now. --
+{{ currentDate }} AS {{ columnName.snapshotDate | quoteIdentifier }},
+-- The actual flag is set to "{{  deletedActualValue  }}" ("keep_del_active" = {{ config.keepDeleteActive() ? 'true' : 'false' }}). --
+{{ deletedActualValue }} AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+    -- IsDeleted flag is set to "1". --
+    1 AS {{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
+FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
+LEFT JOIN {{ tableName.input | quoteIdentifier }} input ON {{ snapshotInputJoinConditionSql }}
+WHERE
+snapshot.{{ columnName.actual | quoteIdentifier }} = 1 AND
+input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
+
+-- Merge partial results to the new snapshot. --
+-- Incremental loading is used to load table in the storage, --
+-- so old rows with the same primary key are overwritten. --
+CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
+-- New last state: --
+SELECT
+{{ snapshotPrimaryKeySelect }},
+{{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+FROM "last_state"
+UNION
+-- Deleted records: --
+SELECT
+{{ snapshotPrimaryKeySelect }},
+{{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+FROM "deleted_records"
+UNION
+-- Modified previous state: --
+SELECT
+{{ snapshotPrimaryKeySelect }},
+{{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+FROM "previous_state";

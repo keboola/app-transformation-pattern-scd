@@ -33,6 +33,15 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return [
             new TwigFilter('quoteIdentifier', fn(string $str) => $this->quoteHelper->quoteIdentifier($str)),
             new TwigFilter('quoteValue', fn(string $str) => $this->quoteHelper->quoteValue($str)),
+            new TwigFilter('noIndent', fn(string $str) => $this->noIndent($str)),
         ];
+    }
+
+    private function noIndent(string $str): string
+    {
+        return implode(
+            "\n",
+            array_map(fn(string $line) => trim($line), explode("\n", $str))
+        );
     }
 }

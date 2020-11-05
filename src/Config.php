@@ -67,11 +67,6 @@ class Config extends BaseConfig
 
     public function useDatetime(): bool
     {
-        if ($this->getScdType() === GenerateDefinition::SCD_TYPE_4) {
-            // In SCD4, time is always present in the date columns
-            return true;
-        }
-
         return (bool) $this->getValue(['parameters', 'use_datetime']);
     }
 
