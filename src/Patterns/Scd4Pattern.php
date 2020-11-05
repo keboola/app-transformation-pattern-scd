@@ -73,6 +73,7 @@ class Scd4Pattern extends AbstractPattern
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
             'deletedActualValue' => $this->config->keepDeleteActive() ? 1 : 0,
+            'generateDeletedRecords' => $this->config->hasDeletedFlag() || $this->config->keepDeleteActive(),
             'tableName' => [
                 'input' => self::TABLE_INPUT,
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
