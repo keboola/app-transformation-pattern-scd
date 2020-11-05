@@ -49,7 +49,7 @@ class Scd2Pattern extends AbstractPattern
 
     protected function getTemplatePath(): string
     {
-        $backend = $this->parameters->getBackend();
+        $backend = $this->getParameters()->getBackend();
         switch ($backend) {
             case Parameters::BACKEND_SNOWFLAKE:
                 return 'Scd2Snowflake.twig';
@@ -63,19 +63,19 @@ class Scd2Pattern extends AbstractPattern
     protected function getTemplateVariables(): array
     {
         return [
-            'timezone' => $this->parameters->getTimezone(),
-            'useDatetime' => $this->parameters->useDatetime(),
-            'keepDeleteActive' => $this->parameters->keepDeleteActive(),
-            'hasDeletedFlag' => $this->parameters->hasDeletedFlag(),
-            'inputPrimaryKey' => $this->parameters->getPrimaryKey(),
-            'inputPrimaryKeyLower' => $this->columnsToLower($this->parameters->getPrimaryKey()),
+            'timezone' => $this->getParameters()->getTimezone(),
+            'useDatetime' => $this->getParameters()->useDatetime(),
+            'keepDeleteActive' => $this->getParameters()->keepDeleteActive(),
+            'hasDeletedFlag' => $this->getParameters()->hasDeletedFlag(),
+            'inputPrimaryKey' => $this->getParameters()->getPrimaryKey(),
+            'inputPrimaryKeyLower' => $this->columnsToLower($this->getParameters()->getPrimaryKey()),
             'inputColumns' => $this->getInputColumns(),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
             'snapshotPrimaryKeyParts' => $this->getSnapshotPrimaryKeyParts(),
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
-            'deletedActualValue' => $this->parameters->keepDeleteActive() ? 1 : 0,
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
             'tableName' => [
                 'input' => self::TABLE_INPUT,
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
@@ -92,13 +92,13 @@ class Scd2Pattern extends AbstractPattern
 
     private function getInputColumns(): array
     {
-        return array_merge($this->parameters->getPrimaryKey(), $this->parameters->getMonitoredParameters());
+        return array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters());
     }
 
     private function getSnapshotPrimaryKeyParts(): array
     {
         // All snapshot columns are lower
-        return $this->columnsToLower(array_merge($this->parameters->getPrimaryKey(), [self::COLUMN_START_DATE]));
+        return $this->columnsToLower(array_merge($this->getParameters()->getPrimaryKey(), [self::COLUMN_START_DATE]));
     }
 
     private function getSnapshotInputColumns(): array
@@ -113,7 +113,7 @@ class Scd2Pattern extends AbstractPattern
         $columns[] = self::COLUMN_END_DATE;
         $columns[] = self::COLUMN_ACTUAL;
 
-        if ($this->parameters->hasDeletedFlag()) {
+        if ($this->getParameters()->hasDeletedFlag()) {
             $columns[] = self::COLUMN_IS_DELETED;
         }
 

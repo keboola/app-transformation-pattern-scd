@@ -13,21 +13,23 @@ use Keboola\TransformationPatternScd\QuoteHelper;
 
 abstract class AbstractPattern extends AbstractExtension implements Pattern
 {
-    // Available after render method calling
-    protected QuoteHelper $quoteHelper;
+    private ?QuoteHelper $quoteHelper = null;
 
-    // Available after render method calling
-    protected Parameters $parameters;
+    private ?Parameters $parameters = null;
 
     abstract protected function getTemplatePath(): string;
 
     abstract protected function getTemplateVariables(): array;
 
-    public function render(Parameters $parameters): string
+    public function setParameters(Parameters $parameters): void
     {
+        // Set parameters before render
         $this->parameters = $parameters;
         $this->quoteHelper = new QuoteHelper($parameters->getBackend());
+    }
 
+    public function render(): string
+    {
         $loader = new Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
         $twig = new Twig\Environment($loader, ['strict_variables' => true, 'autoescape' => false]);
         $twig->addExtension($this);
@@ -47,12 +49,29 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
     public function getFilters(): array
     {
         return [
-            new TwigFilter('quoteIdentifier', fn(string $str) => $this->quoteHelper->quoteIdentifier($str)),
-            new TwigFilter('quoteValue', fn(string $str) => $this->quoteHelper->quoteValue($str)),
+            new TwigFilter('quoteIdentifier', fn(string $str) => $this->getQuoteHelper()->quoteIdentifier($str)),
+            new TwigFilter('quoteValue', fn(string $str) => $this->getQuoteHelper()->quoteValue($str)),
             new TwigFilter('noIndent', fn(string $str) => $this->noIndent($str)),
         ];
     }
 
+    protected function getQuoteHelper(): QuoteHelper
+    {
+        if (!$this->quoteHelper) {
+            throw new ApplicationException('Please, call "setParameters" before calling "getQuoteHelper".');
+        }
+
+        return $this->quoteHelper;
+    }
+
+    protected function getParameters(): Parameters
+    {
+        if (!$this->parameters) {
+            throw new ApplicationException('Please, call "setParameters" before calling "getQuoteHelper".');
+        }
+
+        return $this->parameters;
+    }
 
     protected function columnsToLower(array $columns): array
     {

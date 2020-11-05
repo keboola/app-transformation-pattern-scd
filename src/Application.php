@@ -53,6 +53,7 @@ class Application
     {
         // Create parameters
         $parameters = $this->parametersFactory->create();
+        $this->pattern->setParameters($parameters);
 
         // Create snapshot table by API
         $this->apiFacade->createSnapshotTable(
@@ -63,7 +64,7 @@ class Application
 
         return [
             'storage' => $this->storageGenerator->generate(),
-            'parameters' => $this->blocksGenerator->generate($this->pattern->render($parameters)),
+            'parameters' => $this->blocksGenerator->generate($this->pattern->render()),
         ];
     }
 }

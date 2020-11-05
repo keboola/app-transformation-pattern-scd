@@ -18,5 +18,7 @@ interface Pattern
 
     public function getSnapshotTableHeader(): array;
 
-    public function render(Parameters $parameters): string;
+    public function setParameters(Parameters $parameters): void;
+
+    public function render(): string;
 }
