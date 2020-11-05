@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Tests;
 
-use \PHPUnit\Framework\TestCase;
-use \Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
-use \Keboola\TransformationPatternScd\Config;
-use \PHPUnit\Framework\Assert;
-use \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use PHPUnit\Framework\TestCase;
+use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
+use Keboola\TransformationPatternScd\Config;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigTest extends TestCase
 {
@@ -30,6 +30,7 @@ class ConfigTest extends TestCase
                 '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'primary_key' => 'testKey, testKey2',
+                'monitored_parameters' => 'abc,def',
                 'timezone' => 'Europe/Prague',
             ],
         ];
@@ -54,6 +55,7 @@ class ConfigTest extends TestCase
                 '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => 'invalidScdType',
                 'primary_key' => 'testKey, testKey2',
+                'monitored_parameters' => 'abc,def',
                 'timezone' => 'Europe/Prague',
             ],
         ];
@@ -73,6 +75,7 @@ class ConfigTest extends TestCase
                 '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'timezone' => 'Europe/Prague',
+                'monitored_parameters' => 'abc,def',
             ],
         ];
 
@@ -88,6 +91,7 @@ class ConfigTest extends TestCase
                 '_componentId' => 'keboola.snowflake-transformation',
                 'scd_type' => GenerateDefinition::SCD_TYPE_2,
                 'primary_key' => 'testKey, testKey2',
+                'monitored_parameters' => 'abc,def',
             ],
         ];
 
@@ -105,6 +109,7 @@ class ConfigTest extends TestCase
                         '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_2,
                         'primary_key' => 'testKey, testKey2',
+                        'monitored_parameters' => 'abc,def',
                         'timezone' => 'Europe/Prague',
                         'deleted_flag' => false,
                         'use_datetime' => false,
@@ -118,6 +123,7 @@ class ConfigTest extends TestCase
                         '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_2,
                         'primary_key' => 'testKey, testKey2',
+                        'monitored_parameters' => 'abc,def',
                         'timezone' => 'Europe/Prague',
                         'deleted_flag' => true,
                         'use_datetime' => false,
@@ -131,6 +137,7 @@ class ConfigTest extends TestCase
                         '_componentId' => 'keboola.snowflake-transformation',
                         'scd_type' => GenerateDefinition::SCD_TYPE_4,
                         'primary_key' => 'testKey, testKey2',
+                        'monitored_parameters' => 'abc,def',
                         'timezone' => 'Europe/Prague',
                         'deleted_flag' => true,
                         'use_datetime' => true,
