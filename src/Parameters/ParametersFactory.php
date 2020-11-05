@@ -60,7 +60,7 @@ class ParametersFactory
         $configColumns = $this->config->getPrimaryKeyInput();
         $storageColumns = $this->getInputTableColumns();
         $missingColumns = array_diff($configColumns, $storageColumns);
-        if ($configColumns) {
+        if ($missingColumns) {
             throw new UserException(sprintf(
                 'Primary key "%s" not found in the input table "%s".',
                 implode('", "', $missingColumns),
@@ -76,7 +76,7 @@ class ParametersFactory
         $configColumns = $this->config->getIncludedParametersInput();
         $storageColumns = $this->getInputTableColumns();
         $missingColumns = array_diff($configColumns, $storageColumns);
-        if ($configColumns) {
+        if ($missingColumns) {
             throw new UserException(sprintf(
                 'Monitored parameter "%s" not found in the input table "%s".',
                 implode('", "', $missingColumns),
