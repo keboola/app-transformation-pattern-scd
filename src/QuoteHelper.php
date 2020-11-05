@@ -38,7 +38,7 @@ class QuoteHelper
                 return sprintf('"%s"', $str);
 
             case self::TYPE_SYNAPSE:
-                throw new ApplicationException('Not implemented.');
+                return sprintf('"%s"', $str);
 
             default:
                 throw new ApplicationException('Unexpected quoting type.');
@@ -52,7 +52,7 @@ class QuoteHelper
                 return sprintf("'%s'", $str);
 
             case self::TYPE_SYNAPSE:
-                throw new ApplicationException('Not implemented.');
+                return sprintf("'%s'", $str);
 
             default:
                 throw new ApplicationException('Unexpected quoting type.');
