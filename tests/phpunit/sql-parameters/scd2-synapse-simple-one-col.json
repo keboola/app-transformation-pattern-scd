@@ -1,0 +1,10 @@
+{
+  "backend": "synapse",
+  "scd_type": "scd2",
+  "primary_key": ["Pk1"],
+  "monitored_parameters": ["name"],
+  "timezone": "UTC",
+  "deleted_flag": false,
+  "use_datetime": false,
+  "keep_del_active": false
+}

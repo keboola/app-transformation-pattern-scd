@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b0f0a3b98eff0c5fae7fc15a783a792",
+    "content-hash": "3d9f6f8e5137ac9bf1680823a0c23bc9",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.158.19",
+            "version": "3.158.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "b1c3c763e227e518768f0416cbd2b29c11f79561"
+                "reference": "a2aba95a428f9e478d08b3f8dc1a70837b46785a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b1c3c763e227e518768f0416cbd2b29c11f79561",
-                "reference": "b1c3c763e227e518768f0416cbd2b29c11f79561",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a2aba95a428f9e478d08b3f8dc1a70837b46785a",
+                "reference": "a2aba95a428f9e478d08b3f8dc1a70837b46785a",
                 "shasum": ""
             },
             "require": {
@@ -92,9 +92,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.158.19"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.158.21"
             },
-            "time": "2020-11-02T19:49:21+00:00"
+            "time": "2020-11-05T19:24:22+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2039,19 +2039,20 @@
         },
         {
             "name": "keboola/datadir-tests",
-            "version": "4.0.2",
+            "version": "5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/datadir-tests.git",
-                "reference": "b01856c771760331b50a082f8b6cb2557632c5bc"
+                "reference": "9b2bf6d1495973e43b48a267469cb990dfe44520"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/datadir-tests/zipball/b01856c771760331b50a082f8b6cb2557632c5bc",
-                "reference": "b01856c771760331b50a082f8b6cb2557632c5bc",
+                "url": "https://api.github.com/repos/keboola/datadir-tests/zipball/9b2bf6d1495973e43b48a267469cb990dfe44520",
+                "reference": "9b2bf6d1495973e43b48a267469cb990dfe44520",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "keboola/php-temp": "^2.0",
                 "php": "^7.3",
                 "phpunit/phpunit": "^9.0",
@@ -2077,9 +2078,9 @@
             "description": "Tool for functional testing of Keboola Connection components",
             "support": {
                 "issues": "https://github.com/keboola/datadir-tests/issues",
-                "source": "https://github.com/keboola/datadir-tests/tree/master"
+                "source": "https://github.com/keboola/datadir-tests/tree/5.2.0"
             },
-            "time": "2020-03-19T12:08:12+00:00"
+            "time": "2020-09-10T12:31:35+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -2642,16 +2643,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.53",
+            "version": "0.12.54",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "dbbdb0d7c2434ecd5289f6114d16473e694caa67"
+                "reference": "45c7b999a4b7dd9ac5558bdaaf23dcebbef88223"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/dbbdb0d7c2434ecd5289f6114d16473e694caa67",
-                "reference": "dbbdb0d7c2434ecd5289f6114d16473e694caa67",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/45c7b999a4b7dd9ac5558bdaaf23dcebbef88223",
+                "reference": "45c7b999a4b7dd9ac5558bdaaf23dcebbef88223",
                 "shasum": ""
             },
             "require": {
@@ -2682,7 +2683,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.53"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.54"
             },
             "funding": [
                 {
@@ -2698,7 +2699,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-11-01T14:51:50+00:00"
+            "time": "2020-11-05T13:36:26+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

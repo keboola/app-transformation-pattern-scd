@@ -14,12 +14,13 @@
         "twig/twig": "^3.1"
     },
     "require-dev": {
-        "php-parallel-lint/php-parallel-lint": "^1.2",
         "keboola/coding-standard": ">=7.0.2",
-        "keboola/datadir-tests": "^4.0",
+        "keboola/datadir-tests": "^5.2",
         "keboola/php-temp": "^2.0",
+        "php-parallel-lint/php-parallel-lint": "^1.2",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.0",
+        "symfony/finder": "^5.1",
         "symfony/process": "^5.0"
     },
     "autoload": {
@@ -48,7 +49,8 @@
         "build": [
             "@phplint",
             "@phpcs",
-            "@phpstan"
+            "@phpstan",
+            "@tests"
         ],
         "ci": [
             "@composer validate --no-check-publish --no-check-all",
