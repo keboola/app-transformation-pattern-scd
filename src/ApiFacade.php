@@ -34,7 +34,15 @@ class ApiFacade
             $this->createBucketIfNotExists($snapshotTable);
             $this->createTableIfNotExists($snapshotTable, $header, $primaryKey);
         } catch (ClientException $e) {
-            throw new UserException($e->getMessage(), 0, $e);
+            throw new UserException(
+                sprintf(
+                    'Cannot create snapshot table "%s": %s',
+                    $snapshotTable->getTableId(),
+                    $e->getMessage(),
+                ),
+                0,
+                $e
+            );
         }
     }
 
@@ -60,7 +68,7 @@ class ApiFacade
         if (!$this->client->tableExists($snapshotTable->getTableId())) {
             $csvFile = new CsvFile(sprintf('%s/snapshot.csv', $this->dataDir));
             $csvFile->writeRow($header);
-            $this->client->createTable(
+            $this->client->createTableAsync(
                 $snapshotTable->getBuckedId(),
                 $snapshotTable->getTableName(),
                 $csvFile,
