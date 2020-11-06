@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Patterns;
 
-use Twig\Extension\ExtensionInterface;
+use Keboola\TransformationPatternScd\Parameters\Parameters;
 
 interface Pattern
 {
@@ -18,9 +18,7 @@ interface Pattern
 
     public function getSnapshotTableHeader(): array;
 
-    public function getTemplatePath(): string;
+    public function setParameters(Parameters $parameters): void;
 
-    public function getTemplateVariables(): array;
-
-    public function getTwigExtension(): ?ExtensionInterface;
+    public function render(): string;
 }

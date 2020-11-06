@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Patterns;
 
-use Keboola\Component\UserException;
-use Keboola\TransformationPatternScd\Application;
+use Keboola\TransformationPatternScd\Exception\ApplicationException;
+use Keboola\TransformationPatternScd\Parameters\Parameters;
 
 class Scd4Pattern extends AbstractPattern
 {
@@ -17,21 +17,6 @@ class Scd4Pattern extends AbstractPattern
     public const COLUMN_SNAPSHOT_DATE = 'snapshot_date';
     public const COLUMN_ACTUAL = 'actual';
     public const COLUMN_IS_DELETED = 'is_deleted';
-
-    public function getTemplatePath(): string
-    {
-        switch ($this->config->getComponentId()) {
-            case Application::SNOWFLAKE_TRANS_COMPONENT:
-                return 'Scd4Snowflake.twig';
-            case Application::SYNAPSE_TRANS_COMPONENT:
-                return 'Scd4Synapse.twig';
-            default:
-                throw new UserException(sprintf(
-                    'The SCD code pattern is not compatible with component "%s".',
-                    $this->config->getComponentId()
-                ));
-        }
-    }
 
     public function getInputTableName(): string
     {
@@ -61,19 +46,36 @@ class Scd4Pattern extends AbstractPattern
         );
     }
 
-    public function getTemplateVariables(): array
+    protected function getTemplatePath(): string
+    {
+        $backend = $this->getParameters()->getBackend();
+        switch ($backend) {
+            case Parameters::BACKEND_SNOWFLAKE:
+                return 'Scd4Snowflake.twig';
+            case Parameters::BACKEND_SYNAPSE:
+                return 'Scd4Synapse.twig';
+            default:
+                throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
+        }
+    }
+
+    protected function getTemplateVariables(): array
     {
         return [
-            'config' => $this->config,
-            'inputPrimaryKey' => $this->getInputPrimaryKey(),
+            'timezone' => $this->getParameters()->getTimezone(),
+            'useDatetime' => $this->getParameters()->useDatetime(),
+            'keepDeleteActive' => $this->getParameters()->keepDeleteActive(),
+            'hasDeletedFlag' => $this->getParameters()->hasDeletedFlag(),
+            'inputPrimaryKey' => $this->getParameters()->getPrimaryKey(),
             'inputColumns' => $this->getInputColumns(),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
             'snapshotPrimaryKeyParts' => $this->getSnapshotPrimaryKeyParts(),
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
-            'deletedActualValue' => $this->config->keepDeleteActive() ? 1 : 0,
-            'generateDeletedRecords' => $this->config->hasDeletedFlag() || $this->config->keepDeleteActive(),
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
+            'generateDeletedRecords' =>
+                $this->getParameters()->hasDeletedFlag() || $this->getParameters()->keepDeleteActive(),
             'tableName' => [
                 'input' => self::TABLE_INPUT,
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
@@ -87,20 +89,17 @@ class Scd4Pattern extends AbstractPattern
         ];
     }
 
-    private function getInputPrimaryKey(): array
-    {
-        return $this->config->getPrimaryKey();
-    }
-
     private function getInputColumns(): array
     {
-        return array_merge($this->config->getPrimaryKey(), $this->config->getMonitoredParameters());
+        return array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters());
     }
 
     private function getSnapshotPrimaryKeyParts(): array
     {
         // All snapshot columns are lower
-        return $this->columnsToLower(array_merge($this->config->getPrimaryKey(), [self::COLUMN_SNAPSHOT_DATE]));
+        return $this->columnsToLower(
+            array_merge($this->getParameters()->getPrimaryKey(), [self::COLUMN_SNAPSHOT_DATE])
+        );
     }
 
     private function getSnapshotInputColumns(): array
@@ -114,7 +113,7 @@ class Scd4Pattern extends AbstractPattern
         $columns[] = self::COLUMN_SNAPSHOT_DATE;
         $columns[] = self::COLUMN_ACTUAL;
 
-        if ($this->config->hasDeletedFlag()) {
+        if ($this->getParameters()->hasDeletedFlag()) {
             $columns[] = self::COLUMN_IS_DELETED;
         }
 
@@ -128,10 +127,5 @@ class Scd4Pattern extends AbstractPattern
             $this->getSnapshotInputColumns(),
             $this->getSnapshotSpecialColumns()
         );
-    }
-
-    private function columnsToLower(array $columns): array
-    {
-        return array_map(fn(string $column) => mb_strtolower($column), $columns);
     }
 }

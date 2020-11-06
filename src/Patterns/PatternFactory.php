@@ -5,32 +5,27 @@ declare(strict_types=1);
 namespace Keboola\TransformationPatternScd\Patterns;
 
 use Keboola\Component\UserException;
-use Keboola\TransformationPatternScd\Config;
 use Keboola\TransformationPatternScd\Configuration\GenerateDefinition;
-use Keboola\TransformationPatternScd\QuoteHelper;
 
 class PatternFactory
 {
-    private Config $config;
+    private string $scdType;
 
-    private QuoteHelper $quoteHelper;
-
-    public function __construct(Config $config)
+    public function __construct(string $scdType)
     {
-        $this->config = $config;
-        $this->quoteHelper = new QuoteHelper($config);
+        $this->scdType = $scdType;
     }
 
     public function create(): Pattern
     {
-        switch ($this->config->getScdType()) {
+        switch ($this->scdType) {
             case GenerateDefinition::SCD_TYPE_2:
-                return new Scd2Pattern($this->config, $this->quoteHelper);
+                return new Scd2Pattern();
             case GenerateDefinition::SCD_TYPE_4:
-                return new Scd4Pattern($this->config, $this->quoteHelper);
+                return new Scd4Pattern();
             default:
                 throw new UserException(
-                    sprintf('Unknown scd type "%s"', $this->config->getScdType())
+                    sprintf('Unknown scd type "%s"', $this->scdType)
                 );
         }
     }

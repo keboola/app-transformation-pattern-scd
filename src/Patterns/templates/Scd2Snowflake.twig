@@ -1,5 +1,4 @@
 {% import "macros.twig" as macro %}
-{% set timezone = config.getTimezone() %}
 {% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
 {% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input") %}
 {% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) %}
@@ -7,7 +6,7 @@
 -- by creating new records for new/modified data in the snapshot table. --
 
 {% apply noIndent %}
-    {% if config.useDatetime() %}
+    {% if useDatetime %}
         {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
         {% set infiniteDate = '9999-12-31 00:00:00' | quoteValue %}
         -- The start and end dates contain the time ("use_datetime" = true). --
@@ -21,7 +20,7 @@
         SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
     {% endif %}
 
-    {% if config.keepDeleteActive() %}
+    {% if keepDeleteActive %}
         {% set deletedEndDate = infiniteDate %}
     {% else %}
         {% set deletedEndDate = currentDate %}
@@ -50,7 +49,7 @@ CREATE TABLE "changed_records" AS
         -- The end date is set to infinity. --
         {{ infiniteDate }} AS {{ columnName.endDate | quoteIdentifier }},
         -- Actual flag is set to "1". --
-        1 AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+        1 AS {{ columnName.actual | quoteIdentifier }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "0". --
         0 AS {{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
     FROM "diff_records";
@@ -65,7 +64,7 @@ CREATE TABLE "updated_records" AS
         -- The end date is set to now. --
         {{ currentDate }} AS {{ columnName.endDate | quoteIdentifier }},
         -- Actual flag is set to "0", because the new version exists. --
-        0 AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+        0 AS {{ columnName.actual | quoteIdentifier }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "0", because the new version exists. --
         0 AS {{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
@@ -90,10 +89,10 @@ CREATE TABLE "deleted_records" AS
         -- The start date is unchanged, it is part of the PK, --
         -- so old values are overwritten by incremental loading. --
         snapshot.{{ columnName.startDate | quoteIdentifier }},
-        -- The end date is set to "{{  deletedEndDate  }}" ("keep_del_active" = {{ config.keepDeleteActive() ? 'true' : 'false' }}). --
+        -- The end date is set to "{{  deletedEndDate  }}" ("keep_del_active" = {{ keepDeleteActive ? 'true' : 'false' }}). --
         {{ deletedEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
-        -- The actual flag is set to "{{  deletedActualValue  }}" ("keep_del_active" = {{ config.keepDeleteActive() ? 'true' : 'false' }}). --
-        {{ deletedActualValue }} AS {{ columnName.actual | quoteIdentifier }}{% if config.hasDeletedFlag() %},
+        -- The actual flag is set to "{{  deletedActualValue  }}" ("keep_del_active" = {{ keepDeleteActive? 'true' : 'false' }}). --
+        {{ deletedActualValue }} AS {{ columnName.actual | quoteIdentifier }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "1". --
         1 AS {{ columnName.isDeleted | quoteIdentifier }}{% endif ~%}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot

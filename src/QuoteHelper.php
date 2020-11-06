@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd;
 
-use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\Exception\ApplicationException;
+use Keboola\TransformationPatternScd\Parameters\Parameters;
 
 class QuoteHelper
 {
@@ -14,20 +14,17 @@ class QuoteHelper
 
     private string $type;
 
-    public function __construct(Config $config)
+    public function __construct(string $backend)
     {
-        switch ($config->getComponentId()) {
-            case Application::SNOWFLAKE_TRANS_COMPONENT:
+        switch ($backend) {
+            case Parameters::BACKEND_SNOWFLAKE:
                 $this->type = self::TYPE_SNOWFLAKE;
                 break;
-            case Application::SYNAPSE_TRANS_COMPONENT:
+            case Parameters::BACKEND_SYNAPSE:
                 $this->type = self::TYPE_SYNAPSE;
                 break;
             default:
-                throw new UserException(sprintf(
-                    'The SCD code pattern is not compatible with component "%s".',
-                    $config->getComponentId()
-                ));
+                throw new ApplicationException(sprintf('Unexpected backend ""%s.', $backend));
         }
     }
 
@@ -35,8 +32,6 @@ class QuoteHelper
     {
         switch ($this->type) {
             case self::TYPE_SNOWFLAKE:
-                return sprintf('"%s"', $str);
-
             case self::TYPE_SYNAPSE:
                 return sprintf('"%s"', $str);
 
@@ -49,8 +44,6 @@ class QuoteHelper
     {
         switch ($this->type) {
             case self::TYPE_SNOWFLAKE:
-                return sprintf("'%s'", $str);
-
             case self::TYPE_SYNAPSE:
                 return sprintf("'%s'", $str);
 
