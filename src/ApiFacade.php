@@ -14,18 +14,15 @@ class ApiFacade
 {
     private Config $config;
 
-    private string $dataDir;
-
     private Client $client;
 
-    public function __construct(Config $config, string $dataDir)
+    private string $dataDir;
+
+    public function __construct(Config $config, Client $client, string $dataDir)
     {
         $this->config = $config;
+        $this->client = $client;
         $this->dataDir = $dataDir;
-        $this->client = new Client([
-            'url' => $this->config->getStorageApiUrl(),
-            'token' => $this->config->getStorageApiToken(),
-        ]);
     }
 
     public function createSnapshotTable(Table $snapshotTable, array $header, string $primaryKey): void
