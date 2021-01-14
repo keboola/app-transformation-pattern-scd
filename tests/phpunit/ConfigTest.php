@@ -25,16 +25,7 @@ class ConfigTest extends TestCase
 
     public function testDefaultValues(): void
     {
-        $config = [
-            'parameters' => [
-                '_componentId' => 'keboola.snowflake-transformation',
-                'scd_type' => GenerateDefinition::SCD_TYPE_2,
-                'primary_key' => 'testKey, testKey2',
-                'monitored_parameters' => 'abc,def',
-                'timezone' => 'Europe/Prague',
-            ],
-        ];
-
+        $config = $this->getMinimalConfig();
         $expectedDiff = [
             'deleted_flag' => false,
             'use_datetime' => false,
@@ -50,15 +41,8 @@ class ConfigTest extends TestCase
 
     public function testInvalidScdType(): void
     {
-        $config = [
-            'parameters' => [
-                '_componentId' => 'keboola.snowflake-transformation',
-                'scd_type' => 'invalidScdType',
-                'primary_key' => 'testKey, testKey2',
-                'monitored_parameters' => 'abc,def',
-                'timezone' => 'Europe/Prague',
-            ],
-        ];
+        $config = $this->getMinimalConfig();
+        $config['parameters']['scd_type'] = 'invalidScdType';
 
         $expectedMessage = 'The value "invalidScdType" is not allowed for path "root.parameters.scd_type". ';
         $expectedMessage .= 'Permissible values: "scd2", "scd4"';
@@ -80,7 +64,7 @@ class ConfigTest extends TestCase
         ];
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "primary_key" at path "root.parameters" must be configured.');
+        $this->expectExceptionMessage('The child config "primary_key" under "root.parameters" must be configured.');
         new Config($config, new GenerateDefinition());
     }
 
@@ -96,8 +80,22 @@ class ConfigTest extends TestCase
         ];
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "timezone" at path "root.parameters" must be configured.');
+        $this->expectExceptionMessage('The child config "timezone" under "root.parameters" must be configured.');
         new Config($config, new GenerateDefinition());
+    }
+
+    public function testBranchIdSet(): void
+    {
+        putenv('KBC_BRANCHID=my-branch');
+        $appConfig = new Config($this->getMinimalConfig(), new GenerateDefinition());
+        Assert::assertSame('my-branch', $appConfig->getStorageBranchId());
+    }
+
+    public function testBranchIdNotSet(): void
+    {
+        putenv('KBC_BRANCHID=');
+        $appConfig = new Config($this->getMinimalConfig(), new GenerateDefinition());
+        Assert::assertSame(null, $appConfig->getStorageBranchId());
     }
 
     public function validConfigProvider(): array
@@ -144,6 +142,19 @@ class ConfigTest extends TestCase
                         'keep_del_active' => true,
                     ],
                 ],
+            ],
+        ];
+    }
+
+    private function getMinimalConfig(): array
+    {
+        return [
+            'parameters' => [
+                '_componentId' => 'keboola.snowflake-transformation',
+                'scd_type' => GenerateDefinition::SCD_TYPE_2,
+                'primary_key' => 'testKey, testKey2',
+                'monitored_parameters' => 'abc,def',
+                'timezone' => 'Europe/Prague',
             ],
         ];
     }

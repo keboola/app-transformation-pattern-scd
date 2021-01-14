@@ -40,7 +40,9 @@ class Application
         $this->config = $config;
         $this->logger = $logger;
         $this->dataDir = $dataDir;
-        $this->apiFacade = new ApiFacade($this->config, $dataDir);
+        $apiClientFactory = new ApiClientFactory($this->config);
+        $apiClient = $apiClientFactory->create();
+        $this->apiFacade = new ApiFacade($this->config, $apiClient, $dataDir);
         $this->patternFactory = new PatternFactory($this->config->getScdType());
         $this->pattern = $this->patternFactory->create();
         $this->mappingManager = new MappingManager($this->config, $this->pattern);

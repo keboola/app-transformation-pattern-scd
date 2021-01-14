@@ -28,6 +28,16 @@ class Config extends BaseConfig
         return $url;
     }
 
+    public function getStorageBranchId(): ?string
+    {
+        $branchId = (string) getenv('KBC_BRANCHID');
+        if (!$branchId) {
+            return null;
+        }
+        return $branchId;
+    }
+
+
     public function getComponentId(): string
     {
         // Returns the ID of the component for which the code is generated.
