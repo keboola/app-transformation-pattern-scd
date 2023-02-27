@@ -6,6 +6,7 @@ namespace Keboola\TransformationPatternScd;
 
 use Keboola\StorageApi\Client;
 use Keboola\StorageApiBranch\ClientWrapper;
+use Keboola\StorageApiBranch\Factory\ClientOptions;
 
 class ApiClientFactory
 {
@@ -19,20 +20,13 @@ class ApiClientFactory
     public function create(): Client
     {
         $clientWrapper = new ClientWrapper(
-            new Client([
-               'url' => $this->config->getStorageApiUrl(),
-               'token' => $this->config->getStorageApiToken(),
-            ]),
-            null,
-            null
+            new ClientOptions(
+                $this->config->getStorageApiUrl(),
+                $this->config->getStorageApiToken(),
+                $this->config->getStorageBranchId()
+            ),
         );
 
-        $branchId = $this->config->getStorageBranchId();
-        if ($branchId) {
-            $clientWrapper->setBranchId($branchId);
-            return $clientWrapper->getBranchClient();
-        }
-
-        return $clientWrapper->getBasicClient();
+        return $clientWrapper->getBranchClientIfAvailable();
     }
 }
