@@ -1,7 +1,5 @@
 # Snapshot (SCD) SQL generator
 
-[![Build Status](https://travis-ci.com/keboola/app-transformation-pattern-scd.svg?branch=master)](https://travis-ci.com/keboola/app-transformation-pattern-scd)
-
 > Generate code for SCD type 2 or 4 on any input dataset.
 
 ## Configuration Options
