@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd;
 
+use Keboola\StorageApi\Client;
 use Keboola\TransformationPatternScd\Parameters\ParametersFactory;
 use Keboola\TransformationPatternScd\Patterns\Pattern;
 use Keboola\TransformationPatternScd\Mapping\MappingManager;
@@ -40,9 +41,8 @@ class Application
         $this->config = $config;
         $this->logger = $logger;
         $this->dataDir = $dataDir;
-        $apiClientFactory = new ApiClientFactory($this->config);
-        $apiClient = $apiClientFactory->create();
-        $this->apiFacade = new ApiFacade($this->config, $apiClient, $dataDir);
+        $apiClient = new Client(['url' => $config->getStorageApiUrl(), 'token' => $config->getStorageApiToken()]);
+        $this->apiFacade = new ApiFacade($apiClient, $dataDir);
         $this->patternFactory = new PatternFactory($this->config->getScdType());
         $this->pattern = $this->patternFactory->create();
         $this->mappingManager = new MappingManager($this->config, $this->pattern);
