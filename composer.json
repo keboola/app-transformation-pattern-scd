@@ -9,8 +9,8 @@
         "keboola/common-exceptions": "^1.1",
         "keboola/csv": "^1.1",
         "keboola/php-component": "^8.3",
-        "keboola/storage-api-client": "^11.3",
-        "keboola/storage-api-php-client-branch-wrapper": "^1.0",
+        "keboola/storage-api-client": "^14.8",
+        "keboola/storage-api-php-client-branch-wrapper": "^3.3",
         "symfony/config": "^5.1",
         "twig/twig": "^3.1"
     },
