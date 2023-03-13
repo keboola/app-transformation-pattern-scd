@@ -84,20 +84,6 @@ class ConfigTest extends TestCase
         new Config($config, new GenerateDefinition());
     }
 
-    public function testBranchIdSet(): void
-    {
-        putenv('KBC_BRANCHID=my-branch');
-        $appConfig = new Config($this->getMinimalConfig(), new GenerateDefinition());
-        Assert::assertSame('my-branch', $appConfig->getStorageBranchId());
-    }
-
-    public function testBranchIdNotSet(): void
-    {
-        putenv('KBC_BRANCHID=');
-        $appConfig = new Config($this->getMinimalConfig(), new GenerateDefinition());
-        Assert::assertSame(null, $appConfig->getStorageBranchId());
-    }
-
     public function validConfigProvider(): array
     {
         return [

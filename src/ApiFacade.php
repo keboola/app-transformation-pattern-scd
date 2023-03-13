@@ -12,15 +12,12 @@ use Keboola\TransformationPatternScd\Mapping\Table;
 
 class ApiFacade
 {
-    private Config $config;
-
     private Client $client;
 
     private string $dataDir;
 
-    public function __construct(Config $config, Client $client, string $dataDir)
+    public function __construct(Client $client, string $dataDir)
     {
-        $this->config = $config;
         $this->client = $client;
         $this->dataDir = $dataDir;
     }
