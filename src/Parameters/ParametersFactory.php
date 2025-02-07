@@ -37,6 +37,8 @@ class ParametersFactory
             $this->config->hasDeletedFlag(),
             $this->config->useDatetime(),
             $this->config->keepDeleteActive(),
+            $this->config->getStartDateName(),
+            $this->config->getEndDateName(),
         );
     }
 

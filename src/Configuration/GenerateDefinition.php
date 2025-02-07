@@ -36,6 +36,8 @@ class GenerateDefinition extends BaseConfigDefinition
                 ->booleanNode('use_datetime')->defaultFalse()->end()
                 ->booleanNode('keep_del_active')->defaultFalse()->end()
                 ->scalarNode('timezone')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('start_date_name')->defaultValue('start_date')->end()
+                ->scalarNode('end_date_name')->defaultValue('end_date')->end()
             ->end()
         ;
         // @formatter:on

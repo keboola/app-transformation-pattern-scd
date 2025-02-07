@@ -23,6 +23,10 @@ class Parameters
 
     private bool $keepDeletedActiveValue;
 
+    private string $startDateName;
+
+    private string $endDateName;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -30,7 +34,9 @@ class Parameters
         string $timezone,
         bool $deletedFlag,
         bool $useDatetime,
-        bool $keepDeletedActive
+        bool $keepDeletedActive,
+        string $startDateName,
+        string $endDateName
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -39,6 +45,8 @@ class Parameters
         $this->deletedFlag = $deletedFlag;
         $this->useDatetimeValue = $useDatetime;
         $this->keepDeletedActiveValue = $keepDeletedActive;
+        $this->startDateName = $startDateName;
+        $this->endDateName = $endDateName;
     }
 
     public function getBackend(): string
@@ -74,5 +82,15 @@ class Parameters
     public function keepDeleteActive(): bool
     {
         return $this->keepDeletedActiveValue;
+    }
+
+    public function getStartDateName(): string
+    {
+        return $this->startDateName;
+    }
+
+    public function getEndDateName(): string
+    {
+        return $this->endDateName;
     }
 }

@@ -82,8 +82,8 @@ class Scd2Pattern extends AbstractPattern
                 'newSnapshot' => self::TABLE_NEW_SNAPSHOT,
             ],
             'columnName' => [
-                'startDate' => self::COLUMN_START_DATE,
-                'endDate' => self::COLUMN_END_DATE,
+                'startDate' => $this->getParameters()->getStartDateName(),
+                'endDate' => $this->getParameters()->getEndDateName(),
                 'actual' => self::COLUMN_ACTUAL,
                 'isDeleted' => self::COLUMN_IS_DELETED,
             ],

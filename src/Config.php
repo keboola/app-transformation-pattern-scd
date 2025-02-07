@@ -79,4 +79,14 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'timezone']);
     }
+
+    public function getStartDateName(): string
+    {
+        return $this->getValue(['parameters', 'start_date_name']);
+    }
+
+    public function getEndDateName(): string
+    {
+        return $this->getValue(['parameters', 'end_date_name']);
+    }
 }
