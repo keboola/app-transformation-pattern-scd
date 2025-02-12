@@ -30,6 +30,8 @@ class ConfigTest extends TestCase
             'deleted_flag' => false,
             'use_datetime' => false,
             'keep_del_active' => false,
+            'start_date_name' => 'start_date',
+            'end_date_name' => 'end_date',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -98,6 +100,8 @@ class ConfigTest extends TestCase
                         'deleted_flag' => false,
                         'use_datetime' => false,
                         'keep_del_active' => false,
+                        'start_date_name' => 'start_date',
+                        'end_date_name' => 'end_date',
                     ],
                 ],
             ],
@@ -112,6 +116,8 @@ class ConfigTest extends TestCase
                         'deleted_flag' => true,
                         'use_datetime' => false,
                         'keep_del_active' => true,
+                        'start_date_name' => 'start_date',
+                        'end_date_name' => 'end_date',
                     ],
                 ],
             ],
@@ -126,6 +132,8 @@ class ConfigTest extends TestCase
                         'deleted_flag' => true,
                         'use_datetime' => true,
                         'keep_del_active' => true,
+                        'start_date_name' => 'start_date',
+                        'end_date_name' => 'end_date',
                     ],
                 ],
             ],

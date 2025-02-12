@@ -7,7 +7,6 @@ namespace Keboola\TransformationPatternScd\Parameters;
 class Parameters
 {
     public const BACKEND_SNOWFLAKE = 'snowflake';
-    public const BACKEND_SYNAPSE = 'synapse';
 
     private string $backend;
 

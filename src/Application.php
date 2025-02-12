@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 class Application
 {
     public const SNOWFLAKE_TRANS_COMPONENT = 'keboola.snowflake-transformation';
-    public const SYNAPSE_TRANS_COMPONENT = 'keboola.synapse-transformation';
 
     private string $dataDir;
 

@@ -47,8 +47,6 @@ class ParametersFactory
         switch ($this->config->getComponentId()) {
             case Application::SNOWFLAKE_TRANS_COMPONENT:
                 return Parameters::BACKEND_SNOWFLAKE;
-            case Application::SYNAPSE_TRANS_COMPONENT:
-                return Parameters::BACKEND_SYNAPSE;
             default:
                 throw new UserException(sprintf(
                     'The SCD code pattern is not compatible with component "%s".',
