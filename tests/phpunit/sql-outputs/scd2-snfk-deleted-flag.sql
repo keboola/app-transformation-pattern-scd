@@ -24,9 +24,9 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         "pk1", "pk2", "name", "age", "job",
         -- The start date is set to now. --
-        $CURRENT_DATE_TXT AS "start_date",
+        $CURRENT_DATE_TXT AS "custom_start_date",
         -- The end date is set to infinity. --
-        '9999-12-31' AS "end_date",
+        '9999-12-31' AS "custom_end_date",
         -- Actual flag is set to "1". --
         1 AS "actual",
         -- IsDeleted flag is set to "0". --
@@ -39,9 +39,9 @@ CREATE TABLE "updated_records" AS
         -- Monitored parameters. --
         snapshot."pk1", snapshot."pk2", snapshot."name", snapshot."age", snapshot."job",
         -- The start date is preserved. --
-        snapshot."start_date",
+        snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_DATE_TXT AS "end_date",
+        $CURRENT_DATE_TXT AS "custom_end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "actual",
         -- IsDeleted flag is set to "0", because the new version exists. --
@@ -58,7 +58,7 @@ CREATE TABLE "updated_records" AS
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
         -- TLDR: for each PK, we can have max one row in the new snapshot. --
-        AND snapshot."start_date" != $CURRENT_DATE_TXT;
+        AND snapshot."custom_start_date" != $CURRENT_DATE_TXT;
 
 -- Deleted records are missing in input table, but have actual "1" in last snapshot. --
 CREATE TABLE "deleted_records" AS
@@ -67,9 +67,9 @@ CREATE TABLE "deleted_records" AS
         snapshot."pk1", snapshot."pk2", snapshot."name", snapshot."age", snapshot."job",
         -- The start date is unchanged, it is part of the PK, --
         -- so old values are overwritten by incremental loading. --
-        snapshot."start_date",
+        snapshot."custom_start_date",
         -- The end date is set to "$CURRENT_DATE_TXT" ("keep_del_active" = false). --
-        $CURRENT_DATE_TXT AS "end_date",
+        $CURRENT_DATE_TXT AS "custom_end_date",
         -- The actual flag is set to "0" ("keep_del_active" = false). --
         0 AS "actual",
         -- IsDeleted flag is set to "1". --
