@@ -89,4 +89,14 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'end_date_name']);
     }
+
+    public function getActualName(): string
+    {
+        return $this->getValue(['parameters', 'actual_name']);
+    }
+
+    public function getIsDeletedName(): string
+    {
+        return $this->getValue(['parameters', 'is_deleted_name']);
+    }
 }

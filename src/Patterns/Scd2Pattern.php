@@ -82,8 +82,8 @@ class Scd2Pattern extends AbstractPattern
             'columnName' => [
                 'startDate' => $this->getParameters()->getStartDateName(),
                 'endDate' => $this->getParameters()->getEndDateName(),
-                'actual' => self::COLUMN_ACTUAL,
-                'isDeleted' => self::COLUMN_IS_DELETED,
+                'actual' => $this->getParameters()->getActualName(),
+                'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
         ];
     }

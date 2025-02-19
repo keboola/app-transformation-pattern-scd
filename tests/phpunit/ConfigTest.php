@@ -32,6 +32,8 @@ class ConfigTest extends TestCase
             'keep_del_active' => false,
             'start_date_name' => 'start_date',
             'end_date_name' => 'end_date',
+            'actual_name' => 'actual',
+            'is_deleted_name' => 'isDeleted',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -102,6 +104,8 @@ class ConfigTest extends TestCase
                         'keep_del_active' => false,
                         'start_date_name' => 'start_date',
                         'end_date_name' => 'end_date',
+                        'actual_name' => 'actual',
+                        'is_deleted_name' => 'isDeleted',
                     ],
                 ],
             ],
@@ -118,6 +122,8 @@ class ConfigTest extends TestCase
                         'keep_del_active' => true,
                         'start_date_name' => 'start_date',
                         'end_date_name' => 'end_date',
+                        'actual_name' => 'actual',
+                        'is_deleted_name' => 'isDeleted',
                     ],
                 ],
             ],
@@ -134,6 +140,8 @@ class ConfigTest extends TestCase
                         'keep_del_active' => true,
                         'start_date_name' => 'start_date',
                         'end_date_name' => 'end_date',
+                        'actual_name' => 'actual',
+                        'is_deleted_name' => 'isDeleted',
                     ],
                 ],
             ],

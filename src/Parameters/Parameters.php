@@ -26,6 +26,10 @@ class Parameters
 
     private string $endDateName;
 
+    private string $actualName;
+
+    private string $isDeletedName;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -35,7 +39,9 @@ class Parameters
         bool $useDatetime,
         bool $keepDeletedActive,
         string $startDateName,
-        string $endDateName
+        string $endDateName,
+        string $actualName,
+        string $isDeletedName
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -46,6 +52,8 @@ class Parameters
         $this->keepDeletedActiveValue = $keepDeletedActive;
         $this->startDateName = $startDateName;
         $this->endDateName = $endDateName;
+        $this->actualName = $actualName;
+        $this->isDeletedName = $isDeletedName;
     }
 
     public function getBackend(): string
@@ -91,5 +99,15 @@ class Parameters
     public function getEndDateName(): string
     {
         return $this->endDateName;
+    }
+
+    public function getActualName(): string
+    {
+        return $this->actualName;
+    }
+
+    public function getIsDeletedName(): string
+    {
+        return $this->isDeletedName;
     }
 }

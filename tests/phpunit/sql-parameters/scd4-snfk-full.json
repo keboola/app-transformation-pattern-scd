@@ -8,5 +8,7 @@
   "use_datetime": true,
   "keep_del_active": true,
   "start_date_name": "default_start_date",
-  "end_date_name": "default_end_date"
+  "end_date_name": "default_end_date",
+  "actual_name": "default_actual",
+  "is_deleted_name": "default_is_deleted"
 }

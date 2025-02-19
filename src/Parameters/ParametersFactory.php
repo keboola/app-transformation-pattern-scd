@@ -39,6 +39,8 @@ class ParametersFactory
             $this->config->keepDeleteActive(),
             $this->config->getStartDateName(),
             $this->config->getEndDateName(),
+            $this->config->getActualName(),
+            $this->config->getIsDeletedName(),
         );
     }
 
