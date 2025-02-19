@@ -6,5 +6,7 @@
   "timezone": "UTC",
   "deleted_flag": false,
   "use_datetime": false,
-  "keep_del_active": false
+  "keep_del_active": false,
+  "start_date_name": "default_start_date",
+  "end_date_name": "default_end_date"
 }
