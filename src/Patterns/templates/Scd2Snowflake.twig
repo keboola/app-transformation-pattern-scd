@@ -8,22 +8,28 @@
 {% apply noIndent %}
     {% if useDatetime %}
         {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
-        {% set infiniteDate = (endDateValue ~ " 00:00:00") | quoteValue %}
+        {% set currentDateForEndDate = NEW_BOOLEAN_VALUE ? '$CURRENT_DATE_TXT_MINUS_SECOND' : '$CURRENT_DATE_TXT' %}
+        {% set infiniteDate = (endDateValue ~ ' 00:00:00') | quoteValue %}
+
         -- The start and end dates contain the time ("use_datetime" = true). --
         SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
         SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
+        SET CURRENT_DATE_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
     {% else %}
         {% set currentDate = '$CURRENT_DATE_TXT' %}
+        {% set currentDateForEndDate = NEW_BOOLEAN_VALUE ? '$CURRENT_DATE_TXT_MINUS_DAY' : '$CURRENT_DATE_TXT' %}
         {% set infiniteDate = endDateValue | quoteValue %}
+
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
         SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
         SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
+        SET CURRENT_DATE_TXT_MINUS_DAY = (SELECT TO_CHAR(DATEADD(DAY, -1, $CURRENT_DATE), 'YYYY-MM-DD'));
     {% endif %}
 
     {% if keepDeleteActive %}
         {% set deletedEndDate = infiniteDate %}
     {% else %}
-        {% set deletedEndDate = currentDate %}
+        {% set deletedEndDate = NEW_BOOLEAN_VALUE ? currentDateForEndDate : currentDate %}
     {% endif %}
 {% endapply %}
 
@@ -62,7 +68,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot.{{ columnName.startDate | quoteIdentifier }},
         -- The end date is set to now. --
-        {{ currentDate }} AS {{ columnName.endDate | quoteIdentifier }},
+        {{ currentDateForEndDate }} AS {{ columnName.endDate | quoteIdentifier }},
         -- Actual flag is set to "0", because the new version exists. --
         0 AS {{ columnName.actual | quoteIdentifier }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "0", because the new version exists. --
