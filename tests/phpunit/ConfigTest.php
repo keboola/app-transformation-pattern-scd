@@ -34,6 +34,8 @@ class ConfigTest extends TestCase
             'end_date_name' => 'end_date',
             'actual_name' => 'actual',
             'is_deleted_name' => 'isDeleted',
+            'deleted_flag_value' => '0/1',
+            'end_date_value' => '9999-12-31',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -106,6 +108,8 @@ class ConfigTest extends TestCase
                         'end_date_name' => 'end_date',
                         'actual_name' => 'actual',
                         'is_deleted_name' => 'isDeleted',
+                        'deleted_flag_value' => '0/1',
+                        'end_date_value' => '9999-12-31',
                     ],
                 ],
             ],
@@ -124,6 +128,8 @@ class ConfigTest extends TestCase
                         'end_date_name' => 'end_date',
                         'actual_name' => 'actual',
                         'is_deleted_name' => 'isDeleted',
+                        'deleted_flag_value' => '0/1',
+                        'end_date_value' => '9999-12-31',
                     ],
                 ],
             ],
@@ -142,6 +148,8 @@ class ConfigTest extends TestCase
                         'end_date_name' => 'end_date',
                         'actual_name' => 'actual',
                         'is_deleted_name' => 'isDeleted',
+                        'deleted_flag_value' => '0/1',
+                        'end_date_value' => '9999-12-31',
                     ],
                 ],
             ],

@@ -30,6 +30,10 @@ class Parameters
 
     private string $isDeletedName;
 
+    private string $deletedFlagValue;
+
+    private string $endDateValue;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -41,7 +45,9 @@ class Parameters
         string $startDateName,
         string $endDateName,
         string $actualName,
-        string $isDeletedName
+        string $isDeletedName,
+        string $deletedFlagValue,
+        string $endDateValue
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -54,6 +60,8 @@ class Parameters
         $this->endDateName = $endDateName;
         $this->actualName = $actualName;
         $this->isDeletedName = $isDeletedName;
+        $this->deletedFlagValue = $deletedFlagValue;
+        $this->endDateValue = $endDateValue;
     }
 
     public function getBackend(): string
@@ -109,5 +117,15 @@ class Parameters
     public function getIsDeletedName(): string
     {
         return $this->isDeletedName;
+    }
+
+    public function getDeletedFlagValue(): string
+    {
+        return $this->deletedFlagValue;
+    }
+
+    public function getEndDateValue(): string
+    {
+        return $this->endDateValue;
     }
 }

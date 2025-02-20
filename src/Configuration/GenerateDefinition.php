@@ -17,6 +17,8 @@ class GenerateDefinition extends BaseConfigDefinition
     private const END_DATE_NAME_DEFAULT = 'end_date';
     private const ACTUAL_NAME_DEFAULT = 'actual';
     private const IS_DELETED_NAME_DEFAULT = 'isDeleted';
+    private const DELETED_FLAG_VALUE_DEFAULT = "0/1";
+    private const END_DATE_VALUE_DEFAULT = "9999-12-31";
 
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
@@ -45,6 +47,8 @@ class GenerateDefinition extends BaseConfigDefinition
                 ->scalarNode('end_date_name')->defaultValue(self::END_DATE_NAME_DEFAULT)->end()
                 ->scalarNode('actual_name')->defaultValue(self::ACTUAL_NAME_DEFAULT)->end()
                 ->scalarNode('is_deleted_name')->defaultValue(self::IS_DELETED_NAME_DEFAULT)->end()
+                ->scalarNode('deleted_flag_value')->defaultValue(self::DELETED_FLAG_VALUE_DEFAULT)->end()
+                ->scalarNode('end_date_value')->defaultValue(self::END_DATE_VALUE_DEFAULT)->end()
             ->end()
         ;
         // @formatter:on

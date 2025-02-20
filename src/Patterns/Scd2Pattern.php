@@ -85,6 +85,8 @@ class Scd2Pattern extends AbstractPattern
                 'actual' => $this->getParameters()->getActualName(),
                 'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
+            'endDateValue' => $this->getParameters()->getEndDateValue(),
+            'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
         ];
     }
 

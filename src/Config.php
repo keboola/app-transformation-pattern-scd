@@ -99,4 +99,14 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'is_deleted_name']);
     }
+
+    public function getDeletedFlagValue(): string
+    {
+        return $this->getValue(['parameters', 'deleted_flag_value']);
+    }
+
+    public function getEndDateValue(): string
+    {
+        return $this->getValue(['parameters', 'end_date_value']);
+    }
 }

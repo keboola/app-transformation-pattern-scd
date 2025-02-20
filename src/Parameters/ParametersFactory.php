@@ -41,6 +41,8 @@ class ParametersFactory
             $this->config->getEndDateName(),
             $this->config->getActualName(),
             $this->config->getIsDeletedName(),
+            $this->config->getDeletedFlagValue(),
+            $this->config->getEndDateValue(),
         );
     }
 
