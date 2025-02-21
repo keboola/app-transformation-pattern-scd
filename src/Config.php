@@ -114,4 +114,9 @@ class Config extends BaseConfig
     {
         return (bool) $this->getValue(['parameters', 'current_timestamp_minus_one']);
     }
+
+    public function getUppercaseColumns(): bool
+    {
+        return (bool) $this->getValue(['parameters', 'uppercase_columns']);
+    }
 }

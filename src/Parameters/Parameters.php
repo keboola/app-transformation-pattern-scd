@@ -36,6 +36,8 @@ class Parameters
 
     private bool $currentTimestampMinusOne;
 
+    private bool $uppercaseColumns;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -50,7 +52,8 @@ class Parameters
         string $isDeletedName,
         string $deletedFlagValue,
         string $endDateValue,
-        bool $currentTimestampMinusOne
+        bool $currentTimestampMinusOne,
+        bool $uppercaseColumns
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -66,6 +69,7 @@ class Parameters
         $this->deletedFlagValue = $deletedFlagValue;
         $this->endDateValue = $endDateValue;
         $this->currentTimestampMinusOne = $currentTimestampMinusOne;
+        $this->uppercaseColumns = $uppercaseColumns;
     }
 
     public function getBackend(): string
@@ -136,5 +140,10 @@ class Parameters
     public function getCurrentTimestampMinusOne(): bool
     {
         return $this->currentTimestampMinusOne;
+    }
+
+    public function getUppercaseColumns(): bool
+    {
+        return $this->uppercaseColumns;
     }
 }

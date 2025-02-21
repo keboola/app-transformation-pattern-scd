@@ -20,6 +20,7 @@ class GenerateDefinition extends BaseConfigDefinition
     private const DELETED_FLAG_VALUE_DEFAULT = '0/1';
     private const END_DATE_VALUE_DEFAULT = '9999-12-31';
     private const CURRENT_TIMESTAMP_MINUS_ONE = false;
+    private const UPPERCASE_COLUMNS_DEFAULT = false;
 
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
@@ -51,7 +52,7 @@ class GenerateDefinition extends BaseConfigDefinition
                 ->scalarNode('deleted_flag_value')->defaultValue(self::DELETED_FLAG_VALUE_DEFAULT)->end()
                 ->scalarNode('end_date_value')->defaultValue(self::END_DATE_VALUE_DEFAULT)->end()
                 ->booleanNode('current_timestamp_minus_one')->defaultValue(self::CURRENT_TIMESTAMP_MINUS_ONE)->end()
-            ->end()
+                ->booleanNode('uppercase_columns')->defaultValue(self::UPPERCASE_COLUMNS_DEFAULT)->end()
         ;
         // @formatter:on
         return $parametersNode;

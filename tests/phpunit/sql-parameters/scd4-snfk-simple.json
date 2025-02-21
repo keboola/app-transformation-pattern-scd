@@ -13,5 +13,6 @@
   "is_deleted_name": "default_is_deleted",
   "deleted_flag_value": "0/1",
   "end_date_value": "9999-12-31",
-  "current_timestamp_minus_one": false
+  "current_timestamp_minus_one": false,
+  "uppercase_columns": false
 }

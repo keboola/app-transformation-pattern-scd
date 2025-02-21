@@ -49,6 +49,7 @@ class SqlOutputTest extends TestCase
             $parameters['deleted_flag_value'],
             $parameters['end_date_value'],
             $parameters['current_timestamp_minus_one'],
+            $parameters['uppercase_columns'],
         );
     }
 

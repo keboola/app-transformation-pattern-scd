@@ -1,7 +1,7 @@
 {% import "macros.twig" as macro %}
 {% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
 {% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input") %}
-{% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) %}
+{% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns) %}
 -- SCD2: This method tracks historical data --
 -- by creating new records for new/modified data in the snapshot table. --
 
@@ -115,19 +115,19 @@ CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
     -- Changed records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
-        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk, "", false, uppercaseColumns) }}
     FROM "changed_records"
         UNION
     -- Deleted records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
-        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk, "", false, uppercaseColumns) }}
     FROM "deleted_records"
         UNION
     -- Updated previous versions of the changed records: --
     SELECT
         {{ snapshotPrimaryKeySelect }},
-        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
+        {{ macro.selectFromColumns(snapshotAllColumnsExceptPk, "", false, uppercaseColumns) }}
     FROM "updated_records";
 
 

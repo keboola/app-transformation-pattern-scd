@@ -37,6 +37,7 @@ class ConfigTest extends TestCase
             'deleted_flag_value' => '0/1',
             'end_date_value' => '9999-12-31',
             'current_timestamp_minus_one' => false,
+            'uppercase_columns' => false,
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -112,6 +113,7 @@ class ConfigTest extends TestCase
                         'deleted_flag_value' => '0/1',
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
+                        'uppercase_columns' => false,
                     ],
                 ],
             ],
@@ -133,6 +135,7 @@ class ConfigTest extends TestCase
                         'deleted_flag_value' => '0/1',
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
+                        'uppercase_columns' => true,
                     ],
                 ],
             ],
@@ -154,6 +157,7 @@ class ConfigTest extends TestCase
                         'deleted_flag_value' => '0/1',
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
+                        'uppercase_columns' => true,
                     ],
                 ],
             ],
