@@ -43,6 +43,7 @@ class ParametersFactory
             $this->config->getIsDeletedName(),
             $this->config->getDeletedFlagValue(),
             $this->config->getEndDateValue(),
+            $this->config->getCurrentTimestampMinusOne(),
         );
     }
 

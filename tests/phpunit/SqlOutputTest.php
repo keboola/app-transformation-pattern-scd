@@ -48,6 +48,7 @@ class SqlOutputTest extends TestCase
             $parameters['is_deleted_name'],
             $parameters['deleted_flag_value'],
             $parameters['end_date_value'],
+            $parameters['current_timestamp_minus_one'],
         );
     }
 

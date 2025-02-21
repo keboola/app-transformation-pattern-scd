@@ -8,18 +8,16 @@
 {% apply noIndent %}
     {% if useDatetime %}
         {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
-        {% set currentDateForEndDate = NEW_BOOLEAN_VALUE ? '$CURRENT_DATE_TXT_MINUS_SECOND' : '$CURRENT_DATE_TXT' %}
+        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_TIMESTAMP_TXT_MINUS_SECOND' : '$CURRENT_TIMESTAMP_TXT' %}
         {% set infiniteDate = (endDateValue ~ ' 00:00:00') | quoteValue %}
-
         -- The start and end dates contain the time ("use_datetime" = true). --
         SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
         SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
-        SET CURRENT_DATE_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
+        SET CURRENT_TIMESTAMP_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
     {% else %}
         {% set currentDate = '$CURRENT_DATE_TXT' %}
-        {% set currentDateForEndDate = NEW_BOOLEAN_VALUE ? '$CURRENT_DATE_TXT_MINUS_DAY' : '$CURRENT_DATE_TXT' %}
+        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_DATE_TXT_MINUS_DAY' : '$CURRENT_DATE_TXT' %}
         {% set infiniteDate = endDateValue | quoteValue %}
-
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
         SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
         SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
@@ -29,7 +27,7 @@
     {% if keepDeleteActive %}
         {% set deletedEndDate = infiniteDate %}
     {% else %}
-        {% set deletedEndDate = NEW_BOOLEAN_VALUE ? currentDateForEndDate : currentDate %}
+        {% set deletedEndDate = currentTimestampMinusOne ? currentDateForEndDate : currentDate %}
     {% endif %}
 {% endapply %}
 

@@ -6,6 +6,8 @@ SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('UTC', current_timestamp()))::DATE;
 
 SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
 
+SET CURRENT_DATE_TXT_MINUS_DAY = (SELECT TO_CHAR(DATEADD(DAY, -1, $CURRENT_DATE), 'YYYY-MM-DD'));
+
 -- Changed records: Input table rows, EXCEPT same rows present in the last snapshot. --
 CREATE TABLE "changed_records" AS
     WITH "diff_records" AS (
@@ -39,7 +41,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_DATE_TXT AS "custom_end_date",
+        $CURRENT_DATE_TXT_MINUS_DAY AS "custom_end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "custom_actual"
     FROM "current_snapshot" snapshot

@@ -34,6 +34,8 @@ class Parameters
 
     private string $endDateValue;
 
+    private bool $currentTimestampMinusOne;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -47,7 +49,8 @@ class Parameters
         string $actualName,
         string $isDeletedName,
         string $deletedFlagValue,
-        string $endDateValue
+        string $endDateValue,
+        bool $currentTimestampMinusOne
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -62,6 +65,7 @@ class Parameters
         $this->isDeletedName = $isDeletedName;
         $this->deletedFlagValue = $deletedFlagValue;
         $this->endDateValue = $endDateValue;
+        $this->currentTimestampMinusOne = $currentTimestampMinusOne;
     }
 
     public function getBackend(): string
@@ -127,5 +131,10 @@ class Parameters
     public function getEndDateValue(): string
     {
         return $this->endDateValue;
+    }
+
+    public function getCurrentTimestampMinusOne(): bool
+    {
+        return $this->currentTimestampMinusOne;
     }
 }

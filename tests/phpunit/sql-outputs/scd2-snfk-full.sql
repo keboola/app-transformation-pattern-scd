@@ -6,6 +6,8 @@ SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('UTC', current_timestamp())::TI
 
 SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
 
+SET CURRENT_TIMESTAMP_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
+
 -- Changed records: Input table rows, EXCEPT same rows present in the last snapshot. --
 CREATE TABLE "changed_records" AS
     WITH "diff_records" AS (
@@ -41,7 +43,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_TIMESTAMP_TXT AS "custom_end_date",
+        $CURRENT_TIMESTAMP_TXT_MINUS_SECOND AS "custom_end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "custom_actual",
         -- IsDeleted flag is set to "0", because the new version exists. --

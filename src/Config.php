@@ -109,4 +109,9 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'end_date_value']);
     }
+
+    public function getCurrentTimestampMinusOne(): bool
+    {
+        return (bool) $this->getValue(['parameters', 'current_timestamp_minus_one']);
+    }
 }
