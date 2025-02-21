@@ -73,7 +73,9 @@ class Scd2Pattern extends AbstractPattern
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
-            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive()
+                ? $this->getParameters()->getDeletedFlagValue()[1]
+                : $this->getParameters()->getDeletedFlagValue()[0],
             'tableName' => [
                 'input' => self::TABLE_INPUT,
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,

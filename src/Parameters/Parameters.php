@@ -127,9 +127,9 @@ class Parameters
         return $this->isDeletedName;
     }
 
-    public function getDeletedFlagValue(): string
+    public function getDeletedFlagValue(): array
     {
-        return $this->deletedFlagValue;
+        return explode('/', $this->deletedFlagValue);
     }
 
     public function getEndDateValue(): string
