@@ -16,7 +16,7 @@ class GenerateDefinition extends BaseConfigDefinition
     private const START_DATE_NAME_DEFAULT = 'start_date';
     private const END_DATE_NAME_DEFAULT = 'end_date';
     private const ACTUAL_NAME_DEFAULT = 'actual';
-    private const IS_DELETED_NAME_DEFAULT = 'isDeleted';
+    private const IS_DELETED_NAME_DEFAULT = 'is_deleted';
     private const DELETED_FLAG_VALUE_DEFAULT = '0/1';
     private const END_DATE_VALUE_DEFAULT = '9999-12-31';
     private const CURRENT_TIMESTAMP_MINUS_ONE = false;
