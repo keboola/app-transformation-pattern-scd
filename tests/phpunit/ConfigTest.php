@@ -33,7 +33,7 @@ class ConfigTest extends TestCase
             'start_date_name' => 'start_date',
             'end_date_name' => 'end_date',
             'actual_name' => 'actual',
-            'is_deleted_name' => 'isDeleted',
+            'is_deleted_name' => 'is_deleted',
             'deleted_flag_value' => '0/1',
             'end_date_value' => '9999-12-31',
             'current_timestamp_minus_one' => false,
