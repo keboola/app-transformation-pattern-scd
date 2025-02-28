@@ -7,7 +7,6 @@ namespace Keboola\TransformationPatternScd\Parameters;
 class Parameters
 {
     public const BACKEND_SNOWFLAKE = 'snowflake';
-    public const BACKEND_SYNAPSE = 'synapse';
 
     private string $backend;
 
@@ -23,6 +22,22 @@ class Parameters
 
     private bool $keepDeletedActiveValue;
 
+    private string $startDateName;
+
+    private string $endDateName;
+
+    private string $actualName;
+
+    private string $isDeletedName;
+
+    private string $deletedFlagValue;
+
+    private string $endDateValue;
+
+    private bool $currentTimestampMinusOne;
+
+    private bool $uppercaseColumns;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -30,7 +45,15 @@ class Parameters
         string $timezone,
         bool $deletedFlag,
         bool $useDatetime,
-        bool $keepDeletedActive
+        bool $keepDeletedActive,
+        string $startDateName,
+        string $endDateName,
+        string $actualName,
+        string $isDeletedName,
+        string $deletedFlagValue,
+        string $endDateValue,
+        bool $currentTimestampMinusOne,
+        bool $uppercaseColumns
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -39,6 +62,14 @@ class Parameters
         $this->deletedFlag = $deletedFlag;
         $this->useDatetimeValue = $useDatetime;
         $this->keepDeletedActiveValue = $keepDeletedActive;
+        $this->startDateName = $startDateName;
+        $this->endDateName = $endDateName;
+        $this->actualName = $actualName;
+        $this->isDeletedName = $isDeletedName;
+        $this->deletedFlagValue = $deletedFlagValue;
+        $this->endDateValue = $endDateValue;
+        $this->currentTimestampMinusOne = $currentTimestampMinusOne;
+        $this->uppercaseColumns = $uppercaseColumns;
     }
 
     public function getBackend(): string
@@ -74,5 +105,45 @@ class Parameters
     public function keepDeleteActive(): bool
     {
         return $this->keepDeletedActiveValue;
+    }
+
+    public function getStartDateName(): string
+    {
+        return $this->startDateName;
+    }
+
+    public function getEndDateName(): string
+    {
+        return $this->endDateName;
+    }
+
+    public function getActualName(): string
+    {
+        return $this->actualName;
+    }
+
+    public function getIsDeletedName(): string
+    {
+        return $this->isDeletedName;
+    }
+
+    public function getDeletedFlagValue(): array
+    {
+        return explode('/', $this->deletedFlagValue);
+    }
+
+    public function getEndDateValue(): string
+    {
+        return $this->endDateValue;
+    }
+
+    public function getCurrentTimestampMinusOne(): bool
+    {
+        return $this->currentTimestampMinusOne;
+    }
+
+    public function getUppercaseColumns(): bool
+    {
+        return $this->uppercaseColumns;
     }
 }

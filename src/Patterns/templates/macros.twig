@@ -1,6 +1,6 @@
-{%- macro selectFromColumns(columns, prefix = "", asLower = false) -%}
+{%- macro selectFromColumns(columns, prefix = "", asLower = false, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {{ prefix }}{{ column | quoteIdentifier }}
+        {%- if uppercaseColumns == true %}{{ prefix }}{{ column | upper | quoteIdentifier }}{%- else %}{{ prefix }}{{ column | quoteIdentifier }}{%- endif %}
         {%- if asLower == true %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
         {%- if not loop.last %}, {% endif -%}
     {%- endfor -%}
@@ -13,11 +13,11 @@
     {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName) -%}
+{%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns = false) -%}
     CONCAT(
         {%- for column in snapshotPrimaryKeyParts -%}
             {{ column | lower | quoteIdentifier }}
             {%- if not loop.last %}, {{ '|' | quoteValue }}, {% endif -%}
         {%- endfor -%}
-    ) AS {{ snapshotPrimaryKeyName | quoteIdentifier }}
+    ) AS {%- if uppercaseColumns == true %} {{ snapshotPrimaryKeyName | upper | quoteIdentifier }}{% else %} {{ snapshotPrimaryKeyName | quoteIdentifier }}{% endif %}
 {%- endmacro -%}

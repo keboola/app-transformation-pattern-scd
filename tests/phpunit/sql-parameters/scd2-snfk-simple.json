@@ -6,5 +6,13 @@
   "timezone": "UTC",
   "deleted_flag": false,
   "use_datetime": false,
-  "keep_del_active": false
+  "keep_del_active": false,
+  "start_date_name": "custom_start_date",
+  "end_date_name": "custom_end_date",
+  "actual_name": "custom_actual",
+  "is_deleted_name": "custom_is_deleted",
+  "deleted_flag_value": "0/1",
+  "end_date_value": "9999-12-31",
+  "current_timestamp_minus_one": true,
+  "uppercase_columns": false
 }

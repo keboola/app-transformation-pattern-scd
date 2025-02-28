@@ -52,8 +52,6 @@ class Scd4Pattern extends AbstractPattern
         switch ($backend) {
             case Parameters::BACKEND_SNOWFLAKE:
                 return 'Scd4Snowflake.twig';
-            case Parameters::BACKEND_SYNAPSE:
-                return 'Scd4Synapse.twig';
             default:
                 throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
         }

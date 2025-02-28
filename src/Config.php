@@ -79,4 +79,44 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'timezone']);
     }
+
+    public function getStartDateName(): string
+    {
+        return $this->getValue(['parameters', 'start_date_name']);
+    }
+
+    public function getEndDateName(): string
+    {
+        return $this->getValue(['parameters', 'end_date_name']);
+    }
+
+    public function getActualName(): string
+    {
+        return $this->getValue(['parameters', 'actual_name']);
+    }
+
+    public function getIsDeletedName(): string
+    {
+        return $this->getValue(['parameters', 'is_deleted_name']);
+    }
+
+    public function getDeletedFlagValue(): string
+    {
+        return $this->getValue(['parameters', 'deleted_flag_value']);
+    }
+
+    public function getEndDateValue(): string
+    {
+        return $this->getValue(['parameters', 'end_date_value']);
+    }
+
+    public function getCurrentTimestampMinusOne(): bool
+    {
+        return (bool) $this->getValue(['parameters', 'current_timestamp_minus_one']);
+    }
+
+    public function getUppercaseColumns(): bool
+    {
+        return (bool) $this->getValue(['parameters', 'uppercase_columns']);
+    }
 }

@@ -53,8 +53,6 @@ class Scd2Pattern extends AbstractPattern
         switch ($backend) {
             case Parameters::BACKEND_SNOWFLAKE:
                 return 'Scd2Snowflake.twig';
-            case Parameters::BACKEND_SYNAPSE:
-                return 'Scd2Synapse.twig';
             default:
                 throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
         }
@@ -75,18 +73,24 @@ class Scd2Pattern extends AbstractPattern
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
-            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive()
+                ? $this->getParameters()->getDeletedFlagValue()[1]
+                : $this->getParameters()->getDeletedFlagValue()[0],
             'tableName' => [
                 'input' => self::TABLE_INPUT,
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
                 'newSnapshot' => self::TABLE_NEW_SNAPSHOT,
             ],
             'columnName' => [
-                'startDate' => self::COLUMN_START_DATE,
-                'endDate' => self::COLUMN_END_DATE,
-                'actual' => self::COLUMN_ACTUAL,
-                'isDeleted' => self::COLUMN_IS_DELETED,
+                'startDate' => $this->getParameters()->getStartDateName(),
+                'endDate' => $this->getParameters()->getEndDateName(),
+                'actual' => $this->getParameters()->getActualName(),
+                'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
+            'endDateValue' => $this->getParameters()->getEndDateValue(),
+            'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
+            'currentTimestampMinusOne' => $this->getParameters()->getCurrentTimestampMinusOne(),
+            'uppercaseColumns' => $this->getParameters()->getUppercaseColumns(),
         ];
     }
 

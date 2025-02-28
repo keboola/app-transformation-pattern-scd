@@ -37,6 +37,14 @@ class ParametersFactory
             $this->config->hasDeletedFlag(),
             $this->config->useDatetime(),
             $this->config->keepDeleteActive(),
+            $this->config->getStartDateName(),
+            $this->config->getEndDateName(),
+            $this->config->getActualName(),
+            $this->config->getIsDeletedName(),
+            $this->config->getDeletedFlagValue(),
+            $this->config->getEndDateValue(),
+            $this->config->getCurrentTimestampMinusOne(),
+            $this->config->getUppercaseColumns()
         );
     }
 
@@ -45,8 +53,6 @@ class ParametersFactory
         switch ($this->config->getComponentId()) {
             case Application::SNOWFLAKE_TRANS_COMPONENT:
                 return Parameters::BACKEND_SNOWFLAKE;
-            case Application::SYNAPSE_TRANS_COMPONENT:
-                return Parameters::BACKEND_SYNAPSE;
             default:
                 throw new UserException(sprintf(
                     'The SCD code pattern is not compatible with component "%s".',
