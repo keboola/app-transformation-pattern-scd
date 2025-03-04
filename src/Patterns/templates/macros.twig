@@ -1,7 +1,8 @@
 {%- macro selectFromColumns(columns, prefix = "", asLower = false, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {%- if uppercaseColumns == true %}{{ prefix }}{{ column | upper | quoteIdentifier }}{%- else %}{{ prefix }}{{ column | quoteIdentifier }}{%- endif %}
-        {%- if asLower == true %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
+        {%- if uppercaseColumns == true and asLower == false %}{{ prefix }}{{ column | upper | quoteIdentifier }}{%- else %}{{ prefix }}{{ column | quoteIdentifier }}{%- endif %}
+        {%- if asLower == true and uppercaseColumns == false %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
+        {%- if asLower == true and uppercaseColumns == true %} AS {{ column | upper | quoteIdentifier }}{% endif -%}
         {%- if not loop.last %}, {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}
