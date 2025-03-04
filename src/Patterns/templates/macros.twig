@@ -9,7 +9,7 @@
 
 {%- macro generateJoin(columns, firstAlias, secondAlias, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {{  firstAlias }}.{% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %} = {{ secondAlias }}.{{ column | quoteIdentifier }}
+        {{  firstAlias }}.{% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %} = {{ secondAlias }}.{% if uppercaseColumns == true and secondAlias != "input" %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | quoteIdentifier }}{% endif %}
         {%- if not loop.last %} AND {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}
