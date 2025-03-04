@@ -14,10 +14,6 @@ class Scd2Pattern extends AbstractPattern
     public const TABLE_NEW_SNAPSHOT = 'new_snapshot';
 
     public const COLUMN_SNAPSHOT_PK = 'snapshot_pk';
-    public const COLUMN_START_DATE = 'start_date';
-    public const COLUMN_END_DATE = 'end_date';
-    public const COLUMN_ACTUAL = 'actual';
-    public const COLUMN_IS_DELETED = 'is_deleted';
 
     public function getInputTableName(): string
     {
@@ -102,7 +98,7 @@ class Scd2Pattern extends AbstractPattern
     private function getSnapshotPrimaryKeyParts(): array
     {
         // All snapshot columns are lower
-        return $this->columnsToLower(array_merge($this->getParameters()->getPrimaryKey(), [self::COLUMN_START_DATE]));
+        return $this->columnsToLower(array_merge($this->getParameters()->getPrimaryKey(), [$this->getParameters()->getStartDateName()]));
     }
 
     private function getSnapshotInputColumns(): array
@@ -113,12 +109,12 @@ class Scd2Pattern extends AbstractPattern
 
     private function getSnapshotSpecialColumns(): array
     {
-        $columns[] = self::COLUMN_START_DATE;
-        $columns[] = self::COLUMN_END_DATE;
-        $columns[] = self::COLUMN_ACTUAL;
+        $columns[] = $this->getParameters()->getStartDateName();
+        $columns[] = $this->getParameters()->getEndDateName();
+        $columns[] = $this->getParameters()->getActualName();
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns[] = self::COLUMN_IS_DELETED;
+            $columns[] = $this->getParameters()->getIsDeletedName();
         }
 
         // All snapshot columns are lower

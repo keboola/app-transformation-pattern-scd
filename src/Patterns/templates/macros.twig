@@ -16,7 +16,7 @@
 {%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns = false) -%}
     CONCAT(
         {%- for column in snapshotPrimaryKeyParts -%}
-            {{ column | lower | quoteIdentifier }}
+            {% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %}
             {%- if not loop.last %}, {{ '|' | quoteValue }}, {% endif -%}
         {%- endfor -%}
     ) AS {%- if uppercaseColumns == true %} {{ snapshotPrimaryKeyName | upper | quoteIdentifier }}{% else %} {{ snapshotPrimaryKeyName | quoteIdentifier }}{% endif %}

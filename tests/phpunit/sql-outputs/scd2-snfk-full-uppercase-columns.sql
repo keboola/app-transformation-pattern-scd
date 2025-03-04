@@ -91,18 +91,18 @@ CREATE TABLE "deleted_records" AS
 CREATE TABLE "new_snapshot" AS
     -- Changed records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "SNAPSHOT_PK",
-        "PK1", "PK2", "NAME", "AGE", "JOB", "START_DATE", "END_DATE", "ACTUAL", "IS_DELETED"
+        CONCAT("PK1", '|', "PK2", '|', "CUSTOM_START_DATE") AS "SNAPSHOT_PK",
+        "PK1", "PK2", "NAME", "AGE", "JOB", "CUSTOM_START_DATE", "CUSTOM_END_DATE", "CUSTOM_ACTUAL", "CUSTOM_IS_DELETED"
     FROM "changed_records"
         UNION
     -- Deleted records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "SNAPSHOT_PK",
-        "PK1", "PK2", "NAME", "AGE", "JOB", "START_DATE", "END_DATE", "ACTUAL", "IS_DELETED"
+        CONCAT("PK1", '|', "PK2", '|', "CUSTOM_START_DATE") AS "SNAPSHOT_PK",
+        "PK1", "PK2", "NAME", "AGE", "JOB", "CUSTOM_START_DATE", "CUSTOM_END_DATE", "CUSTOM_ACTUAL", "CUSTOM_IS_DELETED"
     FROM "deleted_records"
         UNION
     -- Updated previous versions of the changed records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "SNAPSHOT_PK",
-        "PK1", "PK2", "NAME", "AGE", "JOB", "START_DATE", "END_DATE", "ACTUAL", "IS_DELETED"
+        CONCAT("PK1", '|', "PK2", '|', "CUSTOM_START_DATE") AS "SNAPSHOT_PK",
+        "PK1", "PK2", "NAME", "AGE", "JOB", "CUSTOM_START_DATE", "CUSTOM_END_DATE", "CUSTOM_ACTUAL", "CUSTOM_IS_DELETED"
     FROM "updated_records";
