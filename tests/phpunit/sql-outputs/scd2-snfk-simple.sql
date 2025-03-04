@@ -85,18 +85,18 @@ CREATE TABLE "deleted_records" AS
 CREATE TABLE "new_snapshot" AS
     -- Changed records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "snapshot_pk",
-        "pk1", "pk2", "name", "age", "job", "start_date", "end_date", "actual"
+        CONCAT("pk1", '|', "pk2", '|', "custom_start_date") AS "snapshot_pk",
+        "pk1", "pk2", "name", "age", "job", "custom_start_date", "custom_end_date", "custom_actual"
     FROM "changed_records"
         UNION
     -- Deleted records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "snapshot_pk",
-        "pk1", "pk2", "name", "age", "job", "start_date", "end_date", "actual"
+        CONCAT("pk1", '|', "pk2", '|', "custom_start_date") AS "snapshot_pk",
+        "pk1", "pk2", "name", "age", "job", "custom_start_date", "custom_end_date", "custom_actual"
     FROM "deleted_records"
         UNION
     -- Updated previous versions of the changed records: --
     SELECT
-        CONCAT("pk1", '|', "pk2", '|', "start_date") AS "snapshot_pk",
-        "pk1", "pk2", "name", "age", "job", "start_date", "end_date", "actual"
+        CONCAT("pk1", '|', "pk2", '|', "custom_start_date") AS "snapshot_pk",
+        "pk1", "pk2", "name", "age", "job", "custom_start_date", "custom_end_date", "custom_actual"
     FROM "updated_records";

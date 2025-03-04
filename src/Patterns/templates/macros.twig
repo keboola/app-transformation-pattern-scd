@@ -1,14 +1,15 @@
 {%- macro selectFromColumns(columns, prefix = "", asLower = false, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {%- if uppercaseColumns == true %}{{ prefix }}{{ column | upper | quoteIdentifier }}{%- else %}{{ prefix }}{{ column | quoteIdentifier }}{%- endif %}
-        {%- if asLower == true %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
+        {%- if uppercaseColumns == true and asLower == false %}{{ prefix }}{{ column | upper | quoteIdentifier }}{%- else %}{{ prefix }}{{ column | quoteIdentifier }}{%- endif %}
+        {%- if asLower == true and uppercaseColumns == false %} AS {{ column | lower | quoteIdentifier }}{% endif -%}
+        {%- if asLower == true and uppercaseColumns == true %} AS {{ column | upper | quoteIdentifier }}{% endif -%}
         {%- if not loop.last %}, {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro generateJoin(columns, firstAlias, secondAlias) -%}
+{%- macro generateJoin(columns, firstAlias, secondAlias, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {{  firstAlias }}.{{ column | lower | quoteIdentifier }} = {{ secondAlias }}.{{ column | quoteIdentifier }}
+        {{  firstAlias }}.{% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %} = {{ secondAlias }}.{% if uppercaseColumns == true and secondAlias != "input" %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | quoteIdentifier }}{% endif %}
         {%- if not loop.last %} AND {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}
@@ -16,7 +17,7 @@
 {%- macro generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns = false) -%}
     CONCAT(
         {%- for column in snapshotPrimaryKeyParts -%}
-            {{ column | lower | quoteIdentifier }}
+            {% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %}
             {%- if not loop.last %}, {{ '|' | quoteValue }}, {% endif -%}
         {%- endfor -%}
     ) AS {%- if uppercaseColumns == true %} {{ snapshotPrimaryKeyName | upper | quoteIdentifier }}{% else %} {{ snapshotPrimaryKeyName | quoteIdentifier }}{% endif %}
