@@ -6,9 +6,9 @@
     {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro generateJoin(columns, firstAlias, secondAlias) -%}
+{%- macro generateJoin(columns, firstAlias, secondAlias, uppercaseColumns = false) -%}
     {%- for column in columns -%}
-        {{  firstAlias }}.{{ column | lower | quoteIdentifier }} = {{ secondAlias }}.{{ column | quoteIdentifier }}
+        {{  firstAlias }}.{% if uppercaseColumns == true %}{{ column | upper | quoteIdentifier }}{% else %}{{ column | lower | quoteIdentifier }}{% endif %} = {{ secondAlias }}.{{ column | quoteIdentifier }}
         {%- if not loop.last %} AND {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}
