@@ -81,7 +81,7 @@ CREATE TABLE "deleted_records" AS
     LEFT JOIN "input_table" input ON snapshot."PK1" = input."Pk1" AND snapshot."PK2" = input."pk2"
     WHERE
         -- Deleted records are calculated only from the actual records. --
-        snapshot."custom_actual" = 1 AND
+        snapshot."CUSTOM_ACTUAL" = 1 AND
         -- Record is no more present in the input table. --
         input."Pk1" IS NULL;
 

@@ -104,7 +104,7 @@ CREATE TABLE "deleted_records" AS
     LEFT JOIN {{ tableName.input | quoteIdentifier }} input ON {{ snapshotInputJoinConditionSql }}
     WHERE
         -- Deleted records are calculated only from the actual records. --
-        snapshot.{{ columnName.actual | quoteIdentifier }} = {{ deletedFlagValue.1 }} AND
+        snapshot.{% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %} = {{ deletedFlagValue.1 }} AND
         -- Record is no more present in the input table. --
         input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
 
