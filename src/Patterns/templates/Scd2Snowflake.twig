@@ -2,6 +2,10 @@
 {% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
 {% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input", uppercaseColumns) %}
 {% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns) %}
+{% set startDateName = uppercaseColumns ? columnName.startDate|upper|quoteIdentifier : columnName.startDate|quoteIdentifier  %}
+{% set endDateName = uppercaseColumns ? columnName.endDate|upper|quoteIdentifier : columnName.endDate|quoteIdentifier  %}
+{% set actualName = uppercaseColumns ? columnName.actual|upper|quoteIdentifier : columnName.actual|quoteIdentifier  %}
+{% set isDeletedName = uppercaseColumns ? columnName.isDeleted|upper|quoteIdentifier : columnName.isDeleted|quoteIdentifier  %}
 -- SCD2: This method tracks historical data --
 -- by creating new records for new/modified data in the snapshot table. --
 
@@ -43,19 +47,19 @@ CREATE TABLE "changed_records" AS
         -- The last snapshot. --
         SELECT {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.", false, uppercaseColumns) }}
         FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
-        WHERE {% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %} = {{ deletedFlagValue.1 }}
+        WHERE {{ actualName }} = {{ deletedFlagValue.1 }}
     )
     SELECT
         -- Monitored parameters. --
         {{ macro.selectFromColumns(snapshotInputColumns, "", false, uppercaseColumns) }},
         -- The start date is set to now. --
-        {{ currentDate }} AS {% if uppercaseColumns == true %}{{ columnName.startDate | upper | quoteIdentifier }}{% else %}{{ columnName.startDate | quoteIdentifier }}{% endif %},
+        {{ currentDate }} AS {{ startDateName }},
         -- The end date is set to infinity. --
-        {{ infiniteDate }} AS {% if uppercaseColumns == true %}{{ columnName.endDate | upper | quoteIdentifier }}{% else %}{{ columnName.endDate | quoteIdentifier }}{% endif %},
+        {{ infiniteDate }} AS {{ endDateName }},
         -- Actual flag is set to "{{ deletedFlagValue.1 }}". --
-        {{ deletedFlagValue.1 }} AS {% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %}{% if hasDeletedFlag %},
+        {{ deletedFlagValue.1 }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.0 }}". --
-        {{ deletedFlagValue.0 }} AS {% if uppercaseColumns == true %}{{ columnName.isDeleted | upper | quoteIdentifier }}{% else %}{{ columnName.isDeleted | quoteIdentifier }}{% endif %}{% endif ~%}
+        {{ deletedFlagValue.0 }} AS {{ isDeletedName }}{% endif ~%}
     FROM "diff_records";
 
 -- Updated records: Set actual flag to "0" in the previous version. --
@@ -64,13 +68,13 @@ CREATE TABLE "updated_records" AS
         -- Monitored parameters. --
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.", false, uppercaseColumns) }},
         -- The start date is preserved. --
-        snapshot.{% if uppercaseColumns == true %}{{ columnName.startDate | upper | quoteIdentifier }}{% else %}{{ columnName.startDate | quoteIdentifier }}{% endif %},
+        snapshot.{{ startDateName }},
         -- The end date is set to now. --
-        {{ currentDateForEndDate }} AS {% if uppercaseColumns == true %}{{ columnName.endDate | upper | quoteIdentifier }}{% else %}{{ columnName.endDate | quoteIdentifier }}{% endif %},
+        {{ currentDateForEndDate }} AS {{ endDateName }},
         -- Actual flag is set to "{{ deletedFlagValue.0 }}", because the new version exists. --
-        {{ deletedFlagValue.0 }} AS {% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %}{% if hasDeletedFlag %},
+        {{ deletedFlagValue.0 }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.0 }}", because the new version exists. --
-        {{ deletedFlagValue.0 }} AS {% if uppercaseColumns == true %}{{ columnName.isDeleted | upper | quoteIdentifier }}{% else %}{{ columnName.isDeleted | quoteIdentifier }}{% endif %}{% endif ~%}
+        {{ deletedFlagValue.0 }} AS {{ isDeletedName }}{% endif ~%}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
     -- Join "changed_records" and "snapshot" table on the defined primary key
     JOIN "changed_records" changed ON
@@ -78,12 +82,12 @@ CREATE TABLE "updated_records" AS
 
     WHERE
         -- Only previous actual results are modified. --
-        snapshot.{% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %} = {{ deletedFlagValue.1 }}
+        snapshot.{{ actualName }} = {{ deletedFlagValue.1 }}
         -- Exclude records with the current date (and therefore with the same PK). --
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
         -- TLDR: for each PK, we can have max one row in the new snapshot. --
-        AND snapshot.{% if uppercaseColumns == true %}{{ columnName.startDate | upper | quoteIdentifier }}{% else %}{{ columnName.startDate | quoteIdentifier }}{% endif %} != {{ currentDate }};
+        AND snapshot.{{ startDateName }} != {{ currentDate }};
 
 -- Deleted records are missing in input table, but have actual "1" in last snapshot. --
 CREATE TABLE "deleted_records" AS
@@ -92,19 +96,19 @@ CREATE TABLE "deleted_records" AS
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.", false, uppercaseColumns) }},
         -- The start date is unchanged, it is part of the PK, --
         -- so old values are overwritten by incremental loading. --
-        snapshot.{% if uppercaseColumns == true %}{{ columnName.startDate | upper | quoteIdentifier }}{% else %}{{ columnName.startDate | quoteIdentifier }}{% endif %},
+        snapshot.{{ startDateName }},
         -- The end date is set to "{{  deletedEndDate  }}" ("keep_del_active" = {{ keepDeleteActive ? 'true' : 'false' }}). --
-        {{ deletedEndDate }} AS {% if uppercaseColumns == true %}{{ columnName.endDate | upper | quoteIdentifier }}{% else %}{{ columnName.endDate | quoteIdentifier }}{% endif %},
+        {{ deletedEndDate }} AS {{ endDateName }},
         -- The actual flag is set to "{{  deletedActualValue  }}" ("keep_del_active" = {{ keepDeleteActive? 'true' : 'false' }}). --
-        {{ deletedActualValue }} AS {% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %}{% if hasDeletedFlag %},
+        {{ deletedActualValue }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.1 }}". --
-        {{ deletedFlagValue.1 }} AS {% if uppercaseColumns == true %}{{ columnName.isDeleted | upper | quoteIdentifier }}{% else %}{{ columnName.isDeleted | quoteIdentifier }}{% endif %}{% endif ~%}
+        {{ deletedFlagValue.1 }} AS {{ isDeletedName }}{% endif ~%}
     FROM {{ tableName.currentSnapshot | quoteIdentifier }} snapshot
     -- Join input and snapshot table on the defined primary key. --
     LEFT JOIN {{ tableName.input | quoteIdentifier }} input ON {{ snapshotInputJoinConditionSql }}
     WHERE
         -- Deleted records are calculated only from the actual records. --
-        snapshot.{% if uppercaseColumns == true %}{{ columnName.actual | upper | quoteIdentifier }}{% else %}{{ columnName.actual | quoteIdentifier }}{% endif %} = {{ deletedFlagValue.1 }} AND
+        snapshot.{{ actualName }} = {{ deletedFlagValue.1 }} AND
         -- Record is no more present in the input table. --
         input.{{ inputRandomColumn | quoteIdentifier }} IS NULL;
 
