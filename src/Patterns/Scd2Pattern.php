@@ -69,7 +69,6 @@ class Scd2Pattern extends AbstractPattern
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
             'snapshotPrimaryKeyParts' => $this->getSnapshotPrimaryKeyParts(),
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
-            'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
             'deletedActualValue' => $this->getParameters()->keepDeleteActive()
                 ? $this->getParameters()->getDeletedFlagValue()[1]
@@ -79,12 +78,7 @@ class Scd2Pattern extends AbstractPattern
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
                 'newSnapshot' => self::TABLE_NEW_SNAPSHOT,
             ],
-            'columnName' => [
-                'startDate' => $this->getParameters()->getStartDateName(),
-                'endDate' => $this->getParameters()->getEndDateName(),
-                'actual' => $this->getParameters()->getActualName(),
-                'isDeleted' => $this->getParameters()->getIsDeletedName(),
-            ],
+            'columnName' => $this->getSnapshotSpecialColumnsWithKeys(),
             'endDateValue' => $this->getParameters()->getEndDateValue(),
             'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
             'currentTimestampMinusOne' => $this->getParameters()->getCurrentTimestampMinusOne(),
@@ -114,12 +108,17 @@ class Scd2Pattern extends AbstractPattern
 
     private function getSnapshotSpecialColumns(): array
     {
-        $columns[] = $this->getParameters()->getStartDateName();
-        $columns[] = $this->getParameters()->getEndDateName();
-        $columns[] = $this->getParameters()->getActualName();
+        return array_values($this->getSnapshotSpecialColumnsWithKeys());
+    }
+
+    private function getSnapshotSpecialColumnsWithKeys(): array
+    {
+        $columns['startDate'] = $this->getParameters()->getStartDateName();
+        $columns['endDate'] = $this->getParameters()->getEndDateName();
+        $columns['actual'] = $this->getParameters()->getActualName();
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns[] = $this->getParameters()->getIsDeletedName();
+            $columns['isDeleted'] = $this->getParameters()->getIsDeletedName();
         }
 
         return $this->getParameters()->getUppercaseColumns()
