@@ -32,7 +32,9 @@ class Scd2Pattern extends AbstractPattern
 
     public function getSnapshotPrimaryKey(): string
     {
-        return mb_strtolower(self::COLUMN_SNAPSHOT_PK);
+        return $this->getParameters()->getUppercaseColumns()
+            ? mb_strtoupper(self::COLUMN_SNAPSHOT_PK)
+            : self::COLUMN_SNAPSHOT_PK;
     }
 
     public function getSnapshotTableHeader(): array
@@ -105,8 +107,9 @@ class Scd2Pattern extends AbstractPattern
 
     private function getSnapshotInputColumns(): array
     {
-        // All snapshot columns are lower
-        return $this->columnsToLower($this->getInputColumns());
+        return $this->getParameters()->getUppercaseColumns()
+            ? $this->columnsToUpper($this->getInputColumns())
+            : $this->columnsToLower($this->getInputColumns());
     }
 
     private function getSnapshotSpecialColumns(): array
@@ -119,8 +122,9 @@ class Scd2Pattern extends AbstractPattern
             $columns[] = $this->getParameters()->getIsDeletedName();
         }
 
-        // All snapshot columns are lower
-        return $this->columnsToLower($columns);
+        return $this->getParameters()->getUppercaseColumns()
+            ? $this->columnsToUpper($columns)
+            : $this->columnsToLower($columns);
     }
 
     private function getSnapshotAllColumnsExceptPk(): array

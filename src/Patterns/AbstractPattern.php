@@ -78,6 +78,11 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return array_map(fn(string $column) => mb_strtolower($column), $columns);
     }
 
+    protected function columnsToUpper(array $columns): array
+    {
+        return array_map(fn(string $column) => mb_strtoupper($column), $columns);
+    }
+
     protected function noIndent(string $str): string
     {
         return implode(
