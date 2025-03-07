@@ -2,10 +2,10 @@
 {% set inputRandomColumn = attribute(inputPrimaryKey, 0) %}
 {% set snapshotInputJoinConditionSql = macro.generateJoin(inputPrimaryKey, "snapshot", "input", uppercaseColumns) %}
 {% set snapshotPrimaryKeySelect = macro.generateSnapshotPrimaryKey(snapshotPrimaryKeyParts, snapshotPrimaryKeyName, uppercaseColumns) %}
-{% set startDateName = uppercaseColumns ? columnName.startDate|upper|quoteIdentifier : columnName.startDate|quoteIdentifier  %}
-{% set endDateName = uppercaseColumns ? columnName.endDate|upper|quoteIdentifier : columnName.endDate|quoteIdentifier  %}
-{% set actualName = uppercaseColumns ? columnName.actual|upper|quoteIdentifier : columnName.actual|quoteIdentifier  %}
-{% set isDeletedName = uppercaseColumns ? columnName.isDeleted|upper|quoteIdentifier : columnName.isDeleted|quoteIdentifier  %}
+{% set startDateName = columnName.startDate | quoteIdentifier %}
+{% set endDateName = columnName.endDate | quoteIdentifier %}
+{% set actualName = columnName.actual | quoteIdentifier %}
+{% set isDeletedName = hasDeletedFlag ? columnName.isDeleted | quoteIdentifier : ''  %}
 -- SCD2: This method tracks historical data --
 -- by creating new records for new/modified data in the snapshot table. --
 
