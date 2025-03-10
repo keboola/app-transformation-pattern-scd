@@ -47,7 +47,12 @@ class OutputMapping
         $this->newMapping[] = $this->createTable([
             'source' => $this->pattern->getSnapshotOutputTable(),
             'destination' => $snapshotInputMapping->getSource(),
-            'primary_key' => [$this->pattern->getSnapshotPrimaryKey()],
+            'primary_key' => [
+                // Cannot be load from parameters, because they are initialized later 'setParameters'
+                $this->config->getUppercaseColumns()
+                    ? mb_strtoupper(Pattern::COLUMN_SNAPSHOT_PK)
+                    : Pattern::COLUMN_SNAPSHOT_PK,
+            ],
             'incremental' => true,
         ]);
     }

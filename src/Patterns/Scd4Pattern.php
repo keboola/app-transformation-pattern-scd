@@ -9,11 +9,6 @@ use Keboola\TransformationPatternScd\Parameters\Parameters;
 
 class Scd4Pattern extends AbstractPattern
 {
-    public const TABLE_INPUT = 'input_table';
-    public const TABLE_CURRENT_SNAPSHOT = 'current_snapshot';
-    public const TABLE_NEW_SNAPSHOT = 'new_snapshot';
-
-    public const COLUMN_SNAPSHOT_PK = 'snapshot_pk';
     public const COLUMN_SNAPSHOT_DATE = 'snapshot_date';
     public const COLUMN_ACTUAL = 'actual';
     public const COLUMN_IS_DELETED = 'is_deleted';
