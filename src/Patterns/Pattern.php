@@ -8,6 +8,11 @@ use Keboola\TransformationPatternScd\Parameters\Parameters;
 
 interface Pattern
 {
+    public const TABLE_INPUT = 'input_table';
+    public const TABLE_CURRENT_SNAPSHOT = 'current_snapshot';
+    public const TABLE_NEW_SNAPSHOT = 'new_snapshot';
+    public const COLUMN_SNAPSHOT_PK = 'snapshot_pk';
+
     public function getInputTableName(): string;
 
     public function getSnapshotInputTable(): string;
