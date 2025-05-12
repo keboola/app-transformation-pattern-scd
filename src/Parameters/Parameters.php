@@ -37,7 +37,7 @@ class Parameters
     private bool $currentTimestampMinusOne;
 
     private bool $uppercaseColumns;
-    
+
     private int $effectiveDateAdjustment;
 
     public function __construct(
@@ -150,7 +150,7 @@ class Parameters
     {
         return $this->uppercaseColumns;
     }
-    
+
     public function getEffectiveDateAdjustment(): int
     {
         return $this->effectiveDateAdjustment;
