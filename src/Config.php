@@ -119,4 +119,9 @@ class Config extends BaseConfig
     {
         return (bool) $this->getValue(['parameters', 'uppercase_columns']);
     }
+
+    public function getEffectiveDateAdjustment(): int
+    {
+        return (int) $this->getValue(['parameters', 'effective_date_adjustment']);
+    }
 }

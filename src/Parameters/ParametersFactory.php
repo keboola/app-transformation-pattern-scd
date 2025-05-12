@@ -44,7 +44,8 @@ class ParametersFactory
             $this->config->getDeletedFlagValue(),
             $this->config->getEndDateValue(),
             $this->config->getCurrentTimestampMinusOne(),
-            $this->config->getUppercaseColumns()
+            $this->config->getUppercaseColumns(),
+            $this->config->getEffectiveDateAdjustment()
         );
     }
 

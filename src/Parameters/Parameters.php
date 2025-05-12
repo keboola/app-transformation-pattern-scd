@@ -37,6 +37,8 @@ class Parameters
     private bool $currentTimestampMinusOne;
 
     private bool $uppercaseColumns;
+    
+    private int $effectiveDateAdjustment;
 
     public function __construct(
         string $backend,
@@ -53,7 +55,8 @@ class Parameters
         string $deletedFlagValue,
         string $endDateValue,
         bool $currentTimestampMinusOne,
-        bool $uppercaseColumns
+        bool $uppercaseColumns,
+        int $effectiveDateAdjustment
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -70,6 +73,7 @@ class Parameters
         $this->endDateValue = $endDateValue;
         $this->currentTimestampMinusOne = $currentTimestampMinusOne;
         $this->uppercaseColumns = $uppercaseColumns;
+        $this->effectiveDateAdjustment = $effectiveDateAdjustment;
     }
 
     public function getBackend(): string
@@ -145,5 +149,10 @@ class Parameters
     public function getUppercaseColumns(): bool
     {
         return $this->uppercaseColumns;
+    }
+    
+    public function getEffectiveDateAdjustment(): int
+    {
+        return $this->effectiveDateAdjustment;
     }
 }
