@@ -2,7 +2,7 @@
 -- by creating new records for new/modified data in the snapshot table. --
 
 -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
-SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('UTC', current_timestamp()))::DATE;
+SET CURRENT_DATE = (SELECT DATEADD(DAY, 0, CONVERT_TIMEZONE('UTC', current_timestamp())::DATE));
 
 SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
 
