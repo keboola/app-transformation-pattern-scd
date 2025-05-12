@@ -4,9 +4,7 @@
 -- The start and end dates contain the time ("use_datetime" = true). --
 SET CURRENT_TIMESTAMP = (SELECT DATEADD(DAY,0,CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP()))::TIMESTAMP_NTZ);
 
-SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
-
-SET CURRENT_TIMESTAMP_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
+SET CURRENT_TIMESTAMP_MINUS_SECOND = DATEADD(SECOND, -1, $CURRENT_TIMESTAMP);
 
 -- Changed records: Input table rows, EXCEPT same rows present in the last snapshot. --
 CREATE TABLE "changed_records" AS
@@ -26,7 +24,7 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         "pk1", "pk2", "name", "age", "job",
         -- The start date is set to now. --
-        $CURRENT_TIMESTAMP_TXT AS "custom_start_date",
+        $CURRENT_TIMESTAMP AS "custom_start_date",
         -- The end date is set to infinity. --
         '9999-12-31 00:00:00' AS "custom_end_date",
         -- Actual flag is set to ""Y"". --
@@ -43,7 +41,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_TIMESTAMP_TXT_MINUS_SECOND AS "custom_end_date",
+        $CURRENT_TIMESTAMP_MINUS_SECOND AS "custom_end_date",
         -- Actual flag is set to ""N"", because the new version exists. --
         "N" AS "custom_actual",
         -- IsDeleted flag is set to ""N"", because the new version exists. --
@@ -60,7 +58,7 @@ CREATE TABLE "updated_records" AS
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
         -- TLDR: for each PK, we can have max one row in the new snapshot. --
-        AND snapshot."custom_start_date" != $CURRENT_TIMESTAMP_TXT;
+        AND snapshot."custom_start_date" != $CURRENT_TIMESTAMP;
 
 -- Deleted records are missing in input table, but have actual "1" in last snapshot. --
 CREATE TABLE "deleted_records" AS

@@ -4,9 +4,7 @@
 -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
 SET CURRENT_DATE = (SELECT DATEADD(DAY, 0, CONVERT_TIMEZONE('UTC', current_timestamp())::DATE));
 
-SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
-
-SET CURRENT_DATE_TXT_MINUS_DAY = (SELECT TO_CHAR(DATEADD(DAY, -1, $CURRENT_DATE), 'YYYY-MM-DD'));
+SET CURRENT_DATE_MINUS_DAY = DATEADD(DAY, -1, $CURRENT_DATE);
 
 -- Changed records: Input table rows, EXCEPT same rows present in the last snapshot. --
 CREATE TABLE "changed_records" AS
@@ -26,7 +24,7 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         "pk1", "pk2", "name", "age", "job",
         -- The start date is set to now. --
-        $CURRENT_DATE_TXT AS "custom_start_date",
+        $CURRENT_DATE AS "custom_start_date",
         -- The end date is set to infinity. --
         '9999-12-31' AS "custom_end_date",
         -- Actual flag is set to "1". --
@@ -41,7 +39,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_DATE_TXT_MINUS_DAY AS "custom_end_date",
+        $CURRENT_DATE_MINUS_DAY AS "custom_end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "custom_actual"
     FROM "current_snapshot" snapshot
@@ -56,7 +54,7 @@ CREATE TABLE "updated_records" AS
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
         -- TLDR: for each PK, we can have max one row in the new snapshot. --
-        AND snapshot."custom_start_date" != $CURRENT_DATE_TXT;
+        AND snapshot."custom_start_date" != $CURRENT_DATE;
 
 -- Deleted records are missing in input table, but have actual "1" in last snapshot. --
 CREATE TABLE "deleted_records" AS
@@ -66,8 +64,8 @@ CREATE TABLE "deleted_records" AS
         -- The start date is unchanged, it is part of the PK, --
         -- so old values are overwritten by incremental loading. --
         snapshot."custom_start_date",
-        -- The end date is set to "$CURRENT_DATE_TXT_MINUS_DAY" ("keep_del_active" = false). --
-        $CURRENT_DATE_TXT_MINUS_DAY AS "custom_end_date",
+        -- The end date is set to "$CURRENT_DATE_MINUS_DAY" ("keep_del_active" = false). --
+        $CURRENT_DATE_MINUS_DAY AS "custom_end_date",
         -- The actual flag is set to "0" ("keep_del_active" = false). --
         0 AS "custom_actual"
     FROM "current_snapshot" snapshot
