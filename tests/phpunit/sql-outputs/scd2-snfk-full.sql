@@ -24,9 +24,9 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         "pk1", "pk2", "name", "age", "job",
         -- The start date is set to now. --
-        $CURRENT_TIMESTAMP AS "custom_start_date",
+        $CURRENT_TIMESTAMP::TIMESTAMP_NTZ AS "custom_start_date",
         -- The end date is set to infinity. --
-        '9999-12-31 00:00:00' AS "custom_end_date",
+        '9999-12-31 00:00:00'::TIMESTAMP_NTZ AS "custom_end_date",
         -- Actual flag is set to "1". --
         1 AS "custom_actual",
         -- IsDeleted flag is set to "0". --
@@ -41,7 +41,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."custom_start_date",
         -- The end date is set to now. --
-        $CURRENT_TIMESTAMP_MINUS_SECOND AS "custom_end_date",
+        $CURRENT_TIMESTAMP_MINUS_SECOND::TIMESTAMP_NTZ AS "custom_end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "custom_actual",
         -- IsDeleted flag is set to "0", because the new version exists. --
@@ -69,7 +69,7 @@ CREATE TABLE "deleted_records" AS
         -- so old values are overwritten by incremental loading. --
         snapshot."custom_start_date",
         -- The end date is set to "'9999-12-31 00:00:00'" ("keep_del_active" = true). --
-        '9999-12-31 00:00:00' AS "custom_end_date",
+        '9999-12-31 00:00:00'::TIMESTAMP_NTZ AS "custom_end_date",
         -- The actual flag is set to "1" ("keep_del_active" = true). --
         1 AS "custom_actual",
         -- IsDeleted flag is set to "1". --
