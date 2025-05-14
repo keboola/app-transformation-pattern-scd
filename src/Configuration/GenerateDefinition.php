@@ -53,7 +53,7 @@ class GenerateDefinition extends BaseConfigDefinition
                 ->scalarNode('end_date_value')->defaultValue(self::END_DATE_VALUE_DEFAULT)->end()
                 ->booleanNode('current_timestamp_minus_one')->defaultValue(self::CURRENT_TIMESTAMP_MINUS_ONE)->end()
                 ->booleanNode('uppercase_columns')->defaultValue(self::UPPERCASE_COLUMNS_DEFAULT)->end()
-                ->scalarNode('effective_date_adjustment')->defaultValue('0')->end()
+                ->scalarNode('effective_date_adjustment')->defaultValue(0)->end()
             ->end()
         ;
         // @formatter:on
