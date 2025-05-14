@@ -13,7 +13,8 @@
     {% if useDatetime %}
         {% set currentDate = '$CURRENT_TIMESTAMP' %}
         {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_TIMESTAMP_MINUS_SECOND' : '$CURRENT_TIMESTAMP' %}
-        {% set infiniteDate = endDateValue ~ ' 00:00:00' %}
+        {% set infiniteDateValue = endDateValue ~ ' 00:00:00' %}
+        {% set infiniteDate = infiniteDateValue | quoteValue %}
         {% set dateType = 'TIMESTAMP_NTZ' %}
         -- The start and end dates contain the time ("use_datetime" = true). --
         SET CURRENT_TIMESTAMP = (SELECT DATEADD(DAY,{{ effectiveDateAdjustment }},CONVERT_TIMEZONE('{{ timezone }}',CURRENT_TIMESTAMP()))::TIMESTAMP_NTZ);
@@ -21,7 +22,8 @@
     {% else %}
         {% set currentDate = '$CURRENT_DATE' %}
         {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_DATE_MINUS_DAY' : '$CURRENT_DATE' %}
-        {% set infiniteDate = endDateValue %}
+        {% set infiniteDateValue = endDateValue %}
+        {% set infiniteDate = infiniteDateValue | quoteValue %}
         {% set dateType = 'DATE' %}
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
         SET CURRENT_DATE = (SELECT DATEADD(DAY, {{ effectiveDateAdjustment }}, CONVERT_TIMEZONE('{{timezone }}', current_timestamp())::DATE));
@@ -29,7 +31,7 @@
     {% endif %}
 
     {% if keepDeleteActive %}
-        {% set deletedEndDate = infiniteDate | quoteValue %}
+        {% set deletedEndDate = infiniteDate %}
     {% else %}
         {% set deletedEndDate = currentTimestampMinusOne ? currentDateForEndDate : currentDate %}
     {% endif %}
@@ -55,7 +57,7 @@ CREATE TABLE "changed_records" AS
         -- The start date is set to now. --
         {{ currentDate }}::{{ dateType }} AS {{ startDateName }},
         -- The end date is set to infinity. --
-        {{ infiniteDate | quoteValue }}::{{ dateType }} AS {{ endDateName }},
+        {{ infiniteDate }}::{{ dateType }} AS {{ endDateName }},
         -- Actual flag is set to "{{ deletedFlagValue.1 }}". --
         {{ deletedFlagValue.1 }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.0 }}". --
