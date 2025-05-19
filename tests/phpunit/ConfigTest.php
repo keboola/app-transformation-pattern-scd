@@ -39,7 +39,7 @@ class ConfigTest extends TestCase
             'current_timestamp_minus_one' => false,
             'uppercase_columns' => false,
             'effective_date_adjustment' => '0',
-            'snapshot_table_name' => null,
+            'snapshot_table_name' => '',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -130,7 +130,7 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => false,
                         'effective_date_adjustment' => '0',
-                        'snapshot_table_name' => null,
+                        'snapshot_table_name' => '',
                     ],
                 ],
             ],
@@ -154,7 +154,7 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
                         'effective_date_adjustment' => '0',
-                        'snapshot_table_name' => null,
+                        'snapshot_table_name' => '',
                     ],
                 ],
             ],
@@ -178,7 +178,7 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
                         'effective_date_adjustment' => '0',
-                        'snapshot_table_name' => null,
+                        'snapshot_table_name' => '',
                     ],
                 ],
             ],

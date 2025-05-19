@@ -127,7 +127,6 @@ class Config extends BaseConfig
 
     public function getSnapshotTableName(): string
     {
-        $value = $this->getValue(['parameters', 'snapshot_table_name'], false);
-        return $value === false ? '' : (string) $value;
+        return (string) $this->getValue(['parameters', 'snapshot_table_name'], '');
     }
 }
