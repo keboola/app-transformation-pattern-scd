@@ -50,6 +50,7 @@ class SqlOutputTest extends TestCase
             $parameters['end_date_value'],
             $parameters['current_timestamp_minus_one'],
             $parameters['uppercase_columns'],
+            isset($parameters['effective_date_adjustment']) ? (int) $parameters['effective_date_adjustment'] : 0
         );
     }
 

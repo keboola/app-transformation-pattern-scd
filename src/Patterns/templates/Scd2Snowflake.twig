@@ -11,21 +11,23 @@
 
 {% apply noIndent %}
     {% if useDatetime %}
-        {% set currentDate = '$CURRENT_TIMESTAMP_TXT' %}
-        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_TIMESTAMP_TXT_MINUS_SECOND' : '$CURRENT_TIMESTAMP_TXT' %}
-        {% set infiniteDate = (endDateValue ~ ' 00:00:00') | quoteValue %}
+        {% set currentDate = '$CURRENT_TIMESTAMP' %}
+        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_TIMESTAMP_MINUS_SECOND' : '$CURRENT_TIMESTAMP' %}
+        {% set infiniteDateValue = endDateValue ~ ' 00:00:00' %}
+        {% set infiniteDate = infiniteDateValue | quoteValue %}
+        {% set dateType = 'TIMESTAMP_NTZ' %}
         -- The start and end dates contain the time ("use_datetime" = true). --
-        SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp())::TIMESTAMP_NTZ);
-        SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
-        SET CURRENT_TIMESTAMP_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
+        SET CURRENT_TIMESTAMP = (SELECT DATEADD(DAY,{{ effectiveDateAdjustment }},CONVERT_TIMEZONE('{{ timezone }}',CURRENT_TIMESTAMP()))::TIMESTAMP_NTZ);
+        SET CURRENT_TIMESTAMP_MINUS_SECOND = DATEADD(SECOND, -1, $CURRENT_TIMESTAMP);
     {% else %}
-        {% set currentDate = '$CURRENT_DATE_TXT' %}
-        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_DATE_TXT_MINUS_DAY' : '$CURRENT_DATE_TXT' %}
-        {% set infiniteDate = endDateValue | quoteValue %}
+        {% set currentDate = '$CURRENT_DATE' %}
+        {% set currentDateForEndDate = currentTimestampMinusOne ? '$CURRENT_DATE_MINUS_DAY' : '$CURRENT_DATE' %}
+        {% set infiniteDateValue = endDateValue %}
+        {% set infiniteDate = infiniteDateValue | quoteValue %}
+        {% set dateType = 'DATE' %}
         -- The start and end dates DO NOT contain the time ("use_datetime" = false). --
-        SET CURRENT_DATE = (SELECT CONVERT_TIMEZONE('{{ timezone }}', current_timestamp()))::DATE;
-        SET CURRENT_DATE_TXT = (SELECT TO_CHAR($CURRENT_DATE, 'YYYY-MM-DD'));
-        SET CURRENT_DATE_TXT_MINUS_DAY = (SELECT TO_CHAR(DATEADD(DAY, -1, $CURRENT_DATE), 'YYYY-MM-DD'));
+        SET CURRENT_DATE = (SELECT DATEADD(DAY, {{ effectiveDateAdjustment }}, CONVERT_TIMEZONE('{{timezone }}', current_timestamp())::DATE));
+        SET CURRENT_DATE_MINUS_DAY = DATEADD(DAY, -1, $CURRENT_DATE);
     {% endif %}
 
     {% if keepDeleteActive %}
@@ -53,9 +55,9 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         {{ macro.selectFromColumns(snapshotInputColumns, "", false, uppercaseColumns) }},
         -- The start date is set to now. --
-        {{ currentDate }} AS {{ startDateName }},
+        {{ currentDate }}::{{ dateType }} AS {{ startDateName }},
         -- The end date is set to infinity. --
-        {{ infiniteDate }} AS {{ endDateName }},
+        {{ infiniteDate }}::{{ dateType }} AS {{ endDateName }},
         -- Actual flag is set to "{{ deletedFlagValue.1 }}". --
         {{ deletedFlagValue.1 }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.0 }}". --
@@ -70,7 +72,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot.{{ startDateName }},
         -- The end date is set to now. --
-        {{ currentDateForEndDate }} AS {{ endDateName }},
+        {{ currentDateForEndDate }}::{{ dateType }} AS {{ endDateName }},
         -- Actual flag is set to "{{ deletedFlagValue.0 }}", because the new version exists. --
         {{ deletedFlagValue.0 }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.0 }}", because the new version exists. --
@@ -98,7 +100,7 @@ CREATE TABLE "deleted_records" AS
         -- so old values are overwritten by incremental loading. --
         snapshot.{{ startDateName }},
         -- The end date is set to "{{  deletedEndDate  }}" ("keep_del_active" = {{ keepDeleteActive ? 'true' : 'false' }}). --
-        {{ deletedEndDate }} AS {{ endDateName }},
+        {{ deletedEndDate }}::{{ dateType }} AS {{ endDateName }},
         -- The actual flag is set to "{{  deletedActualValue  }}" ("keep_del_active" = {{ keepDeleteActive? 'true' : 'false' }}). --
         {{ deletedActualValue }} AS {{ actualName }}{% if hasDeletedFlag %},
         -- IsDeleted flag is set to "{{ deletedFlagValue.1 }}". --

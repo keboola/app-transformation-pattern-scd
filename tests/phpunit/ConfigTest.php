@@ -38,6 +38,7 @@ class ConfigTest extends TestCase
             'end_date_value' => '9999-12-31',
             'current_timestamp_minus_one' => false,
             'uppercase_columns' => false,
+            'effective_date_adjustment' => '0',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -114,6 +115,7 @@ class ConfigTest extends TestCase
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => false,
+                        'effective_date_adjustment' => '0',
                     ],
                 ],
             ],
@@ -136,6 +138,7 @@ class ConfigTest extends TestCase
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
+                        'effective_date_adjustment' => '0',
                     ],
                 ],
             ],
@@ -158,6 +161,7 @@ class ConfigTest extends TestCase
                         'end_date_value' => '9999-12-31',
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
+                        'effective_date_adjustment' => '0',
                     ],
                 ],
             ],

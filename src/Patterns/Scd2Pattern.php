@@ -77,6 +77,7 @@ class Scd2Pattern extends AbstractPattern
             'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
             'currentTimestampMinusOne' => $this->getParameters()->getCurrentTimestampMinusOne(),
             'uppercaseColumns' => $this->getParameters()->getUppercaseColumns(),
+            'effectiveDateAdjustment' => $this->getParameters()->getEffectiveDateAdjustment(),
         ];
     }
 

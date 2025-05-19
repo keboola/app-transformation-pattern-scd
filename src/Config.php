@@ -119,4 +119,14 @@ class Config extends BaseConfig
     {
         return (bool) $this->getValue(['parameters', 'uppercase_columns']);
     }
+
+    public function getEffectiveDateAdjustment(): int
+    {
+        return (int) $this->getValue(['parameters', 'effective_date_adjustment']);
+    }
+
+    public function getSnapshotTableName(): ?string
+    {
+        return $this->getValue(['parameters', 'snapshot_table_name'], null);
+    }
 }

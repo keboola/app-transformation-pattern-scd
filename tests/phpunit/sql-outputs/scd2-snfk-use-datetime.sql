@@ -2,11 +2,9 @@
 -- by creating new records for new/modified data in the snapshot table. --
 
 -- The start and end dates contain the time ("use_datetime" = true). --
-SET CURRENT_TIMESTAMP = (SELECT CONVERT_TIMEZONE('UTC', current_timestamp())::TIMESTAMP_NTZ);
+SET CURRENT_TIMESTAMP = (SELECT DATEADD(DAY,0,CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP()))::TIMESTAMP_NTZ);
 
-SET CURRENT_TIMESTAMP_TXT = (SELECT TO_CHAR($CURRENT_TIMESTAMP, 'YYYY-MM-DD HH:Mi:SS'));
-
-SET CURRENT_TIMESTAMP_TXT_MINUS_SECOND = TO_CHAR(DATEADD(SECOND, -1, $CURRENT_TIMESTAMP), 'YYYY-MM-DD HH:Mi:SS');
+SET CURRENT_TIMESTAMP_MINUS_SECOND = DATEADD(SECOND, -1, $CURRENT_TIMESTAMP);
 
 -- Changed records: Input table rows, EXCEPT same rows present in the last snapshot. --
 CREATE TABLE "changed_records" AS
@@ -26,9 +24,9 @@ CREATE TABLE "changed_records" AS
         -- Monitored parameters. --
         "pk1", "pk2", "name", "age", "job",
         -- The start date is set to now. --
-        $CURRENT_TIMESTAMP_TXT AS "start_date",
+        $CURRENT_TIMESTAMP::TIMESTAMP_NTZ AS "start_date",
         -- The end date is set to infinity. --
-        '9999-12-31 00:00:00' AS "end_date",
+        '9999-12-31 00:00:00'::TIMESTAMP_NTZ AS "end_date",
         -- Actual flag is set to "1". --
         1 AS "custom_actual"
     FROM "diff_records";
@@ -41,7 +39,7 @@ CREATE TABLE "updated_records" AS
         -- The start date is preserved. --
         snapshot."start_date",
         -- The end date is set to now. --
-        $CURRENT_TIMESTAMP_TXT_MINUS_SECOND AS "end_date",
+        $CURRENT_TIMESTAMP_MINUS_SECOND::TIMESTAMP_NTZ AS "end_date",
         -- Actual flag is set to "0", because the new version exists. --
         0 AS "custom_actual"
     FROM "current_snapshot" snapshot
@@ -56,7 +54,7 @@ CREATE TABLE "updated_records" AS
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
         -- TLDR: for each PK, we can have max one row in the new snapshot. --
-        AND snapshot."start_date" != $CURRENT_TIMESTAMP_TXT;
+        AND snapshot."start_date" != $CURRENT_TIMESTAMP;
 
 -- Deleted records are missing in input table, but have actual "1" in last snapshot. --
 CREATE TABLE "deleted_records" AS
@@ -66,8 +64,8 @@ CREATE TABLE "deleted_records" AS
         -- The start date is unchanged, it is part of the PK, --
         -- so old values are overwritten by incremental loading. --
         snapshot."start_date",
-        -- The end date is set to "$CURRENT_TIMESTAMP_TXT_MINUS_SECOND" ("keep_del_active" = false). --
-        $CURRENT_TIMESTAMP_TXT_MINUS_SECOND AS "end_date",
+        -- The end date is set to "$CURRENT_TIMESTAMP_MINUS_SECOND" ("keep_del_active" = false). --
+        $CURRENT_TIMESTAMP_MINUS_SECOND::TIMESTAMP_NTZ AS "end_date",
         -- The actual flag is set to "0" ("keep_del_active" = false). --
         0 AS "custom_actual"
     FROM "current_snapshot" snapshot
