@@ -125,8 +125,9 @@ class Config extends BaseConfig
         return (int) $this->getValue(['parameters', 'effective_date_adjustment']);
     }
 
-    public function getSnapshotTableName(): ?string
+    public function getSnapshotTableName(): string
     {
-        return $this->getValue(['parameters', 'snapshot_table_name'], null);
+        $value = $this->getValue(['parameters', 'snapshot_table_name'], false);
+        return $value === false ? '' : (string) $value;
     }
 }
