@@ -53,9 +53,9 @@ class ConfigTest extends TestCase
     {
         $config = $this->getMinimalConfig();
         $config['parameters']['snapshot_table_name'] = 'custom_snapshot';
-        
+
         $appConfig = new Config($config, new GenerateDefinition());
-        
+
         Assert::assertEquals(
             'custom_snapshot',
             $appConfig->getData()['parameters']['snapshot_table_name']

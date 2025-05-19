@@ -124,7 +124,7 @@ class InputMapping
 
     private function generateSnapshotTable(): void
     {
-        $suffix = !empty($this->config->getSnapshotTableName()) ? 
+        $suffix = !empty($this->config->getSnapshotTableName()) ?
             $this->config->getSnapshotTableName() : self::SNAPSHOT_TABLE_SUFFIX;
         $data = [
             'source' => $this->tableIdGenerator->generate(
