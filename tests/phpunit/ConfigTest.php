@@ -39,6 +39,7 @@ class ConfigTest extends TestCase
             'current_timestamp_minus_one' => false,
             'uppercase_columns' => false,
             'effective_date_adjustment' => '0',
+            'snapshot_table_name' => '',
         ];
 
         $appConfig = new Config($config, new GenerateDefinition());
@@ -46,6 +47,19 @@ class ConfigTest extends TestCase
         $actualDiff = array_diff($appConfig->getData()['parameters'], $config['parameters']);
 
         Assert::assertEquals($expectedDiff, $actualDiff);
+    }
+
+    public function testSnapshotTableNameParameter(): void
+    {
+        $config = $this->getMinimalConfig();
+        $config['parameters']['snapshot_table_name'] = 'custom_snapshot';
+
+        $appConfig = new Config($config, new GenerateDefinition());
+
+        Assert::assertEquals(
+            'custom_snapshot',
+            $appConfig->getData()['parameters']['snapshot_table_name']
+        );
     }
 
     public function testInvalidScdType(): void
@@ -116,6 +130,7 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => false,
                         'effective_date_adjustment' => '0',
+                        'snapshot_table_name' => '',
                     ],
                 ],
             ],
@@ -139,6 +154,7 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
                         'effective_date_adjustment' => '0',
+                        'snapshot_table_name' => '',
                     ],
                 ],
             ],
@@ -162,6 +178,31 @@ class ConfigTest extends TestCase
                         'current_timestamp_minus_one' => false,
                         'uppercase_columns' => true,
                         'effective_date_adjustment' => '0',
+                        'snapshot_table_name' => '',
+                    ],
+                ],
+            ],
+            [
+                [
+                    'parameters' => [
+                        '_componentId' => 'keboola.snowflake-transformation',
+                        'scd_type' => GenerateDefinition::SCD_TYPE_2,
+                        'primary_key' => 'testKey, testKey2',
+                        'monitored_parameters' => 'abc,def',
+                        'timezone' => 'Europe/Prague',
+                        'deleted_flag' => false,
+                        'use_datetime' => false,
+                        'keep_del_active' => false,
+                        'start_date_name' => 'start_date',
+                        'end_date_name' => 'end_date',
+                        'actual_name' => 'actual',
+                        'is_deleted_name' => 'isDeleted',
+                        'deleted_flag_value' => '0/1',
+                        'end_date_value' => '9999-12-31',
+                        'current_timestamp_minus_one' => false,
+                        'uppercase_columns' => false,
+                        'effective_date_adjustment' => '0',
+                        'snapshot_table_name' => 'custom_snapshot',
                     ],
                 ],
             ],

@@ -21,6 +21,7 @@ class GenerateDefinition extends BaseConfigDefinition
     private const END_DATE_VALUE_DEFAULT = '9999-12-31';
     private const CURRENT_TIMESTAMP_MINUS_ONE = false;
     private const UPPERCASE_COLUMNS_DEFAULT = false;
+    private const SNAPSHOT_TABLE_NAME_DEFAULT = '';
 
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
@@ -54,6 +55,7 @@ class GenerateDefinition extends BaseConfigDefinition
                 ->booleanNode('current_timestamp_minus_one')->defaultValue(self::CURRENT_TIMESTAMP_MINUS_ONE)->end()
                 ->booleanNode('uppercase_columns')->defaultValue(self::UPPERCASE_COLUMNS_DEFAULT)->end()
                 ->scalarNode('effective_date_adjustment')->defaultValue(0)->end()
+                ->scalarNode('snapshot_table_name')->defaultValue(self::SNAPSHOT_TABLE_NAME_DEFAULT)->end()
             ->end()
         ;
         // @formatter:on

@@ -40,6 +40,8 @@ class Parameters
 
     private int $effectiveDateAdjustment;
 
+    private string $snapshotTableName;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -56,7 +58,8 @@ class Parameters
         string $endDateValue,
         bool $currentTimestampMinusOne,
         bool $uppercaseColumns,
-        int $effectiveDateAdjustment
+        int $effectiveDateAdjustment,
+        string $snapshotTableName = ''
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -74,6 +77,7 @@ class Parameters
         $this->currentTimestampMinusOne = $currentTimestampMinusOne;
         $this->uppercaseColumns = $uppercaseColumns;
         $this->effectiveDateAdjustment = $effectiveDateAdjustment;
+        $this->snapshotTableName = $snapshotTableName;
     }
 
     public function getBackend(): string
@@ -154,5 +158,10 @@ class Parameters
     public function getEffectiveDateAdjustment(): int
     {
         return $this->effectiveDateAdjustment;
+    }
+
+    public function getSnapshotTableName(): string
+    {
+        return $this->snapshotTableName;
     }
 }

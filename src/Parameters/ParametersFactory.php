@@ -45,7 +45,8 @@ class ParametersFactory
             $this->config->getEndDateValue(),
             $this->config->getCurrentTimestampMinusOne(),
             $this->config->getUppercaseColumns(),
-            $this->config->getEffectiveDateAdjustment()
+            $this->config->getEffectiveDateAdjustment(),
+            $this->config->getSnapshotTableName()
         );
     }
 
