@@ -8,23 +8,17 @@ use Keboola\Component\UserException;
 use Keboola\TransformationPatternScd\ApiFacade;
 use Keboola\TransformationPatternScd\Application;
 use Keboola\TransformationPatternScd\Config;
-use Keboola\TransformationPatternScd\Mapping\MappingManager;
+use Keboola\TransformationPatternScd\InputTableResolver;
 
 class ParametersFactory
 {
     private Config $config;
+    private InputTableResolver $inputTableResolver;
 
-    private ApiFacade $apiFacade;
-
-    private MappingManager $mappingManager;
-
-    private ?array $inputTableDetail = null;
-
-    public function __construct(Config $config, ApiFacade $apiFacade, MappingManager $mappingManager)
+    public function __construct(Config $config, InputTableResolver $inputTableResolver)
     {
         $this->config = $config;
-        $this->apiFacade = $apiFacade;
-        $this->mappingManager = $mappingManager;
+        $this->inputTableResolver = $inputTableResolver;
     }
 
     public function create(): Parameters
@@ -66,13 +60,13 @@ class ParametersFactory
     private function getPrimaryKey(): array
     {
         $configColumns = $this->config->getPrimaryKeyInput();
-        $storageColumns = $this->getInputTableColumns();
+        $storageColumns = $this->inputTableResolver->getInputTableColumns();
         $missingColumns = array_diff($configColumns, $storageColumns);
         if ($missingColumns) {
             throw new UserException(sprintf(
                 'Primary key "%s" not found in the input table "%s".',
                 implode('", "', $missingColumns),
-                $this->getInputTableId()
+                $this->inputTableResolver->getInputTableId()
             ));
         }
 
@@ -82,36 +76,16 @@ class ParametersFactory
     private function getMonitoredParameters(): array
     {
         $configColumns = $this->config->getIncludedParametersInput();
-        $storageColumns = $this->getInputTableColumns();
+        $storageColumns = $this->inputTableResolver->getInputTableColumns();
         $missingColumns = array_diff($configColumns, $storageColumns);
         if ($missingColumns) {
             throw new UserException(sprintf(
                 'Monitored parameter "%s" not found in the input table "%s".',
                 implode('", "', $missingColumns),
-                $this->getInputTableId()
+                $this->inputTableResolver->getInputTableId()
             ));
         }
 
         return $configColumns;
-    }
-
-    private function getInputTableColumns(): array
-    {
-        return $this->getInputTableDetail()['columns'];
-    }
-
-    private function getInputTableDetail(): array
-    {
-        if (!$this->inputTableDetail) {
-            $this->inputTableDetail =
-                $this->apiFacade->getTable($this->getInputTableId());
-        }
-
-        return $this->inputTableDetail;
-    }
-
-    private function getInputTableId(): string
-    {
-        return $this->mappingManager->getInputMapping()->getInputTable()->getSource();
     }
 }
