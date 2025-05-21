@@ -64,10 +64,10 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return $this->quoteHelper;
     }
 
-    protected function getParameters(): Parameters
+    public function getParameters(): Parameters
     {
         if (!$this->parameters) {
-            throw new ApplicationException('Please, call "setParameters" before calling "getQuoteHelper".');
+            throw new ApplicationException('Please, call "setParameters" before calling "getParameters".');
         }
 
         return $this->parameters;
