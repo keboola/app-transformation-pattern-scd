@@ -132,8 +132,8 @@ class InputMapping
                 TableIdGenerator::STAGE_OUTPUT // snapshot is in OUT stage
             ),
             'destination' => $this->pattern->getSnapshotInputTable(),
-            'where_column' => $this->pattern->getParameters()->getActualName(),
-            'where_values' => [$this->pattern->getParameters()->getDeletedFlagValue()[1]],
+            'where_column' => $this->config->getUppercaseColumns() ? mb_strtoupper($this->pattern->getParameters()->getActualName()) : $this->pattern->getParameters()->getActualName(),
+            'where_values' => [str_replace("'", "", $this->pattern->getParameters()->getDeletedFlagValue()[1])],
         ];
         $this->snapshotTable = $this->createTable($data);
     }
