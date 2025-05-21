@@ -40,19 +40,19 @@ class Application
         $this->dataDir = $dataDir;
         $apiClient = new Client(['url' => $config->getStorageApiUrl(), 'token' => $config->getStorageApiToken()]);
         $this->apiFacade = new ApiFacade($apiClient, $dataDir);
-        
+
         // Create input table resolver
         $inputTableResolver = new InputTableResolver($this->config, $this->apiFacade);
-        
+
         // Create parameters
         $parametersFactory = new ParametersFactory($this->config, $inputTableResolver);
         $parameters = $parametersFactory->create();
-        
+
         // Create pattern with parameters
         $this->patternFactory = new PatternFactory($this->config->getScdType());
         $this->pattern = $this->patternFactory->create();
         $this->pattern->setParameters($parameters);
-        
+
         // Create mapping manager with initialized pattern
         $this->mappingManager = new MappingManager($this->config, $this->pattern);
         $this->storageGenerator = new StorageGenerator($this->mappingManager);

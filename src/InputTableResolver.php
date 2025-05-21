@@ -21,11 +21,11 @@ class InputTableResolver
     public function getInputTableId(): string
     {
         $tables = $this->config->getInputTables();
-        
+
         if (empty($tables)) {
             throw new UserException('Please specify one input table in the input mapping.');
         }
-        
+
         if (count($tables) === 1) {
             // One table in input mapping
             return $tables[0]['source'];
@@ -36,7 +36,7 @@ class InputTableResolver
                     return $table['source'];
                 }
             }
-            
+
             throw new UserException(sprintf(
                 'Found "%d" tables in input mapping, but no source table with "destination" = "input_table". ' .
                 'Please set the source table in the input mapping.',
@@ -55,7 +55,7 @@ class InputTableResolver
         if (!$this->inputTableDetail) {
             $this->inputTableDetail = $this->apiFacade->getTable($this->getInputTableId());
         }
-        
+
         return $this->inputTableDetail;
     }
-} 
+}
