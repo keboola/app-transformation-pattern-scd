@@ -25,5 +25,7 @@ interface Pattern
 
     public function setParameters(Parameters $parameters): void;
 
+    public function getParameters(): Parameters;
+
     public function render(): string;
 }
