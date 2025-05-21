@@ -51,6 +51,14 @@ class TableIdGenerator
         return sprintf('%s.%s_%s_%s', $this->getBucketId($stage), $this->sourceTableName, $this->configHash, $name);
     }
 
+    /**
+     * Generate a table name by directly appending a suffix to the source table name without hashes.
+     */
+    public function generateDirect(string $suffix, string $stage): string
+    {
+        return sprintf('%s.%s%s', $this->getBucketId($stage), $this->sourceTableName, $suffix);
+    }
+
     private function getBucketId(string $stage): string
     {
         switch ($stage) {

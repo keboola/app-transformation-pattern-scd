@@ -124,13 +124,24 @@ class InputMapping
 
     private function generateSnapshotTable(): void
     {
-        $suffix = !empty($this->config->getSnapshotTableName()) ?
-            $this->config->getSnapshotTableName() : self::SNAPSHOT_TABLE_SUFFIX;
+        $customSnapshotName = $this->config->getSnapshotTableName();
+        
+        if (!empty($customSnapshotName)) {
+            // When custom snapshot name is defined, append it directly to the source table name
+            $source = $this->tableIdGenerator->generateDirect(
+                $customSnapshotName,
+                TableIdGenerator::STAGE_OUTPUT
+            );
+        } else {
+            // Default behavior - use hash and standard snapshot suffix
+            $source = $this->tableIdGenerator->generate(
+                self::SNAPSHOT_TABLE_SUFFIX,
+                TableIdGenerator::STAGE_OUTPUT
+            );
+        }
+        
         $data = [
-            'source' => $this->tableIdGenerator->generate(
-                $suffix,
-                TableIdGenerator::STAGE_OUTPUT // snapshot is in OUT stage
-            ),
+            'source' => $source,
             'destination' => $this->pattern->getSnapshotInputTable(),
             'where_column' => $this->config->getUppercaseColumns() ? mb_strtoupper($this->pattern->getParameters()->getActualName()) : $this->pattern->getParameters()->getActualName(),
             'where_values' => [str_replace("'", "", $this->pattern->getParameters()->getDeletedFlagValue()[1])],
