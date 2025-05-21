@@ -125,7 +125,7 @@ class InputMapping
     private function generateSnapshotTable(): void
     {
         $customSnapshotName = $this->config->getSnapshotTableName();
-        
+
         if (!empty($customSnapshotName)) {
             // When custom snapshot name is defined, append it directly to the source table name
             $source = $this->tableIdGenerator->generateDirect(
@@ -139,12 +139,15 @@ class InputMapping
                 TableIdGenerator::STAGE_OUTPUT
             );
         }
-        
+
+        $actualName = $this->pattern->getParameters()->getActualName();
+        $where_column = $this->config->getUppercaseColumns() ? mb_strtoupper($actualName) : $actualName;
+
         $data = [
             'source' => $source,
             'destination' => $this->pattern->getSnapshotInputTable(),
-            'where_column' => $this->config->getUppercaseColumns() ? mb_strtoupper($this->pattern->getParameters()->getActualName()) : $this->pattern->getParameters()->getActualName(),
-            'where_values' => [str_replace("'", "", $this->pattern->getParameters()->getDeletedFlagValue()[1])],
+            'where_column' => $where_column,
+            'where_values' => [str_replace("'", '', $this->pattern->getParameters()->getDeletedFlagValue()[1])],
         ];
         $this->snapshotTable = $this->createTable($data);
     }
