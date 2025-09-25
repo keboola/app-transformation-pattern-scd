@@ -27,6 +27,8 @@ class Application
 
     private Pattern $pattern;
 
+    private InputTableResolver $inputTableResolver;
+
     private MappingManager $mappingManager;
 
     private StorageGenerator $storageGenerator;
@@ -42,10 +44,10 @@ class Application
         $this->apiFacade = new ApiFacade($apiClient, $dataDir);
 
         // Create input table resolver
-        $inputTableResolver = new InputTableResolver($this->config, $this->apiFacade);
+        $this->inputTableResolver = new InputTableResolver($this->config, $this->apiFacade);
 
         // Create parameters
-        $parametersFactory = new ParametersFactory($this->config, $inputTableResolver);
+        $parametersFactory = new ParametersFactory($this->config, $this->inputTableResolver);
         $parameters = $parametersFactory->create();
 
         // Create pattern with parameters
@@ -64,8 +66,8 @@ class Application
         // Create snapshot table by API
         $this->apiFacade->createSnapshotTable(
             $this->mappingManager->getInputMapping()->getSnapshotTable(),
-            $this->pattern->getSnapshotTableHeader(),
-            $this->pattern->getSnapshotPrimaryKey(),
+            $this->inputTableResolver->getInputTableDetail(),
+            $this->pattern,
         );
 
         return [

@@ -21,7 +21,11 @@ interface Pattern
 
     public function getSnapshotPrimaryKey(): string;
 
+    public function getSnapshotPrimaryKeyParts(): array;
+
     public function getSnapshotTableHeader(): array;
+
+    public function getSnapshotSpecialColumns(): array;
 
     public function setParameters(Parameters $parameters): void;
 

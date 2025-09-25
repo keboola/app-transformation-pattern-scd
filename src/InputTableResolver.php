@@ -50,7 +50,7 @@ class InputTableResolver
         return $this->getInputTableDetail()['columns'];
     }
 
-    private function getInputTableDetail(): array
+    public function getInputTableDetail(): array
     {
         if (!$this->inputTableDetail) {
             $this->inputTableDetail = $this->apiFacade->getTable($this->getInputTableId());

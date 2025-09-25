@@ -86,7 +86,7 @@ class Scd2Pattern extends AbstractPattern
         return array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters());
     }
 
-    private function getSnapshotPrimaryKeyParts(): array
+    public function getSnapshotPrimaryKeyParts(): array
     {
         // All snapshot columns are lower
         return $this->columnsToLower(
@@ -101,7 +101,7 @@ class Scd2Pattern extends AbstractPattern
             : $this->columnsToLower($this->getInputColumns());
     }
 
-    private function getSnapshotSpecialColumns(): array
+    public function getSnapshotSpecialColumns(): array
     {
         return array_values($this->getSnapshotSpecialColumnsWithKeys());
     }
