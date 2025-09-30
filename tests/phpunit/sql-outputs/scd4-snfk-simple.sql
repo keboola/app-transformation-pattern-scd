@@ -24,7 +24,7 @@ CREATE TABLE "previous_state" AS
         -- The snapshot date is preserved. --
         snapshot."snapshot_date",
         -- Actual flag is set to "0". --
-        0  AS "is_actual"
+        0 AS "is_actual"
     FROM "current_snapshot" snapshot
     WHERE
         -- Only the last results are modified. --

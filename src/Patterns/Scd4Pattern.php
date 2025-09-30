@@ -66,7 +66,9 @@ class Scd4Pattern extends AbstractPattern
             'snapshotInputColumns' => $this->getSnapshotInputColumns(),
             'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
             'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
-            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive()
+                ? $this->getParameters()->getDeletedFlagValue()[1]
+                : $this->getParameters()->getDeletedFlagValue()[0],
             'generateDeletedRecords' =>
                 $this->getParameters()->hasDeletedFlag() || $this->getParameters()->keepDeleteActive(),
             'tableName' => [
@@ -79,6 +81,7 @@ class Scd4Pattern extends AbstractPattern
                 'actual' => $this->getParameters()->getActualName(),
                 'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
+            'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
         ];
     }
 

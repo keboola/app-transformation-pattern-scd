@@ -1,0 +1,18 @@
+{
+  "backend": "snowflake",
+  "scd_type": "scd4",
+  "primary_key": ["Pk1", "pk2"],
+  "monitored_parameters": ["name", "Age", "Job"],
+  "timezone": "UTC",
+  "deleted_flag": true,
+  "use_datetime": false,
+  "keep_del_active": false,
+  "start_date_name": "default_start_date",
+  "end_date_name": "default_end_date",
+  "actual_name": "is_actual",
+  "is_deleted_name": "is_deleted",
+  "deleted_flag_value": "'F'/'T'",
+  "end_date_value": "9999-12-31",
+  "current_timestamp_minus_one": false,
+  "uppercase_columns": false
+}
