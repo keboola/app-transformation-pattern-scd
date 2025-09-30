@@ -22,7 +22,7 @@ CREATE TABLE "previous_state" AS
         -- Monitored parameters. --
         snapshot."pk1", snapshot."name",
         -- The snapshot date is preserved. --
-        "snapshot_date",
+        snapshot."snapshot_date",
         -- Actual flag is set to "0". --
         0  AS "actual"
     FROM "current_snapshot" snapshot
@@ -49,6 +49,6 @@ CREATE TABLE "new_snapshot" AS
         UNION
     -- Modified previous state: --
     SELECT
-        CONCAT("pk1", '|', "snapshot_date") AS "snapshot_pk",
+        CONCAT("pk1", '|', TO_CHAR("snapshot_date", 'YYYY-MM-DD')) AS "snapshot_pk",
         "pk1", "name", "snapshot_date", "actual"
     FROM "previous_state";

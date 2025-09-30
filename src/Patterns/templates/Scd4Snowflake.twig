@@ -39,7 +39,7 @@ CREATE TABLE "previous_state" AS
         -- Monitored parameters. --
         {{ macro.selectFromColumns(snapshotInputColumns, "snapshot.") }},
         -- The snapshot date is preserved. --
-        {{ columnName.snapshotDate | quoteIdentifier }},
+        snapshot.{{ columnName.snapshotDate | quoteIdentifier }},
         -- Actual flag is set to "0". --
         0  AS {{ columnName.actual | quoteIdentifier }}{% if hasDeletedFlag %},
         -- IsDeleted flag is preserved. --
@@ -98,6 +98,19 @@ CREATE TABLE {{ tableName.newSnapshot | quoteIdentifier }} AS
     {% endif -%}
     -- Modified previous state: --
     SELECT
-        {{ snapshotPrimaryKeySelect }},
+        CONCAT(
+            {%- for column in snapshotPrimaryKeyParts -%}
+                {%- if column | lower == 'snapshot_date' -%}
+                    {%- if useDatetime -%}
+                        TO_CHAR({{ column | lower | quoteIdentifier }}, 'YYYY-MM-DD HH:Mi:SS')
+                    {%- else -%}
+                        TO_CHAR({{ column | lower | quoteIdentifier }}, 'YYYY-MM-DD')
+                    {%- endif -%}
+                {%- else -%}
+                    {{ column | lower | quoteIdentifier }}
+                {%- endif -%}
+                {%- if not loop.last %}, {{ '|' | quoteValue }}, {% endif -%}
+            {%- endfor -%}
+        ) AS {{ snapshotPrimaryKeyName | quoteIdentifier }},
         {{ macro.selectFromColumns(snapshotAllColumnsExceptPk) }}
     FROM "previous_state";
