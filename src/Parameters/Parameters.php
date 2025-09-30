@@ -42,6 +42,8 @@ class Parameters
 
     private string $snapshotTableName;
 
+    private string $scdType;
+
     public function __construct(
         string $backend,
         array $primaryKey,
@@ -59,7 +61,8 @@ class Parameters
         bool $currentTimestampMinusOne,
         bool $uppercaseColumns,
         int $effectiveDateAdjustment,
-        string $snapshotTableName = ''
+        string $snapshotTableName = '',
+        string $scdType = ''
     ) {
         $this->backend = $backend;
         $this->primaryKey = $primaryKey;
@@ -78,6 +81,7 @@ class Parameters
         $this->uppercaseColumns = $uppercaseColumns;
         $this->effectiveDateAdjustment = $effectiveDateAdjustment;
         $this->snapshotTableName = $snapshotTableName;
+        $this->scdType = $scdType;
     }
 
     public function getBackend(): string
@@ -163,5 +167,10 @@ class Parameters
     public function getSnapshotTableName(): string
     {
         return $this->snapshotTableName;
+    }
+
+    public function getScdType(): string
+    {
+        return $this->scdType;
     }
 }

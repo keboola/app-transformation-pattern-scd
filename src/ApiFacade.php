@@ -46,8 +46,7 @@ class ApiFacade
 
     public function getTable(string $tableId): array
     {
-        $table = $this->client->getTable($tableId);
-        return $table;
+        return $this->client->getTable($tableId);
     }
 
     private function createBucketIfNotExists(Table $snapshotTable): void
@@ -71,36 +70,57 @@ class ApiFacade
         if ($this->client->tableExists($snapshotTable->getTableId())) {
             return;
         }
+        putenv('KBC_PROJECT_FEATURE_GATES=feature1;new-native-types');
 
-        if ($tableDefinition['isTyped']) {
+        $featureGates = getenv('KBC_PROJECT_FEATURE_GATES') ?: '';
+        $featureGatesArray = array_map('trim', explode(';', $featureGates));
+
+        if (array_intersect(['native-types', 'new-native-types'], $featureGatesArray)) {
             $params = $pattern->getParameters();
             $uppercaseColumns = $params->getUppercaseColumns();
 
             // prepare columns from the historized table, apply uppercase if needed
-            $inputColumns = array_map(function ($column) use ($uppercaseColumns) {
-                unset($column['canBeFiltered']);
+            if (isset($tableDefinition['definition'])) {
+                $inputColumns = array_map(function ($column) use ($uppercaseColumns) {
+                    unset($column['canBeFiltered']);
 
-                if ($uppercaseColumns) {
-                    $column['name'] = strtoupper($column['name']);
-                }
+                    if ($uppercaseColumns) {
+                        $column['name'] = strtoupper($column['name']);
+                    }
 
-                return $column;
-            }, $tableDefinition['definition']['columns']);
+                    return $column;
+                }, $tableDefinition['definition']['columns']);
+            } else {
+                // else create table definition with strings for non-typed tables
+                $inputColumns = array_map(function ($column) use ($uppercaseColumns) {
+                    if ($uppercaseColumns) {
+                        $column = strtoupper($column);
+                    }
+                    return ['name' => $column, 'definition' => ['type' => 'VARCHAR']];
+                }, $tableDefinition['columns']);
+            }
 
             $helperColumnsDetailed = array_map(fn($col) => ['name' => $col], $pattern->getSnapshotSpecialColumns());
 
             $dateType = $params->useDatetime() ? 'DATETIME' : 'DATE';
-            for ($i = 0; $i < 2; $i++) {
-                $helperColumnsDetailed[$i]['definition'] = ['type' => $dateType];
-            }
 
             $deletedFlagValue = $params->getDeletedFlagValue();
+
             $lenToUse = max(
                 mb_strlen(str_replace("'", '', (string) $deletedFlagValue[0])),
                 mb_strlen(str_replace("'", '', (string) $deletedFlagValue[1]))
             );
 
-            for ($i = 2; $i < count($helperColumnsDetailed); $i++) {
+            $dataColsCount = 2;
+            if ($params->getScdType() === 'scd4') {
+                $dataColsCount = 1;
+            }
+
+            for ($i = 0; $i < $dataColsCount; $i++) {
+                $helperColumnsDetailed[$i]['definition'] = ['type' => $dateType];
+            }
+
+            for ($i = $dataColsCount; $i < count($helperColumnsDetailed); $i++) {
                 if (array_intersect($deletedFlagValue, ['0', '1']) === ['0', '1']) {
                     $helperColumnsDetailed[$i]['definition'] = ['type'   => 'NUMERIC', 'length' => 1];
                 } else {
