@@ -1,0 +1,39 @@
+{
+  "action": "generate",
+  "parameters": {
+    "_componentId": "keboola.snowflake-transformation",
+    "primary_key": "id",
+    "end_date_value": "9999-12-31",
+    "scd_type": "scd2",
+    "effective_date_adjustment": 0,
+    "deleted_flag_value": "0/1",
+    "is_deleted_name": "is_deleted",
+    "current_timestamp_minus_one": false,
+    "monitored_parameters": "name,job,holidays",
+    "uppercase_columns": false,
+    "deleted_flag": true,
+    "use_datetime": true,
+    "keep_del_active": true,
+    "snapshot_table_name": "",
+    "end_date_name": "end_date",
+    "timezone": "UTC",
+    "actual_name": "is_actual",
+    "start_date_name": "start_date"
+  },
+  "storage": {
+    "input": {
+      "tables": [
+        {
+          "source": "in.c-TESTS_CI_SCD.scd_in",
+          "destination": "input_table",
+          "columns": [
+            "id",
+            "name",
+            "job",
+            "holidays"
+          ]
+        }
+      ]
+    }
+  }
+}

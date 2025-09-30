@@ -37,15 +37,18 @@
     "autoload-dev": {
         "psr-4": {
             "Keboola\\TransformationPatternScd\\Tests\\": "tests/phpunit/",
-            "Keboola\\TransformationPatternScd\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\TransformationPatternScd\\FunctionalTests\\": "tests/functional/",
+            "Keboola\\TransformationPatternScd\\PlatformTests\\": "tests/platform/"
         }
     },
     "scripts": {
         "tests-phpunit": "phpunit",
         "tests-datadir": "phpunit tests/functional",
+        "tests-platform": "phpunit tests/platform",
         "tests": [
             "@tests-phpunit",
-            "@tests-datadir"
+            "@tests-datadir",
+            "@tests-platform"
         ],
 
         "phpstan": "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon",

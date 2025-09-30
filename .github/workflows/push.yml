@@ -59,6 +59,11 @@ jobs:
   tests:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      KBC_URL: ${{ vars.KBC_URL }}
+      KBC_TOKEN_DTYPES_NEW: ${{ secrets.KBC_TOKEN_DTYPES_NEW }}
+      KBC_TOKEN_DTYPES_OLD: ${{ secrets.KBC_TOKEN_DTYPES_OLD }}
+      KBC_TOKEN_NO_DTYPES: ${{ secrets.KBC_TOKEN_NO_DTYPES }}
     steps:
       -
         name: Check out the repo
@@ -76,7 +81,7 @@ jobs:
           tag_as_latest: true
       -
         name: Run tests
-        run: docker run $APP_IMAGE composer ci
+        run: docker run --env KBC_URL --env KBC_TOKEN_DTYPES_NEW --env KBC_TOKEN_DTYPES_OLD --env KBC_TOKEN_NO_DTYPES $APP_IMAGE composer ci
 
   deploy:
     needs:
