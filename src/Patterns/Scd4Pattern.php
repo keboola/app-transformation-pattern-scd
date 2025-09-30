@@ -76,8 +76,8 @@ class Scd4Pattern extends AbstractPattern
             ],
             'columnName' => [
                 'snapshotDate' => self::COLUMN_SNAPSHOT_DATE,
-                'actual' => self::COLUMN_ACTUAL,
-                'isDeleted' => self::COLUMN_IS_DELETED,
+                'actual' => $this->getParameters()->getActualName(),
+                'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
         ];
     }
@@ -104,10 +104,10 @@ class Scd4Pattern extends AbstractPattern
     public function getSnapshotSpecialColumns(): array
     {
         $columns[] = self::COLUMN_SNAPSHOT_DATE;
-        $columns[] = self::COLUMN_ACTUAL;
+        $columns[] = $this->getParameters()->getActualName();
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns[] = self::COLUMN_IS_DELETED;
+            $columns[] = $this->getParameters()->getIsDeletedName();
         }
 
         // All snapshot columns are lower

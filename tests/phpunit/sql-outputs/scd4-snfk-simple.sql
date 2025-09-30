@@ -13,7 +13,7 @@ CREATE TABLE "last_state" AS
         -- The snapshot date is set to now. --
         $CURRENT_DATE_TXT AS "snapshot_date",
         -- Actual flag is set to "1". --
-        1 AS "actual"
+        1 AS "is_actual"
     FROM "input_table" input;
 
 -- Previous state: Set actual flag to "0" in the previous version of the records. --
@@ -24,11 +24,11 @@ CREATE TABLE "previous_state" AS
         -- The snapshot date is preserved. --
         snapshot."snapshot_date",
         -- Actual flag is set to "0". --
-        0  AS "actual"
+        0  AS "is_actual"
     FROM "current_snapshot" snapshot
     WHERE
         -- Only the last results are modified. --
-        snapshot."actual" = 1
+        snapshot."is_actual" = 1
         -- Exclude records with the current date (and therefore with the same PK). --
         -- This can happen if time is not part of the date, eg. "2020-11-04". --
         -- Row for this PK is then already included in the "last_state". --
@@ -44,11 +44,11 @@ CREATE TABLE "new_snapshot" AS
     -- New last state: --
     SELECT
         CONCAT("pk1", '|', "pk2", '|', "snapshot_date") AS "snapshot_pk",
-        "pk1", "pk2", "name", "age", "job", "snapshot_date", "actual"
+        "pk1", "pk2", "name", "age", "job", "snapshot_date", "is_actual"
     FROM "last_state"
         UNION
     -- Modified previous state: --
     SELECT
         CONCAT("pk1", '|', "pk2", '|', TO_CHAR("snapshot_date", 'YYYY-MM-DD')) AS "snapshot_pk",
-        "pk1", "pk2", "name", "age", "job", "snapshot_date", "actual"
+        "pk1", "pk2", "name", "age", "job", "snapshot_date", "is_actual"
     FROM "previous_state";
