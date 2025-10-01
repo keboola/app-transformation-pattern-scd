@@ -121,8 +121,8 @@ class ApiFacade
             }
 
             for ($i = $dataColsCount; $i < count($helperColumnsDetailed); $i++) {
-                if (array_intersect($deletedFlagValue, ['0', '1']) === ['0', '1']) {
-                    $helperColumnsDetailed[$i]['definition'] = ['type'   => 'NUMERIC', 'length' => 1];
+                if (in_array('0', $deletedFlagValue, true) && in_array('1', $deletedFlagValue, true)) {
+                    $helperColumnsDetailed[$i]['definition'] = ['type' => 'NUMERIC', 'length' => 1];
                 } else {
                     $helperColumnsDetailed[$i]['definition'] = ['type'   => 'VARCHAR', 'length' => $lenToUse];
                 }
