@@ -73,7 +73,9 @@ class ParametersTest extends TestCase
             $config['endDateValue'],
             $config['currentTimestampMinusOne'],
             $config['uppercaseColumns'],
-            $config['effectiveDateAdjustment']
+            $config['effectiveDateAdjustment'],
+            $config['snapshotTableName'],
+            $config['inputTableDefinition'],
         );
 
         self::assertEquals($config['backend'], $parameters->getBackend());
@@ -92,6 +94,7 @@ class ParametersTest extends TestCase
         self::assertEquals($config['currentTimestampMinusOne'], $parameters->getCurrentTimestampMinusOne());
         self::assertEquals($config['uppercaseColumns'], $parameters->getUppercaseColumns());
         self::assertEquals($config['effectiveDateAdjustment'], $parameters->getEffectiveDateAdjustment());
+        self::assertEquals($config['inputTableDefinition'], $parameters->getInputTableDefinition());
     }
 
     public function configProvider(): Generator
@@ -113,6 +116,8 @@ class ParametersTest extends TestCase
             'currentTimestampMinusOne' => false,
             'uppercaseColumns' => true,
             'effectiveDateAdjustment' => 0,
+            'snapshotTableName' => 'tableName',
+            'inputTableDefinition' => [],
         ]];
 
         yield 'minimal config' => [[
@@ -132,6 +137,8 @@ class ParametersTest extends TestCase
             'currentTimestampMinusOne' => true,
             'uppercaseColumns' => false,
             'effectiveDateAdjustment' => 1,
+            'snapshotTableName' => 'tableName',
+            'inputTableDefinition' => [],
         ]];
 
         yield 'config with keep deleted active' => [[
@@ -151,6 +158,15 @@ class ParametersTest extends TestCase
             'currentTimestampMinusOne' => true,
             'uppercaseColumns' => false,
             'effectiveDateAdjustment' => 2,
+            'snapshotTableName' => 'tableName',
+            'inputTableDefinition' => [
+                'columns' => [
+                    ['name' => 'user_id', 'definition' => ['type' => 'VARCHAR']],
+                    ['name' => 'status', 'definition' => ['type' => 'VARCHAR']],
+                    ['name' => 'role', 'definition' => ['type' => 'VARCHAR']],
+                    ['name' => 'created_at', 'definition' => ['type' => 'TIMESTAMP']],
+                ],
+            ],
         ]];
     }
 }

@@ -42,9 +42,15 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())
+            ->method('getTableId')
+            ->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))
+            ->method('getBuckedId')
+            ->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('snapshot-table');
 
         $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
         $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([
@@ -90,9 +96,15 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())
+            ->method('getTableId')
+            ->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))
+            ->method('getBuckedId')
+            ->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('snapshot-table');
 
         $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
         $pattern->expects($this->once())->method('getSnapshotTableHeader')->willReturn(['snapshot_pk', 'start_date']);
@@ -130,7 +142,9 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())
+            ->method('getTableId')
+            ->willReturn('out.c-test-bucket.snapshot-table');
 
         // Mock table exists check - table already exists
         $this->client->expects($this->once())->method('tableExists')->willReturn(true);
@@ -153,9 +167,15 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())
+            ->method('getTableId')
+            ->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))
+            ->method('getBuckedId')
+            ->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('snapshot-table');
 
         $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
         $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([]);
@@ -214,9 +234,15 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())
+            ->method('getTableId')
+            ->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))
+            ->method('getBuckedId')
+            ->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('snapshot-table');
 
         $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
         $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([]);
