@@ -42,24 +42,24 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
 
-        $pattern->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
-        $pattern->method('getSnapshotTypedColumns')->willReturn([
+        $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
+        $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([
             ['name' => 'snapshot_pk', 'definition' => ['type' => 'VARCHAR']],
             ['name' => 'start_date', 'definition' => ['type' => 'DATE']],
         ]);
 
         // Mock table exists check
-        $this->client->method('tableExists')->willReturn(false);
+        $this->client->expects($this->once())->method('tableExists')->willReturn(false);
 
         // Mock bucket exists check
-        $this->client->method('bucketExists')->willReturn(true);
+        $this->client->expects($this->once())->method('bucketExists')->willReturn(true);
 
         // Mock verifyToken with native types features
-        $this->client->method('verifyToken')->willReturn([
+        $this->client->expects($this->once())->method('verifyToken')->willReturn([
             'owner' => [
                 'features' => $features,
             ],
@@ -90,21 +90,21 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
 
-        $pattern->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
-        $pattern->method('getSnapshotTableHeader')->willReturn(['snapshot_pk', 'start_date']);
+        $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
+        $pattern->expects($this->once())->method('getSnapshotTableHeader')->willReturn(['snapshot_pk', 'start_date']);
 
         // Mock table exists check
-        $this->client->method('tableExists')->willReturn(false);
+        $this->client->expects($this->once())->method('tableExists')->willReturn(false);
 
         // Mock bucket exists check
-        $this->client->method('bucketExists')->willReturn(true);
+        $this->client->expects($this->once())->method('bucketExists')->willReturn(true);
 
         // Mock verifyToken without native types features
-        $this->client->method('verifyToken')->willReturn([
+        $this->client->expects($this->once())->method('verifyToken')->willReturn([
             'owner' => [
                 'features' => ['other-feature'],
             ],
@@ -130,10 +130,10 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
 
         // Mock table exists check - table already exists
-        $this->client->method('tableExists')->willReturn(true);
+        $this->client->expects($this->once())->method('tableExists')->willReturn(true);
 
         // Expect no table creation methods to be called
         $this->client->expects($this->never())->method('createTableDefinition');
@@ -153,21 +153,21 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
 
-        $pattern->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
-        $pattern->method('getSnapshotTypedColumns')->willReturn([]);
+        $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
+        $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([]);
 
         // Mock table exists check
-        $this->client->method('tableExists')->willReturn(false);
+        $this->client->expects($this->once())->method('tableExists')->willReturn(false);
 
         // Mock bucket exists check
-        $this->client->method('bucketExists')->willReturn(true);
+        $this->client->expects($this->once())->method('bucketExists')->willReturn(true);
 
         // Mock verifyToken
-        $this->client->method('verifyToken')->willReturn([
+        $this->client->expects($this->once())->method('verifyToken')->willReturn([
             'owner' => [
                 'features' => $features,
             ],
@@ -175,7 +175,7 @@ class ApiFacadeTest extends TestCase
 
         // Mock createTableDefinition to throw exception
         $clientException = new ClientException('Table creation failed');
-        $this->client->method('createTableDefinition')->willThrowException($clientException);
+        $this->client->expects($this->once())->method('createTableDefinition')->willThrowException($clientException);
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage(
@@ -214,21 +214,21 @@ class ApiFacadeTest extends TestCase
         /** @var Pattern&MockObject $pattern */
         $pattern = $this->createMock(Pattern::class);
 
-        $snapshotTable->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
-        $snapshotTable->method('getBuckedId')->willReturn('out.c-test-bucket');
-        $snapshotTable->method('getTableName')->willReturn('snapshot-table');
+        $snapshotTable->expects($this->atLeastOnce())->method('getTableId')->willReturn('out.c-test-bucket.snapshot-table');
+        $snapshotTable->expects($this->exactly(2))->method('getBuckedId')->willReturn('out.c-test-bucket');
+        $snapshotTable->expects($this->once())->method('getTableName')->willReturn('snapshot-table');
 
-        $pattern->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
-        $pattern->method('getSnapshotTypedColumns')->willReturn([]);
+        $pattern->expects($this->once())->method('getSnapshotPrimaryKey')->willReturn('snapshot_pk');
+        $pattern->expects($this->once())->method('getSnapshotTypedColumns')->willReturn([]);
 
         // Mock table exists check
-        $this->client->method('tableExists')->willReturn(false);
+        $this->client->expects($this->once())->method('tableExists')->willReturn(false);
 
         // Mock bucket exists check - bucket does not exist
-        $this->client->method('bucketExists')->willReturn(false);
+        $this->client->expects($this->once())->method('bucketExists')->willReturn(false);
 
         // Mock verifyToken
-        $this->client->method('verifyToken')->willReturn([
+        $this->client->expects($this->once())->method('verifyToken')->willReturn([
             'owner' => [
                 'features' => $features,
             ],

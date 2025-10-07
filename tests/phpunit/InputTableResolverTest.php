@@ -29,7 +29,7 @@ class InputTableResolverTest extends TestCase
 
     public function testGetInputTableIdWithSingleTable(): void
     {
-        $this->config->method('getInputTables')->willReturn([
+        $this->config->expects($this->once())->method('getInputTables')->willReturn([
             ['source' => 'in.c-main.test_table'],
         ]);
 
@@ -40,7 +40,7 @@ class InputTableResolverTest extends TestCase
 
     public function testGetInputTableIdWithMultipleTables(): void
     {
-        $this->config->method('getInputTables')->willReturn([
+        $this->config->expects($this->once())->method('getInputTables')->willReturn([
             ['source' => 'in.c-main.table1', 'destination' => 'other_table'],
             ['source' => 'in.c-main.table2', 'destination' => 'input_table'],
             ['source' => 'in.c-main.table3', 'destination' => 'another_table'],
@@ -53,7 +53,7 @@ class InputTableResolverTest extends TestCase
 
     public function testGetInputTableIdWithEmptyTables(): void
     {
-        $this->config->method('getInputTables')->willReturn([]);
+        $this->config->expects($this->once())->method('getInputTables')->willReturn([]);
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('Please specify one input table in the input mapping.');
@@ -63,7 +63,7 @@ class InputTableResolverTest extends TestCase
 
     public function testGetInputTableIdWithMultipleTablesNoInputTable(): void
     {
-        $this->config->method('getInputTables')->willReturn([
+        $this->config->expects($this->once())->method('getInputTables')->willReturn([
             ['source' => 'in.c-main.table1', 'destination' => 'other_table'],
             ['source' => 'in.c-main.table2', 'destination' => 'another_table'],
         ]);
@@ -80,7 +80,7 @@ class InputTableResolverTest extends TestCase
     public function testGetInputTableColumns(): void
     {
         $this->setupConfigWithSingleTable();
-        $this->apiFacade->method('getTable')->willReturn([
+        $this->apiFacade->expects($this->once())->method('getTable')->willReturn([
             'columns' => ['id', 'name', 'email', 'phone'],
         ]);
 
@@ -92,7 +92,7 @@ class InputTableResolverTest extends TestCase
     public function testGetInputTableDefinition(): void
     {
         $this->setupConfigWithSingleTable();
-        $this->apiFacade->method('getTable')->willReturn([
+        $this->apiFacade->expects($this->once())->method('getTable')->willReturn([
             'definition' => [
                 'columns' => [
                     ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
@@ -114,7 +114,7 @@ class InputTableResolverTest extends TestCase
     public function testGetInputTableDefinitionWithoutDefinition(): void
     {
         $this->setupConfigWithSingleTable();
-        $this->apiFacade->method('getTable')->willReturn([
+        $this->apiFacade->expects($this->once())->method('getTable')->willReturn([
             'columns' => ['id', 'name'],
         ]);
 
@@ -146,7 +146,7 @@ class InputTableResolverTest extends TestCase
         bool $shouldThrowException,
         string $expectedExceptionMessage = ''
     ): void {
-        $this->config->method('getInputTables')->willReturn($inputTables);
+        $this->config->expects($this->once())->method('getInputTables')->willReturn($inputTables);
 
         if ($shouldThrowException) {
             $this->expectException(UserException::class);
@@ -207,7 +207,7 @@ class InputTableResolverTest extends TestCase
 
     private function setupConfigWithSingleTable(): void
     {
-        $this->config->method('getInputTables')->willReturn([
+        $this->config->expects($this->once())->method('getInputTables')->willReturn([
             ['source' => 'in.c-main.test_table'],
         ]);
     }

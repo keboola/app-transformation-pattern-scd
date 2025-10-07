@@ -7,7 +7,6 @@ namespace Keboola\TransformationPatternScd\Tests\Patterns;
 use Generator;
 use Keboola\TransformationPatternScd\Parameters\Parameters;
 use Keboola\TransformationPatternScd\Patterns\Scd2Pattern;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class Scd2PatternTest extends TestCase
@@ -33,8 +32,8 @@ class Scd2PatternTest extends TestCase
     {
         $pattern = new Scd2Pattern();
         $parameters = $this->createMock(Parameters::class);
-        $parameters->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
-        $parameters->method('getUppercaseColumns')->willReturn($uppercaseColumns);
+        $parameters->expects($this->once())->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
+        $parameters->expects($this->once())->method('getUppercaseColumns')->willReturn($uppercaseColumns);
         $pattern->setParameters($parameters);
 
         $result = $pattern->getSnapshotPrimaryKey();
@@ -47,23 +46,23 @@ class Scd2PatternTest extends TestCase
         $parameters = $this->createMock(Parameters::class);
 
         // Setup parameters for this test
-        $parameters->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
-        $parameters->method('getTimezone')->willReturn('Europe/Prague');
-        $parameters->method('useDatetime')->willReturn(true);
-        $parameters->method('keepDeleteActive')->willReturn(false);
-        $parameters->method('hasDeletedFlag')->willReturn(true);
-        $parameters->method('getPrimaryKey')->willReturn(['id', 'name']);
-        $parameters->method('getUppercaseColumns')->willReturn(false);
-        $parameters->method('getStartDateName')->willReturn('start_date');
-        $parameters->method('getEndDateName')->willReturn('end_date');
-        $parameters->method('getActualName')->willReturn('actual');
-        $parameters->method('getIsDeletedName')->willReturn('is_deleted');
-        $parameters->method('getDeletedFlagValue')->willReturn(['0', '1']);
-        $parameters->method('getEndDateValue')->willReturn('9999-12-31');
-        $parameters->method('getCurrentTimestampMinusOne')->willReturn(false);
-        $parameters->method('getEffectiveDateAdjustment')->willReturn(0);
-        $parameters->method('getMonitoredParameters')->willReturn(['email', 'phone']);
-        $parameters->method('getInputTableDefinition')->willReturn([
+        $parameters->expects($this->once())->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
+        $parameters->expects($this->once())->method('getTimezone')->willReturn('Europe/Prague');
+        $parameters->expects($this->exactly(5))->method('useDatetime')->willReturn(true);
+        $parameters->expects($this->exactly(2))->method('keepDeleteActive')->willReturn(false);
+        $parameters->expects($this->exactly(3))->method('hasDeletedFlag')->willReturn(true);
+        $parameters->expects($this->exactly(6))->method('getPrimaryKey')->willReturn(['id', 'name']);
+        $parameters->expects($this->exactly(6))->method('getUppercaseColumns')->willReturn(false);
+        $parameters->expects($this->exactly(3))->method('getStartDateName')->willReturn('start_date');
+        $parameters->expects($this->exactly(2))->method('getEndDateName')->willReturn('end_date');
+        $parameters->expects($this->exactly(2))->method('getActualName')->willReturn('actual');
+        $parameters->expects($this->exactly(2))->method('getIsDeletedName')->willReturn('is_deleted');
+        $parameters->expects($this->exactly(10))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->once())->method('getEndDateValue')->willReturn('9999-12-31');
+        $parameters->expects($this->once())->method('getCurrentTimestampMinusOne')->willReturn(false);
+        $parameters->expects($this->once())->method('getEffectiveDateAdjustment')->willReturn(0);
+        $parameters->expects($this->exactly(3))->method('getMonitoredParameters')->willReturn(['email', 'phone']);
+        $parameters->expects($this->exactly(5))->method('getInputTableDefinition')->willReturn([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'name', 'definition' => ['type' => 'VARCHAR']],
@@ -115,23 +114,23 @@ class Scd2PatternTest extends TestCase
         $parameters = $this->createMock(Parameters::class);
 
         // Setup parameters for this test
-        $parameters->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
-        $parameters->method('getTimezone')->willReturn('Europe/Prague');
-        $parameters->method('useDatetime')->willReturn(false);
-        $parameters->method('keepDeleteActive')->willReturn(true);
-        $parameters->method('hasDeletedFlag')->willReturn(false);
-        $parameters->method('getPrimaryKey')->willReturn(['ID', 'NAME']);
-        $parameters->method('getUppercaseColumns')->willReturn(true);
-        $parameters->method('getStartDateName')->willReturn('START_DATE');
-        $parameters->method('getEndDateName')->willReturn('END_DATE');
-        $parameters->method('getActualName')->willReturn('ACTUAL');
-        $parameters->method('getIsDeletedName')->willReturn('IS_DELETED');
-        $parameters->method('getDeletedFlagValue')->willReturn(['0', '1']);
-        $parameters->method('getEndDateValue')->willReturn('9999-12-31');
-        $parameters->method('getCurrentTimestampMinusOne')->willReturn(true);
-        $parameters->method('getEffectiveDateAdjustment')->willReturn(1);
-        $parameters->method('getMonitoredParameters')->willReturn(['EMAIL', 'PHONE']);
-        $parameters->method('getInputTableDefinition')->willReturn([
+        $parameters->expects($this->once())->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
+        $parameters->expects($this->once())->method('getTimezone')->willReturn('Europe/Prague');
+        $parameters->expects($this->exactly(5))->method('useDatetime')->willReturn(false);
+        $parameters->expects($this->exactly(2))->method('keepDeleteActive')->willReturn(true);
+        $parameters->expects($this->exactly(3))->method('hasDeletedFlag')->willReturn(false);
+        $parameters->expects($this->exactly(6))->method('getPrimaryKey')->willReturn(['ID', 'NAME']);
+        $parameters->expects($this->exactly(6))->method('getUppercaseColumns')->willReturn(true);
+        $parameters->expects($this->exactly(3))->method('getStartDateName')->willReturn('START_DATE');
+        $parameters->expects($this->exactly(2))->method('getEndDateName')->willReturn('END_DATE');
+        $parameters->expects($this->exactly(2))->method('getActualName')->willReturn('ACTUAL');
+        $parameters->expects($this->never())->method('getIsDeletedName')->willReturn('IS_DELETED');
+        $parameters->expects($this->exactly(2))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->once())->method('getEndDateValue')->willReturn('9999-12-31');
+        $parameters->expects($this->once())->method('getCurrentTimestampMinusOne')->willReturn(true);
+        $parameters->expects($this->once())->method('getEffectiveDateAdjustment')->willReturn(1);
+        $parameters->expects($this->exactly(3))->method('getMonitoredParameters')->willReturn(['EMAIL', 'PHONE']);
+        $parameters->expects($this->exactly(5))->method('getInputTableDefinition')->willReturn([
             'columns' => [
                 ['name' => 'ID', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'NAME', 'definition' => ['type' => 'VARCHAR']],

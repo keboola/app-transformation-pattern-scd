@@ -64,7 +64,7 @@ class ParametersFactoryTest extends TestCase
 
     public function testCreateWithUnsupportedComponent(): void
     {
-        $this->config->method('getComponentId')->willReturn('unsupported-component');
+        $this->config->expects($this->exactly(2))->method('getComponentId')->willReturn('unsupported-component');
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('The SCD code pattern is not compatible with component "unsupported-component".');
@@ -75,8 +75,8 @@ class ParametersFactoryTest extends TestCase
     public function testCreateWithMissingPrimaryKeyColumns(): void
     {
         $this->setupSnowflakeConfig();
-        $this->inputTableResolver->method('getInputTableColumns')->willReturn(['id', 'email']);
-        $this->inputTableResolver->method('getInputTableId')->willReturn('in.c-main.test');
+        $this->inputTableResolver->expects($this->once())->method('getInputTableColumns')->willReturn(['id', 'email']);
+        $this->inputTableResolver->expects($this->once())->method('getInputTableId')->willReturn('in.c-main.test');
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('Primary key "name" not found in the input table "in.c-main.test".');
@@ -87,8 +87,10 @@ class ParametersFactoryTest extends TestCase
     public function testCreateWithMissingMonitoredParameters(): void
     {
         $this->setupSnowflakeConfig();
-        $this->inputTableResolver->method('getInputTableColumns')->willReturn(['id', 'name', 'email']);
-        $this->inputTableResolver->method('getInputTableId')->willReturn('in.c-main.test');
+        $this->inputTableResolver->expects($this->exactly(2))
+            ->method('getInputTableColumns')
+            ->willReturn(['id', 'name', 'email']);
+        $this->inputTableResolver->expects($this->once())->method('getInputTableId')->willReturn('in.c-main.test');
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('Monitored parameter "phone" not found in the input table "in.c-main.test".');
@@ -99,8 +101,8 @@ class ParametersFactoryTest extends TestCase
     public function testCreateWithMultipleMissingColumns(): void
     {
         $this->setupSnowflakeConfig();
-        $this->inputTableResolver->method('getInputTableColumns')->willReturn(['id']);
-        $this->inputTableResolver->method('getInputTableId')->willReturn('in.c-main.test');
+        $this->inputTableResolver->expects($this->once())->method('getInputTableColumns')->willReturn(['id']);
+        $this->inputTableResolver->expects($this->once())->method('getInputTableId')->willReturn('in.c-main.test');
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('Primary key "name" not found in the input table "in.c-main.test".');
@@ -113,7 +115,7 @@ class ParametersFactoryTest extends TestCase
      */
     public function testGetBackendWithDifferentComponents(string $componentId, string $expectedBackend): void
     {
-        $this->config->method('getComponentId')->willReturn($componentId);
+        $this->config->expects($this->any())->method('getComponentId')->willReturn($componentId);
         $this->setupInputTableResolver();
 
         if ($expectedBackend === 'exception') {
@@ -134,29 +136,33 @@ class ParametersFactoryTest extends TestCase
 
     private function setupSnowflakeConfig(): void
     {
-        $this->config->method('getComponentId')->willReturn(Application::SNOWFLAKE_TRANS_COMPONENT);
-        $this->config->method('getTimezone')->willReturn('Europe/Prague');
-        $this->config->method('hasDeletedFlag')->willReturn(true);
-        $this->config->method('useDatetime')->willReturn(false);
-        $this->config->method('keepDeleteActive')->willReturn(true);
-        $this->config->method('getStartDateName')->willReturn('start_date');
-        $this->config->method('getEndDateName')->willReturn('end_date');
-        $this->config->method('getActualName')->willReturn('actual');
-        $this->config->method('getIsDeletedName')->willReturn('is_deleted');
-        $this->config->method('getDeletedFlagValue')->willReturn('0/1');
-        $this->config->method('getEndDateValue')->willReturn('9999-12-31');
-        $this->config->method('getCurrentTimestampMinusOne')->willReturn(false);
-        $this->config->method('getUppercaseColumns')->willReturn(true);
-        $this->config->method('getEffectiveDateAdjustment')->willReturn(0);
-        $this->config->method('getSnapshotTableName')->willReturn('my_snapshot');
-        $this->config->method('getPrimaryKeyInput')->willReturn(['id', 'name']);
-        $this->config->method('getIncludedParametersInput')->willReturn(['email', 'phone']);
+        $this->config->expects($this->once())
+            ->method('getComponentId')
+            ->willReturn(Application::SNOWFLAKE_TRANS_COMPONENT);
+        $this->config->expects($this->any())->method('getTimezone')->willReturn('Europe/Prague');
+        $this->config->expects($this->any())->method('hasDeletedFlag')->willReturn(true);
+        $this->config->expects($this->any())->method('useDatetime')->willReturn(false);
+        $this->config->expects($this->any())->method('keepDeleteActive')->willReturn(true);
+        $this->config->expects($this->any())->method('getStartDateName')->willReturn('start_date');
+        $this->config->expects($this->any())->method('getEndDateName')->willReturn('end_date');
+        $this->config->expects($this->any())->method('getActualName')->willReturn('actual');
+        $this->config->expects($this->any())->method('getIsDeletedName')->willReturn('is_deleted');
+        $this->config->expects($this->any())->method('getDeletedFlagValue')->willReturn('0/1');
+        $this->config->expects($this->any())->method('getEndDateValue')->willReturn('9999-12-31');
+        $this->config->expects($this->any())->method('getCurrentTimestampMinusOne')->willReturn(false);
+        $this->config->expects($this->any())->method('getUppercaseColumns')->willReturn(true);
+        $this->config->expects($this->any())->method('getEffectiveDateAdjustment')->willReturn(0);
+        $this->config->expects($this->any())->method('getSnapshotTableName')->willReturn('my_snapshot');
+        $this->config->expects($this->once())->method('getPrimaryKeyInput')->willReturn(['id', 'name']);
+        $this->config->expects($this->any())->method('getIncludedParametersInput')->willReturn(['email', 'phone']);
     }
 
     private function setupInputTableResolver(): void
     {
-        $this->inputTableResolver->method('getInputTableColumns')->willReturn(['id', 'name', 'email', 'phone']);
-        $this->inputTableResolver->method('getInputTableDefinition')->willReturn([
+        $this->inputTableResolver->expects($this->any())
+            ->method('getInputTableColumns')
+            ->willReturn(['id', 'name', 'email', 'phone']);
+        $this->inputTableResolver->expects($this->any())->method('getInputTableDefinition')->willReturn([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'name', 'definition' => ['type' => 'VARCHAR']],

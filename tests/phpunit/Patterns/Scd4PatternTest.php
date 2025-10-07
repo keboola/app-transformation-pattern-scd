@@ -29,15 +29,15 @@ class Scd4PatternTest extends TestCase
     {
         $pattern = new Scd4Pattern();
         $parameters = $this->createMock(Parameters::class);
-        $parameters->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
-        $parameters->method('getTimezone')->willReturn('Europe/Prague');
-        $parameters->method('useDatetime')->willReturn(false);
-        $parameters->method('keepDeleteActive')->willReturn(false);
-        $parameters->method('hasDeletedFlag')->willReturn(true);
-        $parameters->method('getDeletedFlagValue')->willReturn(['0', '1']);
-        $parameters->method('getIsDeletedName')->willReturn('is_deleted');
-        $parameters->method('getPrimaryKey')->willReturn(['id', 'name']);
-        $parameters->method('getInputTableDefinition')->willReturn([
+        $parameters->expects($this->once())->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
+        $parameters->expects($this->once())->method('getTimezone')->willReturn('Europe/Prague');
+        $parameters->expects($this->exactly(3))->method('useDatetime')->willReturn(false);
+        $parameters->expects($this->exactly(2))->method('keepDeleteActive')->willReturn(false);
+        $parameters->expects($this->exactly(4))->method('hasDeletedFlag')->willReturn(true);
+        $parameters->expects($this->exactly(8))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->never())->method('getIsDeletedName')->willReturn('is_deleted');
+        $parameters->expects($this->exactly(5))->method('getPrimaryKey')->willReturn(['id', 'name']);
+        $parameters->expects($this->exactly(4))->method('getInputTableDefinition')->willReturn([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'name', 'definition' => ['type' => 'VARCHAR']],
@@ -72,13 +72,13 @@ class Scd4PatternTest extends TestCase
     {
         $pattern = new Scd4Pattern();
         $parameters = $this->createMock(Parameters::class);
-        $parameters->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
-        $parameters->method('getTimezone')->willReturn('Europe/Prague');
-        $parameters->method('useDatetime')->willReturn(false);
-        $parameters->method('keepDeleteActive')->willReturn(true);
-        $parameters->method('hasDeletedFlag')->willReturn(false);
-        $parameters->method('getPrimaryKey')->willReturn(['id']);
-        $parameters->method('getInputTableDefinition')->willReturn([
+        $parameters->expects($this->once())->method('getBackend')->willReturn(Parameters::BACKEND_SNOWFLAKE);
+        $parameters->expects($this->once())->method('getTimezone')->willReturn('Europe/Prague');
+        $parameters->expects($this->exactly(3))->method('useDatetime')->willReturn(false);
+        $parameters->expects($this->exactly(3))->method('keepDeleteActive')->willReturn(true);
+        $parameters->expects($this->exactly(4))->method('hasDeletedFlag')->willReturn(false);
+        $parameters->expects($this->exactly(5))->method('getPrimaryKey')->willReturn(['id']);
+        $parameters->expects($this->exactly(4))->method('getInputTableDefinition')->willReturn([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
             ],

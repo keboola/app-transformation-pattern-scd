@@ -100,8 +100,6 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return $this->parameters;
     }
 
-
-
     protected function getSnapshotAllColumnsExceptPk(): array
     {
         return PatternHelper::mergeColumnsWithDefinition(
