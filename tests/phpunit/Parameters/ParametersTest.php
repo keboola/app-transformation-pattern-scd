@@ -13,7 +13,7 @@ class ParametersTest extends TestCase
 
     public function testBackendConstant(): void
     {
-        $this->assertEquals('snowflake', Parameters::BACKEND_SNOWFLAKE);
+        self::assertEquals('snowflake', Parameters::BACKEND_SNOWFLAKE);
     }
 
     /**
@@ -40,7 +40,7 @@ class ParametersTest extends TestCase
             0
         );
 
-        $this->assertEquals($expected, $parameters->getDeletedFlagValue());
+        self::assertEquals($expected, $parameters->getDeletedFlagValue());
     }
 
     public function deletedFlagValueProvider(): Generator
@@ -76,22 +76,22 @@ class ParametersTest extends TestCase
             $config['effectiveDateAdjustment']
         );
 
-        $this->assertEquals($config['backend'], $parameters->getBackend());
-        $this->assertEquals($config['primaryKey'], $parameters->getPrimaryKey());
-        $this->assertEquals($config['monitoredParameters'], $parameters->getMonitoredParameters());
-        $this->assertEquals($config['timezone'], $parameters->getTimezone());
-        $this->assertEquals($config['deletedFlag'], $parameters->hasDeletedFlag());
-        $this->assertEquals($config['useDatetime'], $parameters->useDatetime());
-        $this->assertEquals($config['keepDeletedActive'], $parameters->keepDeleteActive());
-        $this->assertEquals($config['startDateName'], $parameters->getStartDateName());
-        $this->assertEquals($config['endDateName'], $parameters->getEndDateName());
-        $this->assertEquals($config['actualName'], $parameters->getActualName());
-        $this->assertEquals($config['isDeletedName'], $parameters->getIsDeletedName());
-        $this->assertEquals(explode('/', $config['deletedFlagValue']), $parameters->getDeletedFlagValue());
-        $this->assertEquals($config['endDateValue'], $parameters->getEndDateValue());
-        $this->assertEquals($config['currentTimestampMinusOne'], $parameters->getCurrentTimestampMinusOne());
-        $this->assertEquals($config['uppercaseColumns'], $parameters->getUppercaseColumns());
-        $this->assertEquals($config['effectiveDateAdjustment'], $parameters->getEffectiveDateAdjustment());
+        self::assertEquals($config['backend'], $parameters->getBackend());
+        self::assertEquals($config['primaryKey'], $parameters->getPrimaryKey());
+        self::assertEquals($config['monitoredParameters'], $parameters->getMonitoredParameters());
+        self::assertEquals($config['timezone'], $parameters->getTimezone());
+        self::assertEquals($config['deletedFlag'], $parameters->hasDeletedFlag());
+        self::assertEquals($config['useDatetime'], $parameters->useDatetime());
+        self::assertEquals($config['keepDeletedActive'], $parameters->keepDeleteActive());
+        self::assertEquals($config['startDateName'], $parameters->getStartDateName());
+        self::assertEquals($config['endDateName'], $parameters->getEndDateName());
+        self::assertEquals($config['actualName'], $parameters->getActualName());
+        self::assertEquals($config['isDeletedName'], $parameters->getIsDeletedName());
+        self::assertEquals(explode('/', $config['deletedFlagValue']), $parameters->getDeletedFlagValue());
+        self::assertEquals($config['endDateValue'], $parameters->getEndDateValue());
+        self::assertEquals($config['currentTimestampMinusOne'], $parameters->getCurrentTimestampMinusOne());
+        self::assertEquals($config['uppercaseColumns'], $parameters->getUppercaseColumns());
+        self::assertEquals($config['effectiveDateAdjustment'], $parameters->getEffectiveDateAdjustment());
     }
 
     public function configProvider(): Generator

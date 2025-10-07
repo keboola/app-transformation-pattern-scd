@@ -43,7 +43,7 @@ class InputMappingTest extends TestCase
 
         // Source should contain hash and 'snapshot' suffix
         $source = $snapshotTable->getSource();
-        $this->assertMatchesRegularExpression(
+        self::assertMatchesRegularExpression(
             '/out\.c-test-bucket\.source-table_[a-f0-9]{6}_snapshot/',
             $source
         );
@@ -80,7 +80,7 @@ class InputMappingTest extends TestCase
 
         // Source should be direct with custom suffix
         $source = $snapshotTable->getSource();
-        $this->assertEquals('out.c-test-bucket.source-table-daily_snapshot', $source);
+        self::assertEquals('out.c-test-bucket.source-table-daily_snapshot', $source);
     }
 
     public function testUppercaseColumnsWithDefaultActualName(): void
@@ -113,7 +113,7 @@ class InputMappingTest extends TestCase
         $snapshotTableArray = $inputMapping->getSnapshotTable()->toArray();
 
         // Where column should be uppercase ACTUAL
-        $this->assertEquals('ACTUAL', $snapshotTableArray['where_column']);
+        self::assertEquals('ACTUAL', $snapshotTableArray['where_column']);
     }
 
     public function testUppercaseColumnsWithCustomActualName(): void
@@ -146,7 +146,7 @@ class InputMappingTest extends TestCase
         $snapshotTableArray = $inputMapping->getSnapshotTable()->toArray();
 
         // Where column should be uppercase IS_ACTUAL
-        $this->assertEquals('IS_ACTUAL', $snapshotTableArray['where_column']);
+        self::assertEquals('IS_ACTUAL', $snapshotTableArray['where_column']);
     }
 
     public function testCustomDeletedFlagValue(): void
@@ -179,6 +179,6 @@ class InputMappingTest extends TestCase
         $snapshotTableArray = $inputMapping->getSnapshotTable()->toArray();
 
         // Where values should be ["yes"] (without quotes)
-        $this->assertEquals(['yes'], $snapshotTableArray['where_values']);
+        self::assertEquals(['yes'], $snapshotTableArray['where_values']);
     }
 }

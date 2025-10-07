@@ -19,7 +19,7 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::columnsToLower($columns);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['name' => 'column1', 'definition' => ['type' => 'VARCHAR']],
             ['name' => 'column2', 'definition' => ['type' => 'INTEGER']],
             ['name' => 'column3', 'definition' => ['type' => 'DATE']],
@@ -36,7 +36,7 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::columnsToUpper($columns);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['name' => 'COLUMN1', 'definition' => ['type' => 'VARCHAR']],
             ['name' => 'COLUMN2', 'definition' => ['type' => 'INTEGER']],
             ['name' => 'COLUMN3', 'definition' => ['type' => 'DATE']],
@@ -52,7 +52,7 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::transformColumnsCase($columns, true);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['name' => 'COLUMN1', 'definition' => ['type' => 'VARCHAR']],
             ['name' => 'COLUMN2', 'definition' => ['type' => 'INTEGER']],
         ], $result);
@@ -67,7 +67,7 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::transformColumnsCase($columns, false);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['name' => 'column1', 'definition' => ['type' => 'VARCHAR']],
             ['name' => 'column2', 'definition' => ['type' => 'INTEGER']],
         ], $result);
@@ -87,7 +87,7 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::mergeColumnsWithDefinition($columns1, $columns2);
 
-        $this->assertEquals([
+        self::assertEquals([
             ['name' => 'col1', 'definition' => ['type' => 'TEXT']], // Last one wins
             ['name' => 'col2', 'definition' => ['type' => 'INTEGER']],
             ['name' => 'col3', 'definition' => ['type' => 'DATE']],
@@ -103,14 +103,14 @@ class PatternHelperTest extends TestCase
 
         $result = PatternHelper::mergeColumnsWithDefinition($columns);
 
-        $this->assertEquals($columns, $result);
+        self::assertEquals($columns, $result);
     }
 
     public function testMergeColumnsWithDefinitionEmptyArrays(): void
     {
         $result = PatternHelper::mergeColumnsWithDefinition([], []);
 
-        $this->assertEquals([], $result);
+        self::assertEquals([], $result);
     }
 
     /**
@@ -120,7 +120,7 @@ class PatternHelperTest extends TestCase
     {
         $result = PatternHelper::noIndent($input);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function noIndentProvider(): \Generator

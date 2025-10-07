@@ -19,10 +19,10 @@ class Scd4PatternTest extends TestCase
 
     public function testGetterMethods(): void
     {
-        $this->assertEquals('input_table', $this->pattern->getInputTableName());
-        $this->assertEquals('current_snapshot', $this->pattern->getSnapshotInputTable());
-        $this->assertEquals('new_snapshot', $this->pattern->getSnapshotOutputTable());
-        $this->assertEquals('snapshot_pk', $this->pattern->getSnapshotPrimaryKey());
+        self::assertEquals('input_table', $this->pattern->getInputTableName());
+        self::assertEquals('current_snapshot', $this->pattern->getSnapshotInputTable());
+        self::assertEquals('new_snapshot', $this->pattern->getSnapshotOutputTable());
+        self::assertEquals('snapshot_pk', $this->pattern->getSnapshotPrimaryKey());
     }
 
     public function testGetTemplateVariables(): void
@@ -52,16 +52,16 @@ class Scd4PatternTest extends TestCase
         $method->setAccessible(true);
         $result = $method->invoke($pattern);
 
-        $this->assertIsArray($result);
-        $this->assertEquals('Europe/Prague', $result['timezone']);
-        $this->assertEquals(false, $result['useDatetime']);
-        $this->assertEquals(false, $result['keepDeleteActive']);
-        $this->assertEquals(true, $result['hasDeletedFlag']);
-        $this->assertEquals(['id', 'name'], $result['inputPrimaryKey']);
-        $this->assertEquals('snapshot_pk', $result['snapshotPrimaryKeyName']);
-        $this->assertEquals(0, $result['deletedActualValue']);
-        $this->assertEquals(true, $result['generateDeletedRecords']);
-        $this->assertEquals([
+        self::assertIsArray($result);
+        self::assertEquals('Europe/Prague', $result['timezone']);
+        self::assertEquals(false, $result['useDatetime']);
+        self::assertEquals(false, $result['keepDeleteActive']);
+        self::assertEquals(true, $result['hasDeletedFlag']);
+        self::assertEquals(['id', 'name'], $result['inputPrimaryKey']);
+        self::assertEquals('snapshot_pk', $result['snapshotPrimaryKeyName']);
+        self::assertEquals(0, $result['deletedActualValue']);
+        self::assertEquals(true, $result['generateDeletedRecords']);
+        self::assertEquals([
             'snapshotDate' => 'snapshot_date',
             'actual' => 'actual',
             'isDeleted' => 'is_deleted',
@@ -91,9 +91,9 @@ class Scd4PatternTest extends TestCase
         $method->setAccessible(true);
         $result = $method->invoke($pattern);
 
-        $this->assertEquals(true, $result['keepDeleteActive']);
-        $this->assertEquals(false, $result['hasDeletedFlag']);
-        $this->assertEquals(1, $result['deletedActualValue']);
-        $this->assertEquals(true, $result['generateDeletedRecords']);
+        self::assertEquals(true, $result['keepDeleteActive']);
+        self::assertEquals(false, $result['hasDeletedFlag']);
+        self::assertEquals(1, $result['deletedActualValue']);
+        self::assertEquals(true, $result['generateDeletedRecords']);
     }
 }

@@ -36,25 +36,25 @@ class ParametersFactoryTest extends TestCase
 
         $parameters = $this->factory->create();
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
-        $this->assertEquals(Parameters::BACKEND_SNOWFLAKE, $parameters->getBackend());
-        $this->assertEquals(['id', 'name'], $parameters->getPrimaryKey());
-        $this->assertEquals(['email', 'phone'], $parameters->getMonitoredParameters());
-        $this->assertEquals('Europe/Prague', $parameters->getTimezone());
-        $this->assertEquals(true, $parameters->hasDeletedFlag());
-        $this->assertEquals(false, $parameters->useDatetime());
-        $this->assertEquals(true, $parameters->keepDeleteActive());
-        $this->assertEquals('start_date', $parameters->getStartDateName());
-        $this->assertEquals('end_date', $parameters->getEndDateName());
-        $this->assertEquals('actual', $parameters->getActualName());
-        $this->assertEquals('is_deleted', $parameters->getIsDeletedName());
-        $this->assertEquals(['0', '1'], $parameters->getDeletedFlagValue());
-        $this->assertEquals('9999-12-31', $parameters->getEndDateValue());
-        $this->assertEquals(false, $parameters->getCurrentTimestampMinusOne());
-        $this->assertEquals(true, $parameters->getUppercaseColumns());
-        $this->assertEquals(0, $parameters->getEffectiveDateAdjustment());
-        $this->assertEquals('my_snapshot', $parameters->getSnapshotTableName());
-        $this->assertEquals([
+        self::assertInstanceOf(Parameters::class, $parameters);
+        self::assertEquals(Parameters::BACKEND_SNOWFLAKE, $parameters->getBackend());
+        self::assertEquals(['id', 'name'], $parameters->getPrimaryKey());
+        self::assertEquals(['email', 'phone'], $parameters->getMonitoredParameters());
+        self::assertEquals('Europe/Prague', $parameters->getTimezone());
+        self::assertEquals(true, $parameters->hasDeletedFlag());
+        self::assertEquals(false, $parameters->useDatetime());
+        self::assertEquals(true, $parameters->keepDeleteActive());
+        self::assertEquals('start_date', $parameters->getStartDateName());
+        self::assertEquals('end_date', $parameters->getEndDateName());
+        self::assertEquals('actual', $parameters->getActualName());
+        self::assertEquals('is_deleted', $parameters->getIsDeletedName());
+        self::assertEquals(['0', '1'], $parameters->getDeletedFlagValue());
+        self::assertEquals('9999-12-31', $parameters->getEndDateValue());
+        self::assertEquals(false, $parameters->getCurrentTimestampMinusOne());
+        self::assertEquals(true, $parameters->getUppercaseColumns());
+        self::assertEquals(0, $parameters->getEffectiveDateAdjustment());
+        self::assertEquals('my_snapshot', $parameters->getSnapshotTableName());
+        self::assertEquals([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'name', 'definition' => ['type' => 'VARCHAR']],
@@ -123,7 +123,7 @@ class ParametersFactoryTest extends TestCase
             $this->factory->create();
         } else {
             $parameters = $this->factory->create();
-            $this->assertEquals($expectedBackend, $parameters->getBackend());
+            self::assertEquals($expectedBackend, $parameters->getBackend());
         }
     }
 

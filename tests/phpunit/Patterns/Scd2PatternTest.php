@@ -20,9 +20,9 @@ class Scd2PatternTest extends TestCase
 
     public function testGetterMethods(): void
     {
-        $this->assertEquals('input_table', $this->pattern->getInputTableName());
-        $this->assertEquals('current_snapshot', $this->pattern->getSnapshotInputTable());
-        $this->assertEquals('new_snapshot', $this->pattern->getSnapshotOutputTable());
+        self::assertEquals('input_table', $this->pattern->getInputTableName());
+        self::assertEquals('current_snapshot', $this->pattern->getSnapshotInputTable());
+        self::assertEquals('new_snapshot', $this->pattern->getSnapshotOutputTable());
     }
 
     /**
@@ -37,7 +37,7 @@ class Scd2PatternTest extends TestCase
         $pattern->setParameters($parameters);
 
         $result = $pattern->getSnapshotPrimaryKey();
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public function testGetTemplateVariables(): void
@@ -79,33 +79,33 @@ class Scd2PatternTest extends TestCase
         $method->setAccessible(true);
         $result = $method->invoke($pattern);
 
-        $this->assertIsArray($result);
-        $this->assertEquals('Europe/Prague', $result['timezone']);
-        $this->assertEquals(true, $result['useDatetime']);
-        $this->assertEquals(false, $result['keepDeleteActive']);
-        $this->assertEquals(true, $result['hasDeletedFlag']);
-        $this->assertEquals(['id', 'name'], $result['inputPrimaryKey']);
-        $this->assertEquals(['id', 'name'], $result['inputPrimaryKeyLower']);
-        $this->assertEquals(['id', 'name', 'email', 'phone'], $result['inputColumns']);
-        $this->assertEquals('snapshot_pk', $result['snapshotPrimaryKeyName']);
-        $this->assertEquals(['id', 'name', 'start_date'], $result['snapshotPrimaryKeyParts']);
-        $this->assertEquals(['id', 'name', 'email', 'phone'], $result['snapshotInputColumns']);
-        $this->assertEquals(
+        self::assertIsArray($result);
+        self::assertEquals('Europe/Prague', $result['timezone']);
+        self::assertEquals(true, $result['useDatetime']);
+        self::assertEquals(false, $result['keepDeleteActive']);
+        self::assertEquals(true, $result['hasDeletedFlag']);
+        self::assertEquals(['id', 'name'], $result['inputPrimaryKey']);
+        self::assertEquals(['id', 'name'], $result['inputPrimaryKeyLower']);
+        self::assertEquals(['id', 'name', 'email', 'phone'], $result['inputColumns']);
+        self::assertEquals('snapshot_pk', $result['snapshotPrimaryKeyName']);
+        self::assertEquals(['id', 'name', 'start_date'], $result['snapshotPrimaryKeyParts']);
+        self::assertEquals(['id', 'name', 'email', 'phone'], $result['snapshotInputColumns']);
+        self::assertEquals(
             ['id', 'name', 'email', 'phone', 'start_date', 'end_date', 'actual', 'is_deleted'],
             $result['snapshotAllColumnsExceptPk']
         );
-        $this->assertEquals('0', $result['deletedActualValue']);
-        $this->assertEquals([
+        self::assertEquals('0', $result['deletedActualValue']);
+        self::assertEquals([
             'input' => 'input_table',
             'currentSnapshot' => 'current_snapshot',
             'newSnapshot' => 'new_snapshot',
         ], $result['tableName']);
-        $this->assertEquals(['start_date', 'end_date', 'actual', 'is_deleted'], array_values($result['columnName']));
-        $this->assertEquals('9999-12-31', $result['endDateValue']);
-        $this->assertEquals(['0', '1'], $result['deletedFlagValue']);
-        $this->assertEquals(false, $result['currentTimestampMinusOne']);
-        $this->assertEquals(false, $result['uppercaseColumns']);
-        $this->assertEquals(0, $result['effectiveDateAdjustment']);
+        self::assertEquals(['start_date', 'end_date', 'actual', 'is_deleted'], array_values($result['columnName']));
+        self::assertEquals('9999-12-31', $result['endDateValue']);
+        self::assertEquals(['0', '1'], $result['deletedFlagValue']);
+        self::assertEquals(false, $result['currentTimestampMinusOne']);
+        self::assertEquals(false, $result['uppercaseColumns']);
+        self::assertEquals(0, $result['effectiveDateAdjustment']);
     }
 
     public function testGetTemplateVariablesWithUppercaseColumns(): void
@@ -147,20 +147,20 @@ class Scd2PatternTest extends TestCase
         $method->setAccessible(true);
         $result = $method->invoke($pattern);
 
-        $this->assertIsArray($result);
-        $this->assertEquals('SNAPSHOT_PK', $result['snapshotPrimaryKeyName']);
-        $this->assertEquals(['id', 'name', 'start_date'], $result['snapshotPrimaryKeyParts']);
-        $this->assertEquals(['ID', 'NAME', 'EMAIL', 'PHONE'], $result['snapshotInputColumns']);
-        $this->assertEquals(
+        self::assertIsArray($result);
+        self::assertEquals('SNAPSHOT_PK', $result['snapshotPrimaryKeyName']);
+        self::assertEquals(['id', 'name', 'start_date'], $result['snapshotPrimaryKeyParts']);
+        self::assertEquals(['ID', 'NAME', 'EMAIL', 'PHONE'], $result['snapshotInputColumns']);
+        self::assertEquals(
             ['ID', 'NAME', 'EMAIL', 'PHONE', 'START_DATE', 'END_DATE', 'ACTUAL'],
             $result['snapshotAllColumnsExceptPk']
         );
-        $this->assertEquals('1', $result['deletedActualValue']); // keepDeleteActive = true
-        $this->assertEquals(
+        self::assertEquals('1', $result['deletedActualValue']); // keepDeleteActive = true
+        self::assertEquals(
             ['START_DATE', 'END_DATE', 'ACTUAL'],
             array_values($result['columnName'])
         ); // no deleted flag
-        $this->assertEquals(true, $result['uppercaseColumns']);
+        self::assertEquals(true, $result['uppercaseColumns']);
     }
 
     public function uppercaseColumnsProvider(): Generator

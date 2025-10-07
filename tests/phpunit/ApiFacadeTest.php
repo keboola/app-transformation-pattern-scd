@@ -201,7 +201,7 @@ class ApiFacadeTest extends TestCase
 
         $result = $this->apiFacade->getTable($tableId);
 
-        $this->assertEquals($expectedTableData, $result);
+        self::assertEquals($expectedTableData, $result);
     }
 
     /**

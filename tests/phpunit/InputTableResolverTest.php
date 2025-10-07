@@ -35,7 +35,7 @@ class InputTableResolverTest extends TestCase
 
         $result = $this->resolver->getInputTableId();
 
-        $this->assertEquals('in.c-main.test_table', $result);
+        self::assertEquals('in.c-main.test_table', $result);
     }
 
     public function testGetInputTableIdWithMultipleTables(): void
@@ -48,7 +48,7 @@ class InputTableResolverTest extends TestCase
 
         $result = $this->resolver->getInputTableId();
 
-        $this->assertEquals('in.c-main.table2', $result);
+        self::assertEquals('in.c-main.table2', $result);
     }
 
     public function testGetInputTableIdWithEmptyTables(): void
@@ -86,7 +86,7 @@ class InputTableResolverTest extends TestCase
 
         $result = $this->resolver->getInputTableColumns();
 
-        $this->assertEquals(['id', 'name', 'email', 'phone'], $result);
+        self::assertEquals(['id', 'name', 'email', 'phone'], $result);
     }
 
     public function testGetInputTableDefinition(): void
@@ -103,7 +103,7 @@ class InputTableResolverTest extends TestCase
 
         $result = $this->resolver->getInputTableDefinition();
 
-        $this->assertEquals([
+        self::assertEquals([
             'columns' => [
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
                 ['name' => 'name', 'definition' => ['type' => 'VARCHAR']],
@@ -120,7 +120,7 @@ class InputTableResolverTest extends TestCase
 
         $result = $this->resolver->getInputTableDefinition();
 
-        $this->assertEquals([], $result);
+        self::assertEquals([], $result);
     }
 
     public function testCachingOfTableDetail(): void
@@ -156,7 +156,7 @@ class InputTableResolverTest extends TestCase
         $result = $this->resolver->getInputTableId();
 
         if (!$shouldThrowException) {
-            $this->assertEquals($expectedTableId, $result);
+            self::assertEquals($expectedTableId, $result);
         }
     }
 
