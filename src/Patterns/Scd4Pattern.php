@@ -42,7 +42,13 @@ class Scd4Pattern extends AbstractPattern
             'inputColumns' => array_map(fn($col) => $col['name'], $this->getInputColumns()),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
             'snapshotPrimaryKeyParts' => array_map(fn($col) => $col['name'], $this->getSnapshotPrimaryKeyParts()),
-            'snapshotInputColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotInputColumns()),
+            'snapshotInputColumns' => array_map(
+                fn($col) => $col['name'],
+                PatternHelper::transformColumnsCase(
+                    $this->getInputColumns(),
+                    $this->getParameters()->getUppercaseColumns()
+                )
+            ),
             'snapshotSpecialColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotSpecialColumns()),
             'snapshotAllColumnsExceptPk' => array_map(fn($col) => $col['name'], $this->getSnapshotAllColumnsExceptPk()),
             'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
@@ -68,7 +74,7 @@ class Scd4Pattern extends AbstractPattern
         );
 
         // All snapshot columns are lower
-        return $this->columnsToLower($columns);
+        return PatternHelper::columnsToLower($columns);
     }
 
     protected function getSnapshotSpecialColumns(): array
@@ -88,6 +94,6 @@ class Scd4Pattern extends AbstractPattern
         }
 
         // All snapshot columns are lower
-        return $this->columnsToLower($columns);
+        return PatternHelper::columnsToLower($columns);
     }
 }

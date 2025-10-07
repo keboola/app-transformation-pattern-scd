@@ -32,7 +32,7 @@ class Scd2Pattern extends AbstractPattern
 
     protected function getTemplateVariables(): array
     {
-        $inputPrimaryKeyLower =  $this->columnsToLower(
+        $inputPrimaryKeyLower =  PatternHelper::columnsToLower(
             $this->getColumnsWithDefinition($this->getParameters()->getPrimaryKey()),
         );
         return [
@@ -45,7 +45,13 @@ class Scd2Pattern extends AbstractPattern
             'inputColumns' => array_map(fn($col) => $col['name'], $this->getInputColumns()),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
             'snapshotPrimaryKeyParts' => array_map(fn($col) => $col['name'], $this->getSnapshotPrimaryKeyParts()),
-            'snapshotInputColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotInputColumns()),
+            'snapshotInputColumns' => array_map(
+                fn($col) => $col['name'],
+                PatternHelper::transformColumnsCase(
+                    $this->getInputColumns(),
+                    $this->getParameters()->getUppercaseColumns()
+                )
+            ),
             'snapshotAllColumnsExceptPk' => array_map(fn($col) => $col['name'], $this->getSnapshotAllColumnsExceptPk()),
             'deletedActualValue' => $this->getParameters()->keepDeleteActive()
                 ? $this->getParameters()->getDeletedFlagValue()[1]
@@ -71,7 +77,7 @@ class Scd2Pattern extends AbstractPattern
             array_merge($this->getParameters()->getPrimaryKey(), [$this->getParameters()->getStartDateName()])
         );
 
-        return $this->columnsToLower($columns);
+        return PatternHelper::columnsToLower($columns);
     }
 
     protected function getSnapshotSpecialColumns(): array
@@ -101,7 +107,7 @@ class Scd2Pattern extends AbstractPattern
         }
 
         return $this->getParameters()->getUppercaseColumns() ?
-            $this->columnsToUpper($columns) :
-            $this->columnsToLower($columns);
+            PatternHelper::columnsToUpper($columns) :
+            PatternHelper::columnsToLower($columns);
     }
 }

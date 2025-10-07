@@ -15,7 +15,6 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
 {
     protected string $templateName;
     private ?QuoteHelper $quoteHelper = null;
-
     private ?Parameters $parameters = null;
 
     abstract protected function getSnapshotSpecialColumns(): array;
@@ -63,7 +62,7 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return [
             new TwigFilter('quoteIdentifier', fn(string $str) => $this->getQuoteHelper()->quoteIdentifier($str)),
             new TwigFilter('quoteValue', fn(string $str) => $this->getQuoteHelper()->quoteValue($str)),
-            new TwigFilter('noIndent', fn(string $str) => $this->noIndent($str)),
+            new TwigFilter('noIndent', fn(string $str) => PatternHelper::noIndent($str)),
         ];
     }
 
@@ -77,7 +76,7 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
 
     public function getSnapshotTypedColumns(): array
     {
-        return $this->mergeColumnsWithDefinition(
+        return PatternHelper::mergeColumnsWithDefinition(
             $this->getColumnsWithDefinition([$this->getSnapshotPrimaryKey()]),
             $this->getSnapshotAllColumnsExceptPk(),
         );
@@ -101,34 +100,15 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return $this->parameters;
     }
 
-    protected function columnsToLower(array $columns): array
-    {
-        return array_map(fn(array $column) => [
-            'name' => mb_strtolower($column['name']),
-            'definition' => $column['definition'],
-        ], $columns);
-    }
 
-    protected function columnsToUpper(array $columns): array
-    {
-        return array_map(fn(array $column) => [
-            'name' => mb_strtoupper($column['name']),
-            'definition' => $column['definition'],
-        ], $columns);
-    }
-
-    protected function noIndent(string $str): string
-    {
-        return implode(
-            "\n",
-            array_map(fn(string $line) => trim($line), explode("\n", $str))
-        );
-    }
 
     protected function getSnapshotAllColumnsExceptPk(): array
     {
-        return $this->mergeColumnsWithDefinition(
-            $this->getSnapshotInputColumns(),
+        return PatternHelper::mergeColumnsWithDefinition(
+            PatternHelper::transformColumnsCase(
+                $this->getInputColumns(),
+                $this->getParameters()->getUppercaseColumns()
+            ),
             $this->getSnapshotSpecialColumns()
         );
     }
@@ -140,12 +120,6 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         );
     }
 
-    protected function getSnapshotInputColumns(): array
-    {
-        return $this->getParameters()->getUppercaseColumns() ?
-            $this->columnsToUpper($this->getInputColumns()) :
-            $this->columnsToLower($this->getInputColumns());
-    }
 
     protected function getColumnsWithDefinition(array $columns): array
     {
@@ -165,16 +139,6 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return $result;
     }
 
-    protected function mergeColumnsWithDefinition(array ...$columns): array
-    {
-        $merged = [];
-        foreach ($columns as $columnSet) {
-            foreach ($columnSet as $column) {
-                $merged[$column['name']] = $column;
-            }
-        }
-        return array_values($merged);
-    }
 
     protected function getDeletedColumn(?string $name = null): array
     {
