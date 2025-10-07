@@ -40,7 +40,8 @@ class ParametersFactory
             $this->config->getCurrentTimestampMinusOne(),
             $this->config->getUppercaseColumns(),
             $this->config->getEffectiveDateAdjustment(),
-            $this->config->getSnapshotTableName()
+            $this->config->getSnapshotTableName(),
+            $this->inputTableResolver->getInputTableDefinition(),
         );
     }
 

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Patterns;
 
-use Keboola\TransformationPatternScd\Exception\ApplicationException;
-use Keboola\TransformationPatternScd\Parameters\Parameters;
-
 class Scd2Pattern extends AbstractPattern
 {
+    protected string $templateName = 'Scd2Snowflake.twig';
+
     public function getInputTableName(): string
     {
         return self::TABLE_INPUT;
@@ -31,39 +30,23 @@ class Scd2Pattern extends AbstractPattern
             : self::COLUMN_SNAPSHOT_PK;
     }
 
-    public function getSnapshotTableHeader(): array
-    {
-        return array_merge(
-            [$this->getSnapshotPrimaryKey()],
-            $this->getSnapshotAllColumnsExceptPk()
-        );
-    }
-
-    protected function getTemplatePath(): string
-    {
-        $backend = $this->getParameters()->getBackend();
-        switch ($backend) {
-            case Parameters::BACKEND_SNOWFLAKE:
-                return 'Scd2Snowflake.twig';
-            default:
-                throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
-        }
-    }
-
     protected function getTemplateVariables(): array
     {
+        $inputPrimaryKeyLower =  $this->columnsToLower(
+            $this->getColumnsWithDefinition($this->getParameters()->getPrimaryKey()),
+        );
         return [
             'timezone' => $this->getParameters()->getTimezone(),
             'useDatetime' => $this->getParameters()->useDatetime(),
             'keepDeleteActive' => $this->getParameters()->keepDeleteActive(),
             'hasDeletedFlag' => $this->getParameters()->hasDeletedFlag(),
             'inputPrimaryKey' => $this->getParameters()->getPrimaryKey(),
-            'inputPrimaryKeyLower' => $this->columnsToLower($this->getParameters()->getPrimaryKey()),
-            'inputColumns' => $this->getInputColumns(),
+            'inputPrimaryKeyLower' => array_map(fn($col) => $col['name'], $inputPrimaryKeyLower),
+            'inputColumns' => array_map(fn($col) => $col['name'], $this->getInputColumns()),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
-            'snapshotPrimaryKeyParts' => $this->getSnapshotPrimaryKeyParts(),
-            'snapshotInputColumns' => $this->getSnapshotInputColumns(),
-            'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
+            'snapshotPrimaryKeyParts' => array_map(fn($col) => $col['name'], $this->getSnapshotPrimaryKeyParts()),
+            'snapshotInputColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotInputColumns()),
+            'snapshotAllColumnsExceptPk' => array_map(fn($col) => $col['name'], $this->getSnapshotAllColumnsExceptPk()),
             'deletedActualValue' => $this->getParameters()->keepDeleteActive()
                 ? $this->getParameters()->getDeletedFlagValue()[1]
                 : $this->getParameters()->getDeletedFlagValue()[0],
@@ -72,7 +55,7 @@ class Scd2Pattern extends AbstractPattern
                 'currentSnapshot' => self::TABLE_CURRENT_SNAPSHOT,
                 'newSnapshot' => self::TABLE_NEW_SNAPSHOT,
             ],
-            'columnName' => $this->getSnapshotSpecialColumnsWithKeys(),
+            'columnName' => array_map(fn($col) => $col['name'], $this->getSnapshotSpecialColumnsWithKeys()),
             'endDateValue' => $this->getParameters()->getEndDateValue(),
             'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
             'currentTimestampMinusOne' => $this->getParameters()->getCurrentTimestampMinusOne(),
@@ -81,51 +64,44 @@ class Scd2Pattern extends AbstractPattern
         ];
     }
 
-    private function getInputColumns(): array
-    {
-        return array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters());
-    }
-
     private function getSnapshotPrimaryKeyParts(): array
     {
         // All snapshot columns are lower
-        return $this->columnsToLower(
+        $columns = $this->getColumnsWithDefinition(
             array_merge($this->getParameters()->getPrimaryKey(), [$this->getParameters()->getStartDateName()])
         );
+
+        return $this->columnsToLower($columns);
     }
 
-    private function getSnapshotInputColumns(): array
-    {
-        return $this->getParameters()->getUppercaseColumns()
-            ? $this->columnsToUpper($this->getInputColumns())
-            : $this->columnsToLower($this->getInputColumns());
-    }
-
-    private function getSnapshotSpecialColumns(): array
+    protected function getSnapshotSpecialColumns(): array
     {
         return array_values($this->getSnapshotSpecialColumnsWithKeys());
     }
 
     private function getSnapshotSpecialColumnsWithKeys(): array
     {
-        $columns['startDate'] = $this->getParameters()->getStartDateName();
-        $columns['endDate'] = $this->getParameters()->getEndDateName();
-        $columns['actual'] = $this->getParameters()->getActualName();
+        $columns['startDate'] = [
+            'name' => $this->getParameters()->getStartDateName(),
+            'definition' => ['type' => $this->getParameters()->useDatetime() ? 'DATETIME' : 'DATE'],
+        ];
+
+        $columns['endDate'] = [
+            'name' => $this->getParameters()->getEndDateName(),
+            'definition' => ['type' => $this->getParameters()->useDatetime() ? 'DATETIME' : 'DATE'],
+        ];
+
+        $columns['actual'] = [
+            'name' => $this->getParameters()->getActualName(),
+            'definition' => ['type' => 'VARCHAR'],
+        ];
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns['isDeleted'] = $this->getParameters()->getIsDeletedName();
+            $columns['isDeleted'] = $this->getDeletedColumn();
         }
 
-        return $this->getParameters()->getUppercaseColumns()
-            ? $this->columnsToUpper($columns)
-            : $this->columnsToLower($columns);
-    }
-
-    private function getSnapshotAllColumnsExceptPk(): array
-    {
-        return array_merge(
-            $this->getSnapshotInputColumns(),
-            $this->getSnapshotSpecialColumns()
-        );
+        return $this->getParameters()->getUppercaseColumns() ?
+            $this->columnsToUpper($columns) :
+            $this->columnsToLower($columns);
     }
 }

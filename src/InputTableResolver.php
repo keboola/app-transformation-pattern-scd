@@ -58,4 +58,10 @@ class InputTableResolver
 
         return $this->inputTableDetail;
     }
+
+    public function getInputTableDefinition(): array
+    {
+        $tableDetail = $this->getInputTableDetail();
+        return $tableDetail['definition'] ?? [];
+    }
 }

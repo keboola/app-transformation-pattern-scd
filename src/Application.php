@@ -64,8 +64,7 @@ class Application
         // Create snapshot table by API
         $this->apiFacade->createSnapshotTable(
             $this->mappingManager->getInputMapping()->getSnapshotTable(),
-            $this->pattern->getSnapshotTableHeader(),
-            $this->pattern->getSnapshotPrimaryKey(),
+            $this->pattern,
         );
 
         return [

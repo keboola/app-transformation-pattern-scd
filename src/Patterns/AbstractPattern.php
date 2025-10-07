@@ -13,11 +13,23 @@ use Keboola\TransformationPatternScd\QuoteHelper;
 
 abstract class AbstractPattern extends AbstractExtension implements Pattern
 {
+    protected string $templateName;
     private ?QuoteHelper $quoteHelper = null;
 
     private ?Parameters $parameters = null;
 
-    abstract protected function getTemplatePath(): string;
+    abstract protected function getSnapshotSpecialColumns(): array;
+
+    protected function getTemplatePath(): string
+    {
+        $backend = $this->getParameters()->getBackend();
+        switch ($backend) {
+            case Parameters::BACKEND_SNOWFLAKE:
+                return $this->templateName;
+            default:
+                throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
+        }
+    }
 
     abstract protected function getTemplateVariables(): array;
 
@@ -55,6 +67,22 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         ];
     }
 
+    public function getSnapshotTableHeader(): array
+    {
+        return array_merge(
+            [$this->getSnapshotPrimaryKey()],
+            $this->getSnapshotAllColumnsExceptPk()
+        );
+    }
+
+    public function getSnapshotTypedColumns(): array
+    {
+        return $this->mergeColumnsWithDefinition(
+            $this->getColumnsWithDefinition([$this->getSnapshotPrimaryKey()]),
+            $this->getSnapshotAllColumnsExceptPk(),
+        );
+    }
+
     protected function getQuoteHelper(): QuoteHelper
     {
         if (!$this->quoteHelper) {
@@ -75,12 +103,18 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
 
     protected function columnsToLower(array $columns): array
     {
-        return array_map(fn(string $column) => mb_strtolower($column), $columns);
+        return array_map(fn(array $column) => [
+            'name' => mb_strtolower($column['name']),
+            'definition' => $column['definition'],
+        ], $columns);
     }
 
     protected function columnsToUpper(array $columns): array
     {
-        return array_map(fn(string $column) => mb_strtoupper($column), $columns);
+        return array_map(fn(array $column) => [
+            'name' => mb_strtoupper($column['name']),
+            'definition' => $column['definition'],
+        ], $columns);
     }
 
     protected function noIndent(string $str): string
@@ -89,5 +123,74 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
             "\n",
             array_map(fn(string $line) => trim($line), explode("\n", $str))
         );
+    }
+
+    protected function getSnapshotAllColumnsExceptPk(): array
+    {
+        return $this->mergeColumnsWithDefinition(
+            $this->getSnapshotInputColumns(),
+            $this->getSnapshotSpecialColumns()
+        );
+    }
+
+    protected function getInputColumns(): array
+    {
+        return $this->getColumnsWithDefinition(
+            array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters()),
+        );
+    }
+
+    protected function getSnapshotInputColumns(): array
+    {
+        return $this->getParameters()->getUppercaseColumns() ?
+            $this->columnsToUpper($this->getInputColumns()) :
+            $this->columnsToLower($this->getInputColumns());
+    }
+
+    protected function getColumnsWithDefinition(array $columns): array
+    {
+        $tableDefinition = $this->getParameters()->getInputTableDefinition();
+
+        $result = [];
+        foreach ($columns as $column) {
+            $columnDefinition = array_filter($tableDefinition['columns'] ?? [], fn($col) => $col['name'] === $column);
+            $result[] = [
+                'name' => $column,
+                'definition' => $columnDefinition ?
+                    array_values($columnDefinition)[0]['definition'] :
+                    ['type' => 'VARCHAR'],
+            ];
+        }
+
+        return $result;
+    }
+
+    protected function mergeColumnsWithDefinition(array ...$columns): array
+    {
+        $merged = [];
+        foreach ($columns as $columnSet) {
+            foreach ($columnSet as $column) {
+                $merged[$column['name']] = $column;
+            }
+        }
+        return array_values($merged);
+    }
+
+    protected function getDeletedColumn(?string $name = null): array
+    {
+        $length = max(
+            mb_strlen(str_replace("'", '', (string) $this->getParameters()->getDeletedFlagValue()[0])),
+            mb_strlen(str_replace("'", '', (string) $this->getParameters()->getDeletedFlagValue()[1])),
+        );
+        $isNumeric = in_array('0', $this->getParameters()->getDeletedFlagValue(), true)
+            && in_array('1', $this->getParameters()->getDeletedFlagValue(), true);
+
+        return [
+            'name' => $name ?? $this->getParameters()->getIsDeletedName(),
+            'definition' => [
+                'type' => $isNumeric ? 'NUMERIC' : 'VARCHAR',
+                'length' => $isNumeric ? 1 : $length,
+            ],
+        ];
     }
 }
