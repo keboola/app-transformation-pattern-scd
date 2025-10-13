@@ -57,7 +57,7 @@ class Scd2PatternTest extends TestCase
         $parameters->expects($this->exactly(2))->method('getEndDateName')->willReturn('end_date');
         $parameters->expects($this->exactly(2))->method('getActualName')->willReturn('actual');
         $parameters->expects($this->exactly(2))->method('getIsDeletedName')->willReturn('is_deleted');
-        $parameters->expects($this->exactly(10))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->exactly(18))->method('getDeletedFlagValue')->willReturn(['0', '1']);
         $parameters->expects($this->once())->method('getEndDateValue')->willReturn('9999-12-31');
         $parameters->expects($this->once())->method('getCurrentTimestampMinusOne')->willReturn(false);
         $parameters->expects($this->once())->method('getEffectiveDateAdjustment')->willReturn(0);
@@ -125,7 +125,7 @@ class Scd2PatternTest extends TestCase
         $parameters->expects($this->exactly(2))->method('getEndDateName')->willReturn('END_DATE');
         $parameters->expects($this->exactly(2))->method('getActualName')->willReturn('ACTUAL');
         $parameters->expects($this->never())->method('getIsDeletedName')->willReturn('IS_DELETED');
-        $parameters->expects($this->exactly(2))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->exactly(10))->method('getDeletedFlagValue')->willReturn(['0', '1']);
         $parameters->expects($this->once())->method('getEndDateValue')->willReturn('9999-12-31');
         $parameters->expects($this->once())->method('getCurrentTimestampMinusOne')->willReturn(true);
         $parameters->expects($this->once())->method('getEffectiveDateAdjustment')->willReturn(1);

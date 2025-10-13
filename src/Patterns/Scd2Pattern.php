@@ -99,11 +99,14 @@ class Scd2Pattern extends AbstractPattern
 
         $columns['actual'] = [
             'name' => $this->getParameters()->getActualName(),
-            'definition' => ['type' => 'VARCHAR'],
+            'definition' => $this->getDeletedFlagColumnDefinition(),
         ];
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns['isDeleted'] = $this->getDeletedColumn();
+            $columns['isDeleted'] = [
+                'name' => $this->getParameters()->getIsDeletedName(),
+                'definition' => $this->getDeletedFlagColumnDefinition(),
+            ];
         }
 
         return $this->getParameters()->getUppercaseColumns() ?

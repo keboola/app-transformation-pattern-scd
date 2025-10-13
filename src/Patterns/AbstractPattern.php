@@ -138,7 +138,10 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
     }
 
 
-    protected function getDeletedColumn(?string $name = null): array
+    /**
+     * Returns the column definition for the deleted flag.
+     */
+    protected function getDeletedFlagColumnDefinition(): array
     {
         $length = max(
             mb_strlen(str_replace("'", '', (string) $this->getParameters()->getDeletedFlagValue()[0])),
@@ -148,11 +151,8 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
             && in_array('1', $this->getParameters()->getDeletedFlagValue(), true);
 
         return [
-            'name' => $name ?? $this->getParameters()->getIsDeletedName(),
-            'definition' => [
-                'type' => $isNumeric ? 'NUMERIC' : 'VARCHAR',
-                'length' => $isNumeric ? 1 : $length,
-            ],
+            'type' => $isNumeric ? 'NUMERIC' : 'VARCHAR',
+            'length' => $isNumeric ? 1 : $length,
         ];
     }
 }

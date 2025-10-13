@@ -86,11 +86,14 @@ class Scd4Pattern extends AbstractPattern
 
         $columns[] = [
             'name' => self::COLUMN_ACTUAL,
-            'definition' => ['type' => 'VARCHAR'],
+            'definition' => ['type' => 'NUMERIC', 'length' => 1],
         ];
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns[] = $this->getDeletedColumn(self::COLUMN_IS_DELETED);
+            $columns[] = [
+                'name' => self::COLUMN_IS_DELETED,
+                'definition' => $this->getDeletedFlagColumnDefinition(),
+            ];
         }
 
         // All snapshot columns are lower
