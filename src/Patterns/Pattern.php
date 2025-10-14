@@ -23,6 +23,8 @@ interface Pattern
 
     public function getSnapshotTableHeader(): array;
 
+    public function getSnapshotTypedColumns(): array;
+
     public function setParameters(Parameters $parameters): void;
 
     public function getParameters(): Parameters;

@@ -9,9 +9,12 @@ use Keboola\Csv\CsvFile;
 use Keboola\StorageApi\Client;
 use Keboola\StorageApi\ClientException;
 use Keboola\TransformationPatternScd\Mapping\Table;
+use Keboola\TransformationPatternScd\Patterns\Pattern;
 
 class ApiFacade
 {
+    private const NATIVE_TYPES_FEATURES = ['native-types', 'new-native-types'];
+
     private Client $client;
 
     private string $dataDir;
@@ -22,11 +25,36 @@ class ApiFacade
         $this->dataDir = $dataDir;
     }
 
-    public function createSnapshotTable(Table $snapshotTable, array $header, string $primaryKey): void
-    {
+    public function createSnapshotTable(
+        Table $snapshotTable,
+        Pattern $pattern
+    ): void {
         try {
+            if ($this->client->tableExists($snapshotTable->getTableId())) {
+                return;
+            }
             $this->createBucketIfNotExists($snapshotTable);
-            $this->createTableIfNotExists($snapshotTable, $header, $primaryKey);
+
+            $features = $this->client->verifyToken()['owner']['features'];
+            if (count(array_intersect(self::NATIVE_TYPES_FEATURES, $features)) > 0) {
+                $this->client->createTableDefinition(
+                    $snapshotTable->getBuckedId(),
+                    [
+                        'name' => $snapshotTable->getTableName(),
+                        'primaryKeysNames' => [$pattern->getSnapshotPrimaryKey()],
+                        'columns' => $pattern->getSnapshotTypedColumns(),
+                    ]
+                );
+            } else {
+                $csvFile = new CsvFile(sprintf('%s/snapshot.csv', $this->dataDir));
+                $csvFile->writeRow($pattern->getSnapshotTableHeader());
+                $this->client->createTableAsync(
+                    $snapshotTable->getBuckedId(),
+                    $snapshotTable->getTableName(),
+                    $csvFile,
+                    ['primaryKey' => $pattern->getSnapshotPrimaryKey()]
+                );
+            }
         } catch (ClientException $e) {
             throw new UserException(
                 sprintf(
@@ -54,20 +82,6 @@ class ApiFacade
             // Remove c- from the name start
             $name = (string) preg_replace('~^c-~', '', $name);
             $this->client->createBucket($name, $stage);
-        }
-    }
-
-    private function createTableIfNotExists(Table $snapshotTable, array $header, string $primaryKey): void
-    {
-        if (!$this->client->tableExists($snapshotTable->getTableId())) {
-            $csvFile = new CsvFile(sprintf('%s/snapshot.csv', $this->dataDir));
-            $csvFile->writeRow($header);
-            $this->client->createTableAsync(
-                $snapshotTable->getBuckedId(),
-                $snapshotTable->getTableName(),
-                $csvFile,
-                ['primaryKey'=> $primaryKey]
-            );
         }
     }
 }

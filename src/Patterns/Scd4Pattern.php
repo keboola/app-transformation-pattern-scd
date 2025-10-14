@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\TransformationPatternScd\Patterns;
 
-use Keboola\TransformationPatternScd\Exception\ApplicationException;
-use Keboola\TransformationPatternScd\Parameters\Parameters;
-
 class Scd4Pattern extends AbstractPattern
 {
     public const COLUMN_SNAPSHOT_DATE = 'snapshot_date';
     public const COLUMN_ACTUAL = 'actual';
     public const COLUMN_IS_DELETED = 'is_deleted';
+    protected string $templateName = 'Scd4Snowflake.twig';
 
     public function getInputTableName(): string
     {
@@ -33,25 +31,6 @@ class Scd4Pattern extends AbstractPattern
         return mb_strtolower(self::COLUMN_SNAPSHOT_PK);
     }
 
-    public function getSnapshotTableHeader(): array
-    {
-        return array_merge(
-            [$this->getSnapshotPrimaryKey()],
-            $this->getSnapshotAllColumnsExceptPk()
-        );
-    }
-
-    protected function getTemplatePath(): string
-    {
-        $backend = $this->getParameters()->getBackend();
-        switch ($backend) {
-            case Parameters::BACKEND_SNOWFLAKE:
-                return 'Scd4Snowflake.twig';
-            default:
-                throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
-        }
-    }
-
     protected function getTemplateVariables(): array
     {
         return [
@@ -60,12 +39,18 @@ class Scd4Pattern extends AbstractPattern
             'keepDeleteActive' => $this->getParameters()->keepDeleteActive(),
             'hasDeletedFlag' => $this->getParameters()->hasDeletedFlag(),
             'inputPrimaryKey' => $this->getParameters()->getPrimaryKey(),
-            'inputColumns' => $this->getInputColumns(),
+            'inputColumns' => array_map(fn($col) => $col['name'], $this->getInputColumns()),
             'snapshotPrimaryKeyName' => $this->getSnapshotPrimaryKey(),
-            'snapshotPrimaryKeyParts' => $this->getSnapshotPrimaryKeyParts(),
-            'snapshotInputColumns' => $this->getSnapshotInputColumns(),
-            'snapshotSpecialColumns' => $this->getSnapshotSpecialColumns(),
-            'snapshotAllColumnsExceptPk' => $this->getSnapshotAllColumnsExceptPk(),
+            'snapshotPrimaryKeyParts' => array_map(fn($col) => $col['name'], $this->getSnapshotPrimaryKeyParts()),
+            'snapshotInputColumns' => array_map(
+                fn($col) => $col['name'],
+                PatternHelper::transformColumnsCase(
+                    $this->getInputColumns(),
+                    $this->getParameters()->getUppercaseColumns()
+                )
+            ),
+            'snapshotSpecialColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotSpecialColumns()),
+            'snapshotAllColumnsExceptPk' => array_map(fn($col) => $col['name'], $this->getSnapshotAllColumnsExceptPk()),
             'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
             'generateDeletedRecords' =>
                 $this->getParameters()->hasDeletedFlag() || $this->getParameters()->keepDeleteActive(),
@@ -82,43 +67,36 @@ class Scd4Pattern extends AbstractPattern
         ];
     }
 
-    private function getInputColumns(): array
-    {
-        return array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters());
-    }
-
     private function getSnapshotPrimaryKeyParts(): array
     {
-        // All snapshot columns are lower
-        return $this->columnsToLower(
+        $columns = $this->getColumnsWithDefinition(
             array_merge($this->getParameters()->getPrimaryKey(), [self::COLUMN_SNAPSHOT_DATE])
         );
-    }
 
-    private function getSnapshotInputColumns(): array
-    {
         // All snapshot columns are lower
-        return $this->columnsToLower($this->getInputColumns());
+        return PatternHelper::columnsToLower($columns);
     }
 
-    private function getSnapshotSpecialColumns(): array
+    protected function getSnapshotSpecialColumns(): array
     {
-        $columns[] = self::COLUMN_SNAPSHOT_DATE;
-        $columns[] = self::COLUMN_ACTUAL;
+        $columns[] = [
+            'name' => self::COLUMN_SNAPSHOT_DATE,
+            'definition' => ['type' => $this->getParameters()->useDatetime() ? 'DATETIME' : 'DATE'],
+        ];
+
+        $columns[] = [
+            'name' => self::COLUMN_ACTUAL,
+            'definition' => ['type' => 'NUMERIC', 'length' => 1],
+        ];
 
         if ($this->getParameters()->hasDeletedFlag()) {
-            $columns[] = self::COLUMN_IS_DELETED;
+            $columns[] = [
+                'name' => self::COLUMN_IS_DELETED,
+                'definition' => $this->getDeletedFlagColumnDefinition(),
+            ];
         }
 
         // All snapshot columns are lower
-        return $this->columnsToLower($columns);
-    }
-
-    private function getSnapshotAllColumnsExceptPk(): array
-    {
-        return array_merge(
-            $this->getSnapshotInputColumns(),
-            $this->getSnapshotSpecialColumns()
-        );
+        return PatternHelper::columnsToLower($columns);
     }
 }

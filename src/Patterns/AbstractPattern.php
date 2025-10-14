@@ -13,11 +13,22 @@ use Keboola\TransformationPatternScd\QuoteHelper;
 
 abstract class AbstractPattern extends AbstractExtension implements Pattern
 {
+    protected string $templateName;
     private ?QuoteHelper $quoteHelper = null;
-
     private ?Parameters $parameters = null;
 
-    abstract protected function getTemplatePath(): string;
+    abstract protected function getSnapshotSpecialColumns(): array;
+
+    protected function getTemplatePath(): string
+    {
+        $backend = $this->getParameters()->getBackend();
+        switch ($backend) {
+            case Parameters::BACKEND_SNOWFLAKE:
+                return $this->templateName;
+            default:
+                throw new ApplicationException(sprintf('Unexpected backend "%s".', $backend));
+        }
+    }
 
     abstract protected function getTemplateVariables(): array;
 
@@ -51,8 +62,24 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return [
             new TwigFilter('quoteIdentifier', fn(string $str) => $this->getQuoteHelper()->quoteIdentifier($str)),
             new TwigFilter('quoteValue', fn(string $str) => $this->getQuoteHelper()->quoteValue($str)),
-            new TwigFilter('noIndent', fn(string $str) => $this->noIndent($str)),
+            new TwigFilter('noIndent', fn(string $str) => PatternHelper::noIndent($str)),
         ];
+    }
+
+    public function getSnapshotTableHeader(): array
+    {
+        return array_merge(
+            [$this->getSnapshotPrimaryKey()],
+            $this->getSnapshotAllColumnsExceptPk()
+        );
+    }
+
+    public function getSnapshotTypedColumns(): array
+    {
+        return PatternHelper::mergeColumnsWithDefinition(
+            $this->getColumnsWithDefinition([$this->getSnapshotPrimaryKey()]),
+            $this->getSnapshotAllColumnsExceptPk(),
+        );
     }
 
     protected function getQuoteHelper(): QuoteHelper
@@ -73,21 +100,59 @@ abstract class AbstractPattern extends AbstractExtension implements Pattern
         return $this->parameters;
     }
 
-    protected function columnsToLower(array $columns): array
+    protected function getSnapshotAllColumnsExceptPk(): array
     {
-        return array_map(fn(string $column) => mb_strtolower($column), $columns);
-    }
-
-    protected function columnsToUpper(array $columns): array
-    {
-        return array_map(fn(string $column) => mb_strtoupper($column), $columns);
-    }
-
-    protected function noIndent(string $str): string
-    {
-        return implode(
-            "\n",
-            array_map(fn(string $line) => trim($line), explode("\n", $str))
+        return PatternHelper::mergeColumnsWithDefinition(
+            PatternHelper::transformColumnsCase(
+                $this->getInputColumns(),
+                $this->getParameters()->getUppercaseColumns()
+            ),
+            $this->getSnapshotSpecialColumns()
         );
+    }
+
+    protected function getInputColumns(): array
+    {
+        return $this->getColumnsWithDefinition(
+            array_merge($this->getParameters()->getPrimaryKey(), $this->getParameters()->getMonitoredParameters()),
+        );
+    }
+
+
+    protected function getColumnsWithDefinition(array $columns): array
+    {
+        $tableDefinition = $this->getParameters()->getInputTableDefinition();
+
+        $result = [];
+        foreach ($columns as $column) {
+            $columnDefinition = array_filter($tableDefinition['columns'] ?? [], fn($col) => $col['name'] === $column);
+            $result[] = [
+                'name' => $column,
+                'definition' => $columnDefinition ?
+                    array_values($columnDefinition)[0]['definition'] :
+                    ['type' => 'VARCHAR'],
+            ];
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Returns the column definition for the deleted flag.
+     */
+    protected function getDeletedFlagColumnDefinition(): array
+    {
+        $length = max(
+            mb_strlen(str_replace("'", '', (string) $this->getParameters()->getDeletedFlagValue()[0])),
+            mb_strlen(str_replace("'", '', (string) $this->getParameters()->getDeletedFlagValue()[1])),
+        );
+        $isNumeric = in_array('0', $this->getParameters()->getDeletedFlagValue(), true)
+            && in_array('1', $this->getParameters()->getDeletedFlagValue(), true);
+
+        return [
+            'type' => $isNumeric ? 'NUMERIC' : 'VARCHAR',
+            'length' => $isNumeric ? 1 : $length,
+        ];
     }
 }
