@@ -34,8 +34,9 @@ class Scd4PatternTest extends TestCase
         $parameters->expects($this->exactly(3))->method('useDatetime')->willReturn(false);
         $parameters->expects($this->exactly(2))->method('keepDeleteActive')->willReturn(false);
         $parameters->expects($this->exactly(4))->method('hasDeletedFlag')->willReturn(true);
-        $parameters->expects($this->exactly(8))->method('getDeletedFlagValue')->willReturn(['0', '1']);
-        $parameters->expects($this->never())->method('getIsDeletedName')->willReturn('is_deleted');
+        $parameters->expects($this->exactly(18))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->exactly(3))->method('getIsDeletedName')->willReturn('is_deleted');
+        $parameters->expects($this->exactly(3))->method('getActualName')->willReturn('actual');
         $parameters->expects($this->exactly(5))->method('getPrimaryKey')->willReturn(['id', 'name']);
         $parameters->expects($this->exactly(4))->method('getInputTableDefinition')->willReturn([
             'columns' => [
@@ -83,6 +84,8 @@ class Scd4PatternTest extends TestCase
                 ['name' => 'id', 'definition' => ['type' => 'VARCHAR']],
             ],
         ]);
+        $parameters->expects($this->exactly(10))->method('getDeletedFlagValue')->willReturn(['0', '1']);
+        $parameters->expects($this->exactly(3))->method('getActualName')->willReturn('actual');
         $pattern->setParameters($parameters);
 
         // Use reflection to access protected method
