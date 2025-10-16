@@ -7,8 +7,6 @@ namespace Keboola\TransformationPatternScd\Patterns;
 class Scd4Pattern extends AbstractPattern
 {
     public const COLUMN_SNAPSHOT_DATE = 'snapshot_date';
-    public const COLUMN_ACTUAL = 'actual';
-    public const COLUMN_IS_DELETED = 'is_deleted';
     protected string $templateName = 'Scd4Snowflake.twig';
 
     public function getInputTableName(): string
@@ -51,7 +49,10 @@ class Scd4Pattern extends AbstractPattern
             ),
             'snapshotSpecialColumns' => array_map(fn($col) => $col['name'], $this->getSnapshotSpecialColumns()),
             'snapshotAllColumnsExceptPk' => array_map(fn($col) => $col['name'], $this->getSnapshotAllColumnsExceptPk()),
-            'deletedActualValue' => $this->getParameters()->keepDeleteActive() ? 1 : 0,
+            'deletedActualValue' => $this->getParameters()->keepDeleteActive()
+                ? $this->getParameters()->getDeletedFlagValue()[1]
+                : $this->getParameters()->getDeletedFlagValue()[0],
+            'deletedFlagValue' => $this->getParameters()->getDeletedFlagValue(),
             'generateDeletedRecords' =>
                 $this->getParameters()->hasDeletedFlag() || $this->getParameters()->keepDeleteActive(),
             'tableName' => [
@@ -61,8 +62,8 @@ class Scd4Pattern extends AbstractPattern
             ],
             'columnName' => [
                 'snapshotDate' => self::COLUMN_SNAPSHOT_DATE,
-                'actual' => self::COLUMN_ACTUAL,
-                'isDeleted' => self::COLUMN_IS_DELETED,
+                'actual' => $this->getParameters()->getActualName(),
+                'isDeleted' => $this->getParameters()->getIsDeletedName(),
             ],
         ];
     }
@@ -84,14 +85,14 @@ class Scd4Pattern extends AbstractPattern
             'definition' => ['type' => $this->getParameters()->useDatetime() ? 'DATETIME' : 'DATE'],
         ];
 
-        $columns[] = [
-            'name' => self::COLUMN_ACTUAL,
-            'definition' => ['type' => 'NUMERIC', 'length' => 1],
+        $columns['actual'] = [
+            'name' => $this->getParameters()->getActualName(),
+            'definition' => $this->getDeletedFlagColumnDefinition(),
         ];
 
         if ($this->getParameters()->hasDeletedFlag()) {
             $columns[] = [
-                'name' => self::COLUMN_IS_DELETED,
+                'name' => $this->getParameters()->getIsDeletedName(),
                 'definition' => $this->getDeletedFlagColumnDefinition(),
             ];
         }
